@@ -1,0 +1,18 @@
+[/]
+allow-bold=false
+background-color='#000000000000'
+background-darkness=0.90784313725490196
+background-type='solid'
+bold-color='#000000000000'
+bold-color-same-as-fg=false
+cursor-shape='ibeam'
+font='Monospace 20'
+foreground-color='#FFFFFFFFFFFF'
+palette='#FFFFFFFFFFFF:#CCCC00000000:#0000FFFF0000:#C4C4A0A00000:#34346565A4A4:#F6F6D3D32D2D:#060698209A9A:#D3D3D7D7CFCF:#555557575353:#EFEF29292929:#8A8AE2E23434:#FCFCE9E94F4F:#72729F9FCFCF:#ADAD7F7FA8A8:#3434E2E2E2E2:#EEEEEEEEECEC'
+scrollback-lines=16384
+scrollback-unlimited=true
+scrollbar-position='hidden'
+title='Parrot Terminal'
+use-system-font=false
+use-theme-colors=false
+visible-name='yt'

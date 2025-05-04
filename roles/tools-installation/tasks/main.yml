@@ -1,0 +1,3 @@
+---
+# tasks file for tools-installation
+- include_tasks: golang-tools.yml

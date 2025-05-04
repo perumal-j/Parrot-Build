@@ -1,0 +1,10 @@
+---
+- name: "Installing Kerbrute"
+  shell: "go install github.com/ropnop/kerbrute@master"
+  changed_when: false
+- name: "Moving Kerbrute to Bin Path"
+  copy:
+    src: "{{ ansible_env.HOME }}/go/bin/kerbrute"
+    dest: "{{ ansible_env.HOME }}/.local/bin/"
+    mode: 0750
+  
