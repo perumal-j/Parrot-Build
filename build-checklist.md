@@ -1,12 +1,22 @@
-1) Configure ip tables, firewall rules
+1) Configure ip tables, firewall rules // Done
 2) Configure SUDO no password
-2) Configure Obsidian Automation
-5) Install Sublime Text
-6) install Rust
-6) Tools:
-flameshot
-rlwrap
-feroxbuster
+3) Configure Obsidian Automation
+4) Install Sublime Text // Done
+5) install Rust  // Done
+6) feroxbuster
+
+
+APT tools:
+      - jq
+      - pipx
+      - ntpdate
+      - flameshot
+      - rlwrap
+      - exiftool
+      - rsyslog
+      - ca-certificates
+      - curl
+      - gh
 
 AD Tools:
 certipy
@@ -14,6 +24,7 @@ impacket (reinstall)
 pywhisker
 bloodyad
 Install latest NetExec
+pip install pygments  ---> for GDB syntax highlighting
 
 Watch 0xdf video and Automate Python tools installation
 
@@ -52,17 +63,6 @@ Remove Unofficial Docker Images & reinstall:
     state: present
   become: true
   become_method: sudo
-
-APT tools:
-      - jq
-      - pipx
-      - ntpdate
-      - flameshot
-      - exiftool
-      - rsyslog
-      - ca-certificates
-      - curl
-      - gh
 
 
 3) Bloodhound-CE

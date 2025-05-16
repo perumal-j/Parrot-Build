@@ -1,8 +1,10 @@
-sudo apt install pipx
+#!/bin/bash
+sudo apt-get update
+sudo apt-get install pipx -y
 pipx install --include-deps ansible
 
 # Install locales package if missing
-sudo apt update && sudo apt install locales
+sudo apt-get install locales -y
 
 # Generate UTF-8 locale
 sudo locale-gen en_US.UTF-8

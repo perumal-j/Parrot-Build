@@ -1,0 +1,61 @@
+---
+- name: "Install and configure AuditD"
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Get Latest GDB Version"
+      shell: "curl -s https://ftp.gnu.org/gnu/gdb/ | grep -oP 'gdb-\\d+(\\.\\d+)*\\.tar\\.xz' | sort -V | uniq | tail -n 1"
+      register: gdb_version
+      changed_when: false
+
+    - name: "Check if GDB tar file exists"
+      stat: 
+        path: "/tmp/gdb_latest.tar.gz"
+      register: gdb_tar_file
+      changed_when: false
+ 
+    - name: "Downloading GDB"
+      get_url:
+        url: "https://ftp.gnu.org/gnu/gdb/{{ gdb_version.stdout }}"
+        dest: "/tmp/gdb_latest.tar.gz"
+        mode: '0640'
+      when: not gdb_tar_file.stat.exists
+
+    - name: "Creating GDB build directory"
+      file:
+        path: "/usr/local/src/gdb"
+        state: directory
+        mode: 0755
+      become: true
+      become_method: sudo
+
+    - name: "Extracting GDB"
+      unarchive:
+        src: "/tmp/gdb_latest.tar.gz"
+        dest: "/usr/local/src/gdb"
+      become: true
+      become_method: sudo
+      when: gdb_tar_file.stat.exists
+
+    - name: "Configure GDB Directory"
+      shell: "./configure --prefix=/usr/local"
+      args:
+        chdir: "/usr/local/src/gdb/{{ lookup('pipe', 'ls /usr/local/src/gdb | grep gdb-') }}"
+        creates: "/usr/local/src/gdb/gdb-*/Makefile"
+      become: true
+      become_method: sudo
+
+    - name: "Make GDB"
+      shell: "make"
+      args:
+        chdir: "/usr/local/src/gdb/{{ lookup('pipe', 'ls /usr/local/src/gdb | grep gdb-') }}"
+        creates: "/usr/local/src/gdb/gdb-*/Makefile"
+      become: true
+      become_method: sudo
+    
+    - name: "Make GDB Install"
+      shell: "make install"
+      args:
+        chdir: "/usr/local/src/gdb/{{ lookup('pipe', 'ls /usr/local/src/gdb | grep gdb-') }}"
+      become: true
+      become_method: sudo
