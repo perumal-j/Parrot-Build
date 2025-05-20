@@ -87,11 +87,6 @@
   register: laurel_latest_version
   changed_when: false
 
-- name: :Debug laurel_latest_version
-  debug:
-    msg: "{{ laurel_latest_version.stdout }}"
-
-
 - name: "Downloading laurel"
   get_url: 
     url: "{{ laurel_latest_version.stdout }}"

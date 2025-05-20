@@ -2,6 +2,7 @@
 sudo apt-get update
 sudo apt-get install pipx -y
 pipx install --include-deps ansible
+pipx ensurepath
 
 # Install locales package if missing
 sudo apt-get install locales -y

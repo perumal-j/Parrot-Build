@@ -17,6 +17,8 @@
     src: "golanginstall.sh"
     dest: "/tmp/golanginstall.sh"
     mode: 0755
+
+
   when: not golang_exists.stat.exists
   
 - name: "Executing Bash Script to Install Golang"
@@ -31,7 +33,10 @@
 
 - name: "Installing Kerbrute"
   shell: "go install github.com/ropnop/kerbrute@master"
+  environment:
+    PATH: "/usr/local/go/bin"
   changed_when: false
+
 - name: "Moving Kerbrute to Bin Path"
   copy:
     src: "{{ ansible_env.HOME }}/go/bin/kerbrute"
