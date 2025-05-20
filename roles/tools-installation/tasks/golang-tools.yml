@@ -23,6 +23,11 @@
   shell: "/tmp/golanginstall.sh"
   when: not golang_exists.stat.exists
 
+- name: "Activate Modified Bashrc"
+  shell: "source {{ ansible_env.HOME }}/.bashrc"
+  args:
+    executable: /bin/bash
+  changed_when: false
 
 - name: "Installing Kerbrute"
   shell: "go install github.com/ropnop/kerbrute@master"

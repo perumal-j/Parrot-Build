@@ -76,10 +76,21 @@
         mode: '0640'
   when: latest_json_file.stat.exists == false
 
+- name: "Copy laureldownload.sh to /tmp/laureldownload.sh"
+  copy:
+    src: laureldownload.sh
+    dest: /tmp/laureldownload.sh
+    mode: 0760
+
 - name: "Extracting version number from JSON"
-  command: "jq -r '.assets[].browser_download_url | select(contains(\"x86_64-glibc\"))' /tmp/latest.json"
+  shell: "/tmp/laureldownload.sh"
   register: laurel_latest_version
   changed_when: false
+
+- name: :Debug laurel_latest_version
+  debug:
+    msg: "{{ laurel_latest_version.stdout }}"
+
 
 - name: "Downloading laurel"
   get_url: 
