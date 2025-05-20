@@ -3,6 +3,12 @@
   copy:
     src: "bashrc"
     dest: "{{ ansible_env.HOME }}/.bashrc"
+  
+- name: "Activate Modified Bashrc"
+  shell: "source {{ ansible_env.HOME }}/.bashrc"
+  args:
+    executable: /bin/bash
+  changed_when: false
 
 - name: "Copy Profile File"
   copy:

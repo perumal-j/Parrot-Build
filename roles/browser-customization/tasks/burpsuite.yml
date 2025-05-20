@@ -4,12 +4,31 @@
     path: "/tmp/openjdk-latest.tar.gz"
   register: openjdk_21
 
+- name: "Copying downloadopenjdk.sh"
+  copy:
+    src: "downloadopenjdk.sh"
+    dest: "/tmp/downloadopenjdk.sh"
+    mode: 0755
+  when: not openjdk_21.stat.exists
+
 - name: "Downloading OpenJDK-21"
-  get_url:
-    url: "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jdk/hotspot/normal/eclipse"
-    dest: "/tmp/openjdk-latest.tar.gz"
+  shell: "/tmp/downloadopenjdk.sh"
   when: not openjdk_21.stat.exists
   changed_when: false
+
+- name: "Check the existence of /usr/lib/jvm"
+  stat:
+    path: /usr/lib/jvm
+  register: jvm_dir
+
+- name: "Create /usr/lib/jvm"
+  file:
+    path: /usr/lib/jvm
+    state: directory
+    mode: 0755
+  become: true
+  become_method: sudo
+  when: not jvm_dir.stat.exists
 
 - name: "Extracting OpenJDK-21"
   unarchive:

@@ -2,6 +2,7 @@
 - name: "Copying Firefox Policies"
   template:
     src: "policies.json.j2"
-    dest: "/usr/share/firefox-esr/distribution/policies.json"
+    # dest: "/usr/share/firefox-esr/distribution/policies.json" # Parrot
+    dest: "/etc/firefox/policies/policies.json" # Ubuntu
   become: true
   become_method: sudo
