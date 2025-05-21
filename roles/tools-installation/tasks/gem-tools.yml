@@ -1,0 +1,32 @@
+---
+- name: "Installing RubyGems"
+  apt:
+    name: ruby-full
+    state: present
+  become: true
+  become_method: sudo
+
+
+- name: "Installing tools from Gems"
+  gem:
+    name: "{{ item }}"
+    state: present
+    user_install  : true
+  loop:
+    - logger
+    - stringio
+    - winrm
+    - builder
+    - erubi
+    - gssapi
+    - gyoku
+    - httpclient
+    - logging
+    - little-plugger
+    - nori
+    - rubyntlm
+    - winrm-fs
+    - evil-winrm
+
+- name: "Add RubyGems to PATH"
+  shell: "echo 'export PATH=$PATH:/home/perumalj/.local/share/gem/ruby/3.2.0/bin/' >> ~/.bashrc"

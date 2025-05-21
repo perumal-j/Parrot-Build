@@ -4,3 +4,4 @@
 - include_tasks: apt.yml
 - include_tasks: golang-tools.yml
 - include_tasks: rust-installation.yml
+- include_tasks: gem-tools.yml

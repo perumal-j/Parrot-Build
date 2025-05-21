@@ -24,6 +24,7 @@ impacket (reinstall)
 pywhisker
 bloodyad
 Install latest NetExec
+targetedkerberoast
 pip install pygments  ---> for GDB syntax highlighting
 
 Watch 0xdf video and Automate Python tools installation
@@ -33,6 +34,7 @@ chisel (linux/windows)
 PEASS-ng (linux/windows)
 Chainsaw
 BloodhoundAD/bloodhound
+sshuttle
 SharpCollection
 SecLists
 SharpHound
