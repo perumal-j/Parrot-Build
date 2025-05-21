@@ -6,7 +6,7 @@
 6) feroxbuster
 
 
-APT tools:
+APT tools: // Done
       - jq
       - pipx
       - ntpdate
@@ -40,7 +40,7 @@ SecLists
 SharpHound
 
 
-Install Gem Tools:
+Install Gem Tools: // Done
     - logger
     - stringio
     - winrm

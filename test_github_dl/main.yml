@@ -10,13 +10,11 @@
       become: true
       become_method: sudo
 
-
     - name: "Installing tools from Gems"
       gem:
         name: "{{ item }}"
         state: present
-        user_install  : false
-        install_dir: "/home/perumalj/.local/gems"
+        user_install  : true
       loop:
         - logger
         - stringio
@@ -32,3 +30,15 @@
         - rubyntlm
         - winrm-fs
         - evil-winrm
+ 
+    - name: "Get Ruby Version Directory"
+      shell: "ls {{ ansible_env.HOME }}/.local/share/gem/ruby | head -n 1"
+      register: ruby_version
+      changed_when: false
+
+    - name: "Add ruby BIN PATH to .bashrc"
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: "export PATH=$PATH:{{ ansible_env.HOME }}/.local/share/gem/ruby/{{ ruby_version.stdout }}/bin"      
+        state: present
+

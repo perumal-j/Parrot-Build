@@ -3,6 +3,7 @@
   copy:
     src: "bashrc"
     dest: "{{ ansible_env.HOME }}/.bashrc"
+  changed_when: false
   
 - name: "Activate Modified Bashrc"
   shell: "source {{ ansible_env.HOME }}/.bashrc"
