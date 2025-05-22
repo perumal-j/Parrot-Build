@@ -305,7 +305,7 @@ func UnifiedExtractionByteStream(repo string, regex string, output_directory str
 	for _, url := range browser_download_url {
 
 		fmt.Println("Downloading:", url)
-		// download_github_binary(browser_download_url[0])
+
 		buffer, err := DownloadToBuffer(url)
 		if err != nil {
 			fmt.Println("Error Downloading the Buffer:", err)

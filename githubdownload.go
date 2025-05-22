@@ -301,47 +301,42 @@ func UnifiedExtractionByteStream(repo string, regex string, output_directory str
 	meta_data := GetGithubReleasesLatest(repo)
 	browser_download_url := GetGithubReleaseUrls(meta_data, regex)
 
-	// Print each URL from the list
-	for _, url := range browser_download_url {
+	// download_github_binary(browser_download_url[0])
+	buffer, err := DownloadToBuffer(browser_download_url[0])
+	if err != nil {
+		fmt.Println("Error Downloading the Buffer:", err)
+	}
 
-		fmt.Println("Downloading:", url)
-		// download_github_binary(browser_download_url[0])
-		buffer, err := DownloadToBuffer(url)
+	binaryName := ExtractFileNameFromURL(browser_download_url[0])
+
+	if strings.HasSuffix(binaryName, "tar.gz") {
+		err = ExtractTar(buffer.Bytes(), output_directory)
 		if err != nil {
-			fmt.Println("Error Downloading the Buffer:", err)
+			fmt.Println("Error Extracting Tar:", err)
+		}
+	} else if strings.HasSuffix(binaryName, "zip") {
+		err = ExtractZip(buffer.Bytes(), output_directory)
+		if err != nil {
+			fmt.Println("Error Extracting Zip:", err)
+		}
+	} else if strings.HasSuffix(binaryName, "gz") {
+		err = ExtractGz(buffer.Bytes(), output_directory)
+		if err != nil {
+			fmt.Println("Error Extracing Gz:", err)
 		}
 
-		binaryName := ExtractFileNameFromURL(url)
-
-		if strings.HasSuffix(binaryName, "tar.gz") {
-			err = ExtractTar(buffer.Bytes(), output_directory)
-			if err != nil {
-				fmt.Println("Error Extracting Tar:", err)
-			}
-		} else if strings.HasSuffix(binaryName, "zip") {
-			err = ExtractZip(buffer.Bytes(), output_directory)
-			if err != nil {
-				fmt.Println("Error Extracting Zip:", err)
-			}
-		} else if strings.HasSuffix(binaryName, "gz") {
-			err = ExtractGz(buffer.Bytes(), output_directory)
-			if err != nil {
-				fmt.Println("Error Extracing Gz:", err)
-			}
-
-		} else {
-			// if not a tar.gz or zip file, save that file as it is
-			file, err := os.Create(filepath.Join(output_directory, binaryName))
-			if err != nil {
-				fmt.Println("Error creating file:", err)
-				return err
-			}
-			defer file.Close()
-			_, err = io.Copy(file, bytes.NewReader(buffer.Bytes()))
-			if err != nil {
-				fmt.Println("Error copying file:", err)
-				return err
-			}
+	} else {
+		// if not a tar.gz or zip file, save that file as it is
+		file, err := os.Create(filepath.Join(output_directory, binaryName))
+		if err != nil {
+			fmt.Println("Error creating file:", err)
+			return err
+		}
+		defer file.Close()
+		_, err = io.Copy(file, bytes.NewReader(buffer.Bytes()))
+		if err != nil {
+			fmt.Println("Error copying file:", err)
+			return err
 		}
 	}
 	return nil

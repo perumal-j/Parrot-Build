@@ -1,0 +1,57 @@
+---
+- name: "Check the presence of /opt/SecLists"
+  stat:
+    path: "/opt/SecLists"
+  register: sec_lists
+  changed_when: false
+
+- name: "Check the presence of /opt/SharpCollection"
+  stat:
+    path: "/opt/SharpCollection"
+  register: sharp_collection
+  changed_when: false
+
+- name: "Installing Tools from GitHub Repositories"
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.destination }}"
+  loop:
+    - { repo: "https://github.com/danielmiessler/SecLists", destination: "/opt/SecLists" }
+    - { repo: "https://github.com/Flangvik/SharpCollection", destination: "/opt/SharpCollection" }
+  become: true
+  become_method: sudo
+  when: not sec_lists.stat.exists or not sharp_collection.stat.exists
+
+  
+- name: "Create Temporary Build Directory"
+  tempfile:
+    state: directory
+  register: build_dir
+  changed_when: false
+
+- name: "Copying golang script to download github releases"
+  copy: 
+    src: "githubdownload.go"
+    dest: "{{ build_dir.path }}/githubdownload.go"
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Downloading GitHub Tools"
+  shell: "go run {{ build_dir.path }}/githubdownload.go {{ item.repo }} {{ item.regex }} {{ item.destination }}"
+  environment:
+    PATH: "/usr/local/go/bin"
+  loop: 
+    - { repo: "jpillora/chisel", regex: "linux_amd64.gz", destination: "/opt/chisel" }
+    - { repo: "jpillora/chisel", regex: "windows_amd64.gz", destination: "/opt/chisel" }
+    - { repo: "peass-ng/PEASS-ng", regex: "linpeas.sh", destination: "/opt/peass" }
+    - { repo: "peass-ng/PEASS-ng", regex: "winPEASx64.exe", destination: "/opt/peass" }
+    - { repo: "SpecterOps/SharpHound", regex: "windows_x86.zip", destination: "/opt/sharphound" }
+    - { repo: "WithSecureLabs/chainsaw", regex: "chainsaw_all_", destination: "/opt/chainsaw" }
+    # - { repo: "", regex: "", destination: "" }
+  become: true
+  become_method: sudo
+  changed_when: false

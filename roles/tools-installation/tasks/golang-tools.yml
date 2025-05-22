@@ -4,6 +4,8 @@
     name: golang-go
     state: absent
     purge: yes
+  become: true
+  become_method: sudo
 
 - name: "Check if Golang exists"
   stat:
@@ -17,8 +19,6 @@
     src: "golanginstall.sh"
     dest: "/tmp/golanginstall.sh"
     mode: 0755
-
-
   when: not golang_exists.stat.exists
   
 - name: "Executing Bash Script to Install Golang"
