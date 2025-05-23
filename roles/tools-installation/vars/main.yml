@@ -1,4 +1,13 @@
 ---
+GitHubTools:
+  - name: SecLists
+    repo: "https://github.com/danielmiessler/SecLists"
+    destination: "/opt/SecLists"
+  
+  - name: SharpCollection
+    repo: "https://github.com/Flangvik/SharpCollection"
+    destination: "/opt/SharpCollection"
+
 UVtools:
   - impacket
   - sshuttle

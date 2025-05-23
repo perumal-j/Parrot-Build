@@ -1,5 +1,15 @@
 #SPDX-License-Identifier: MIT-0
 ---
+GitHubTools:
+  - name: SecLists
+    url: "https://github.com/danielmiessler/SecLists"
+    destination: "/opt/SecLists"
+  
+  - name: SharpCollection
+    url: "https://github.com/Flangvik/SharpCollection"
+    destination: "/opt/SharpCollection"
+
+
 UVtools:
   - impacket
   - sshuttle
@@ -9,7 +19,6 @@ GithubRepositories:
     destination: "tmp/pywhisker"
 
 repositories: 
-
   - name: bloodyAD
     url: "https://github.com/CravateRouge/bloodyAD"
     destination: "{{ ansible_env.HOME }}/bloodyAD"
@@ -17,7 +26,3 @@ repositories:
   - name: targetedKerberoast
     url: "https://github.com/ShutdownRepo/targetedKerberoast"
     destination: "/tmp/targetedKerberoast"
-
-  # - name: pywhisker
-  #   url: "https://github.com/ShutdownRepo/pywhisker"
-  #   destination: "/tmp/pywhisker"
