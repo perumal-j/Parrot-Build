@@ -18,6 +18,7 @@
   loop:
     - { repo: "https://github.com/danielmiessler/SecLists", destination: "/opt/SecLists" }
     - { repo: "https://github.com/Flangvik/SharpCollection", destination: "/opt/SharpCollection" }
+    - { repo: "https://github.com/CravateRouge/bloodyAD", destination: "/opt/bloodyAD" }
   become: true
   become_method: sudo
   when: not sec_lists.stat.exists or not sharp_collection.stat.exists

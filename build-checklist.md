@@ -1,9 +1,9 @@
 1) Configure ip tables, firewall rules // Done
-2) Configure SUDO no password
+2) Configure SUDO no password // Done
 3) Configure Obsidian Automation
 4) Install Sublime Text // Done
 5) install Rust  // Done
-6) feroxbuster
+6) feroxbuster // Done
 
 
 APT tools: // Done
@@ -20,21 +20,21 @@ APT tools: // Done
 
 AD Tools:
 certipy
-impacket (reinstall) 
-pywhisker
-bloodyad
-Install latest NetExec
-targetedkerberoast
+sshuttle // Done
+impacket (reinstall)  // Done
+pywhisker // Done
+bloodyad // Done
+Install latest NetExec // Done
+targetedkerberoast.py // Done
 pip install pygments  ---> for GDB syntax highlighting
 
 Watch 0xdf video and Automate Python tools installation
 
-Write Script to install github tools:
+Write Script to install github tools: // Done
 chisel (linux/windows)
 PEASS-ng (linux/windows)
 Chainsaw
 BloodhoundAD/bloodhound
-sshuttle
 SharpCollection
 SecLists
 SharpHound

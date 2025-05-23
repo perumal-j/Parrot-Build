@@ -1,3 +1,4 @@
+---
 - name: "Copying rust-install.sh"
   copy:
     src: "rust-install.sh"
@@ -13,3 +14,10 @@
 - name: "Executing Bash Script Install Rust"
   shell: "/tmp/rust-install.sh"
   when: not rust_exists.stat.exists
+
+- name: "Install Feroxbuster"
+  shell: 
+    cmd: "cargo install feroxbuster"
+  environment:
+    path: "{{ ansible_env.HOME }}/.cargo/bin"
+  changed_when: false

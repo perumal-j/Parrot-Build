@@ -1,3 +1,4 @@
+#SPDX-License-Identifier: MIT-0
 ---
 UVtools:
   - impacket
@@ -16,3 +17,7 @@ repositories:
   - name: targetedKerberoast
     url: "https://github.com/ShutdownRepo/targetedKerberoast"
     destination: "/tmp/targetedKerberoast"
+
+  # - name: pywhisker
+  #   url: "https://github.com/ShutdownRepo/pywhisker"
+  #   destination: "/tmp/pywhisker"

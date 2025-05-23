@@ -13,3 +13,4 @@
     - role: "roles/vscode-installation"
     - role: "roles/browser-customization"
     - role: "roles/logging-config"
+    - role: "roles/system-config"
