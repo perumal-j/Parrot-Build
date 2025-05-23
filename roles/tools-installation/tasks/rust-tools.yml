@@ -16,8 +16,5 @@
   when: not rust_exists.stat.exists
 
 - name: "Install Feroxbuster"
-  shell: 
-    cmd: "cargo install feroxbuster"
-  environment:
-    path: "{{ ansible_env.HOME }}/.cargo/bin"
+  shell: "{{ ansible_env.HOME }}/.cargo/bin/cargo install feroxbuster"
   changed_when: false

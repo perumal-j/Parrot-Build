@@ -27,7 +27,7 @@
 - name: "Installing Kerbrute"
   shell: "go install github.com/ropnop/kerbrute@master"
   environment:
-    path: "/usr/local/go/bin"
+    PATH: "/usr/local/go/bin"
   changed_when: false
 
 - name: "Moving Kerbrute to Bin Path"

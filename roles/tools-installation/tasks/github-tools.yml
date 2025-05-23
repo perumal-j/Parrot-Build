@@ -13,10 +13,9 @@
 
 - name: "Installing Tools from GitHub Repositories"
   git:
-    repo: "{{ item.repo }}"
+    repo: "{{ item.url }}"
     dest: "{{ item.destination }}"
-  loop:
-    - "{{ GitHubTools }}"
+  loop: "{{ GitHubTools }}"
   become: true
   become_method: sudo
   when: not sec_lists.stat.exists or not sharp_collection.stat.exists

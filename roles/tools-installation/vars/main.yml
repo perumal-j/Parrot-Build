@@ -1,11 +1,11 @@
 ---
 GitHubTools:
   - name: SecLists
-    repo: "https://github.com/danielmiessler/SecLists"
+    url: "https://github.com/danielmiessler/SecLists"
     destination: "/opt/SecLists"
   
   - name: SharpCollection
-    repo: "https://github.com/Flangvik/SharpCollection"
+    url: "https://github.com/Flangvik/SharpCollection"
     destination: "/opt/SharpCollection"
 
 UVtools:
