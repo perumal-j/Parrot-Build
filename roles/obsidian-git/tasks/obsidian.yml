@@ -1,0 +1,29 @@
+---
+- name: "Copying obsidian-download.sh to /tmp"
+  copy:
+    src: "obsidian-download.sh"
+    dest: "/tmp/obsidian-download.sh"
+    mode: 0755
+  
+- name: "Check If Obsidian Exists"
+  stat:
+    path: "/usr/local/bin/obsidian"
+  register: obsidian_exists
+  changed_when: false
+
+- name: "Executing Bash Script to Install Obsidian"
+  shell: "/tmp/obsidian-download.sh"
+  when: not obsidian_exists.stat.exists
+
+- name: "Check if Obsidian Valut Exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/Tech-Notes/.git"
+  register: obsidian_valut_exists
+  changed_when: false
+
+- name: "Clone Obsidian Valut via Git"
+  git:
+    repo: https://github.com/obsidianmd/obsidian-releases.git
+    dest: "{{ ansible_env.HOME }}/Tech-Notes"
+    accept_hostkey: yes
+  when: not obsidian_valut_exists.stat.exists

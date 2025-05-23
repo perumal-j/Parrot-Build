@@ -6,6 +6,8 @@
     - name: "Write File"
       debug:
         msg: "Parrot is being built..." 
+  vars_files:
+    - "{{ ansible_env.HOME }}/.ansible/secrets.yml"
   roles:
     - role: "roles/tmux-config"
     - role: "roles/terminal-config"
@@ -14,3 +16,4 @@
     - role: "roles/browser-customization"
     - role: "roles/logging-config"
     - role: "roles/system-config"
+    - role: "roles/obsidian-git"

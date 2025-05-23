@@ -1,11 +1,11 @@
 ---
-- name: "Building Parrot"
+- name: "Building Obsidian Git"
   hosts: localhost
   connection: local
   tasks:
-    - name: "Write File"
+    - name: "Writing File"
       debug:
-        msg: "Parrot is being built..." 
+        msg: "Obsidian Git is being built..." 
   roles:
-    - role: "roles/python-installation"
+    - role: "roles/obsidian-git"
   

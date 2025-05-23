@@ -1,0 +1,17 @@
+---
+- name: "Copying obsidian-download.sh to /tmp"
+  copy:
+    src: "obsidian-download.sh"
+    dest: "/tmp/obsidian-download.sh"
+    mode: 0755
+  
+- name: "Check If Obsidian Exists"
+  stat:
+    path: "/usr/local/bin/obsidian"
+  register: obsidian_exists
+  changed_when: false
+
+- name: "Executing Bash Script to Install Obsidian"
+  shell: "/tmp/obsidian-download.sh"
+  when: not obsidian_exists.stat.exists
+  

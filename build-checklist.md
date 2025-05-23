@@ -1,6 +1,6 @@
 1) Configure ip tables, firewall rules // Done
 2) Configure SUDO no password // Done
-3) Configure Obsidian Automation
+3) Configure Obsidian Automation + Git // Partially Done. Obsidian Config to be automated
 4) Install Sublime Text // Done
 5) install Rust  // Done
 6) feroxbuster // Done
@@ -19,25 +19,24 @@ APT tools: // Done
       - gh
 
 AD Tools:
-certipy
+certipy // Done
 sshuttle // Done
 impacket (reinstall)  // Done
 pywhisker // Done
 bloodyad // Done
 Install latest NetExec // Done
 targetedkerberoast.py // Done
-pip install pygments  ---> for GDB syntax highlighting
 
-Watch 0xdf video and Automate Python tools installation
+Watch 0xdf video and Automate Python tools installation // Done
 
 Write Script to install github tools: // Done
-chisel (linux/windows)
-PEASS-ng (linux/windows)
-Chainsaw
+chisel (linux/windows) // Done
+PEASS-ng (linux/windows) // Done
+Chainsaw // Done
 BloodhoundAD/bloodhound
-SharpCollection
-SecLists
-SharpHound
+SharpCollection // Done
+SecLists // Done
+SharpHound // Done
 
 
 Install Gem Tools: // Done
@@ -56,6 +55,12 @@ Install Gem Tools: // Done
     - winrm-fs
     - evil-winrm
 
+
+====================
+To Be Done
+====================
+
+3) Configure Obsidian Automation + Git // Partially Done. Obsidian Config to be automated
 
 Remove Unofficial Docker Images & reinstall:
 
