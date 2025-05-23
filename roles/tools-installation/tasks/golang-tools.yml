@@ -1,5 +1,5 @@
 ---
-- name: "Remove Go Package"
+- name: "Removing Go Package"
   apt:
     name: golang-go
     state: absent

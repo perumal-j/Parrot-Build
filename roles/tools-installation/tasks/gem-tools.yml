@@ -32,7 +32,7 @@
     register: ruby_version
     changed_when: false
 
-  - name: "Add ruby BIN PATH to .bashrc"
+  - name: "Adding ruby BIN PATH to .bashrc"
     lineinfile:
       path: "{{ ansible_env.HOME }}/.bashrc"
       line: "export PATH=$PATH:{{ ansible_env.HOME }}/.local/share/gem/ruby/{{ ruby_version.stdout }}/bin"      

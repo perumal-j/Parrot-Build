@@ -15,6 +15,6 @@
   shell: "/tmp/rust-install.sh"
   when: not rust_exists.stat.exists
 
-- name: "Install Feroxbuster"
+- name: "Installing Feroxbuster"
   shell: "{{ ansible_env.HOME }}/.cargo/bin/cargo install feroxbuster"
   changed_when: false

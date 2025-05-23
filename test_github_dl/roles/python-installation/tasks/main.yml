@@ -1,47 +1,15 @@
 #SPDX-License-Identifier: MIT-0
 ---
-- name: "Check if Python UV exists"
-  stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/uv"
-  register: uv_manager_exists
-  changed_when: false
-
-- name: "Copying uv-install.sh"
-  copy:
-    src: "uv-install.sh"
-    dest: "/tmp/uv-install.sh"
-    mode: 0755
-
-- name: "Installing Python UV"
-  shell: /tmp/uv-install.sh
-  when: not uv_manager_exists.stat.exists
-
-- name: "Removing Netexec"
-  apt:
-    name: netexec
-    state: absent
-    purge: yes
-  become: true
-  become_method: sudo 
-
-- name: "Check if NetExec exists"
-  stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/netexec"
-  register: netexec_exists
-  changed_when: false
-
-- name: "Installing Netexec"
-  shell: |
-    pipx ensurepath
-    pipx install git+https://github.com/Pennyw0rth/NetExec
-  when: not netexec_exists.stat.exists
-
-- name: "Download repositories from GitHub"
+- name: "Downloading repositories from GitHub"
   git:
     repo: "{{ item.url }}"
     dest: "{{ item.destination }}"
   loop: "{{ GithubRepositories }}"
   register: downloaded_repos
+
+- name: "Debug pywhisker_files"
+  debug:
+    msg: "{{ downloaded_repos.results }}"
 
 - name: "Search for pywhisker.py in downloaded repositories"
   find:
@@ -50,52 +18,3 @@
     recurse: true
   loop: "{{ downloaded_repos.results }}"
   register: pywhisker_files
-
-- name: "Copy pywhisker.py to local bin"
-  copy:
-    src: "{{ item.files[0].path if item.files else '' }}"
-    dest: "{{ ansible_env.HOME }}/.local/bin/pywhisker.py"
-    mode: 0755
-  loop: "{{ pywhisker_files.results }}"
-  when: item.files|length > 0
-
-- name: "Uninstall old Impacket"
-  apt:
-    name: python3-impacket
-    state: absent
-    purge: yes
-  become: true
-  become_method: sudo
-
-- name: "Check if Impacket Exists"
-  stat:
-    path: "{{ ansible_env.HOME }}/.local/share/uv/tools/impacket/bin"
-  register: "impacket_exists"
-  changed_when: false
-
-- name: "Check if sshuttle Exists"
-  stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/sshuttle"
-  register: "sshuttle_exists"
-  changed_when: false
-
-- name: "Installing {{ item }}"
-  shell:
-    cmd: uv tool install {{ item }}
-  loop: "{{ UVtools }}"
-  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists
-        
-- name: "Downloading Certipy from GitHub"
-  git:
-    repo: "https://github.com/ly4k/Certipy"
-    dest: "{{ ansible_env.HOME }}/Certipy"
-
-- name: "Copying Github Download Template"
-  template:
-    src: "uv-manager.sh.j2"
-    dest: "/tmp/uv-manager.sh"
-    mode: 0755
-
-- name: "Executing Bash Script to Install Python UV"
-  shell: "/tmp/uv-manager.sh"
-  changed_when: false

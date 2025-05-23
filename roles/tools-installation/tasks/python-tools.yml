@@ -35,28 +35,6 @@
     pipx install git+https://github.com/Pennyw0rth/NetExec
   when: not netexec_exists.stat.exists
 
-- name: "Download repositories from GitHub"
-  git:
-    repo: "{{ item.url }}"
-    dest: "{{ item.destination }}"
-  loop: "{{ GithubRepositories }}"
-  register: downloaded_repos
-
-- name: "Search for pywhisker.py in downloaded repositories"
-  find:
-    path: "{{ item.item.destination }}"
-    patterns: "pywhisker.py"
-    recurse: true
-  loop: "{{ downloaded_repos.results }}"
-  register: pywhisker_files
-
-- name: "Copy pywhisker.py to local bin"
-  copy:
-    src: "{{ item.files[0].path if item.files else '' }}"
-    dest: "{{ ansible_env.HOME }}/.local/bin/pywhisker.py"
-    mode: 0755
-  loop: "{{ pywhisker_files.results }}"
-  when: item.files|length > 0
 
 - name: "Uninstall old Impacket"
   apt:

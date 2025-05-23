@@ -12,15 +12,15 @@ UVtools:
   - impacket
   - sshuttle
 
-GithubRepositories:
-  - url: "https://github.com/ShutdownRepo/pywhisker"
-    destination: "tmp/pywhisker"
-
 repositories: 
 
   - name: bloodyAD
     url: "https://github.com/CravateRouge/bloodyAD"
     destination: "{{ ansible_env.HOME }}/bloodyAD"
+
+  - name: pywhisker
+    url: "https://github.com/ShutdownRepo/pywhisker"
+    destination: "{{ ansible_env.HOME }}/pywhisker"
 
   - name: targetedKerberoast
     url: "https://github.com/ShutdownRepo/targetedKerberoast"
