@@ -28,6 +28,9 @@
       - gh
       - pipx
       - sublime-text
+      - xclip
+      - python3-dev
+      - build-essential
     state: latest
   become: true
   become_method: sudo

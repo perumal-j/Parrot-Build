@@ -23,7 +23,7 @@
 
 - name: "Clone Obsidian Valut via Git"
   git:
-    repo: https://github.com/obsidianmd/obsidian-releases.git
+    repo: "git@github.com:perumal-j/Tech-Notes.git"
     dest: "{{ ansible_env.HOME }}/Tech-Notes"
     accept_hostkey: yes
   when: not obsidian_valut_exists.stat.exists

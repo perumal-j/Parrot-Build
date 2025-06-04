@@ -31,7 +31,7 @@
 
 - name: "Installing Netexec"
   shell: |
-    pipx ensurepath
+    pipx ensurepath --force
     pipx install git+https://github.com/Pennyw0rth/NetExec
   when: not netexec_exists.stat.exists
 

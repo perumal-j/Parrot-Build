@@ -36,7 +36,7 @@
   loop:
     - { "path": "/var/log/laurel", "owner": "_laurel", "group": "_laurel" }
     - { "path": "/tmp/laurel", "owner": "_laurel", "group": "_laurel" }
-    - { "path":"/etc/laurel" }
+    - { "path": "/etc/laurel" }
   become: true
   become_method: sudo
   async: 15 # Allow some time for the directory creation
