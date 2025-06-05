@@ -29,6 +29,7 @@
       - pipx
       - sublime-text
       - xclip
+      - remmina
       - sqlite3
       - python3-dev
       - build-essential
