@@ -1,0 +1,44 @@
+---
+# curl -fsSL "https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/windsurf.gpg" | sudo gpg --dearmor -o /usr/share/keyrings/windsurf-stable-archive-keyring.gpg
+
+- name: "Installing Windsurf GPG Keys"
+  get_url:
+    url: https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/windsurf.gpg
+    dest: /usr/share/keyrings/windsurf-stable-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: 0644
+  become: true 
+  become_method: sudo
+
+# echo "deb [signed-by=/usr/share/keyrings/windsurf-stable-archive-keyring.gpg arch=amd64] https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt stable main" | sudo tee /etc/apt/sources.list.d/windsurf.list > /dev/null
+
+- name: "Check the existence of /etc/apt/sources.list.d/windsurf.list"
+  stat: 
+    path: /etc/apt/sources.list.d/windsurf.list
+  register: windsurf_file
+  changed_when: false
+
+- name: "Installing Windsurf Repository"
+  lineinfile:
+    path: /etc/apt/sources.list.d/windsurf.list
+    line: "deb [signed-by=/usr/share/keyrings/windsurf-stable-archive-keyring.gpg arch=amd64] https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt stable main"
+    create: yes
+  become: true
+  become_method: sudo
+  when: not windsurf_file.stat.exists 
+
+- name: "Updating Apt Cache"
+  command: apt-get update
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Installing Windsurf"
+  apt:
+    name: windsurf
+    state: present
+    upgrade: yes
+  become: true
+  become_method: sudo
+  

@@ -1,11 +1,7 @@
 ---
-- name: "Building Obsidian Git"
+- name: "Windsurf Installation"
   hosts: localhost
   connection: local
-  tasks:
-    - name: "Writing File"
-      debug:
-        msg: "Obsidian Git is being built..." 
   roles:
-    - role: "roles/obsidian-git"
+    - windsurf
   

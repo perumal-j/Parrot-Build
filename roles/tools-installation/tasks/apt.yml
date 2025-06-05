@@ -29,6 +29,7 @@
       - pipx
       - sublime-text
       - xclip
+      - sqlite3
       - python3-dev
       - build-essential
     state: latest
