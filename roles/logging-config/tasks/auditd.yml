@@ -87,11 +87,18 @@
   register: laurel_latest_version
   changed_when: false
 
+- name: "Check the Presence of /tmp/laurel-latest.tar.gz"
+  stat:
+    path: /tmp/laurel-latest.tar.gz
+  register: laurel_tar_file
+  changed_when: false
+
 - name: "Downloading laurel"
   get_url: 
     url: "{{ laurel_latest_version.stdout }}"
     dest: /tmp/laurel-latest.tar.gz
     mode: '0640'
+  when: laurel_tar_file.stat.exists == false
 
 - name: "Extracting laurel" 
   unarchive:
