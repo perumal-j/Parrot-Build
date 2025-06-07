@@ -17,3 +17,4 @@
     - role: "roles/logging-config"
     - role: "roles/system-config"
     - role: "roles/obsidian-git"
+    - role: "roles/docker-bloodhound"

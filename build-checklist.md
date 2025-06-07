@@ -60,19 +60,10 @@ Install Gem Tools: // Done
 To Be Done
 ====================
 
-3) Configure Obsidian Automation + Git // Partially Done. Obsidian Config to be automated
-
-Remove Unofficial Docker Images & reinstall:
-
-- name: "Add Docker keyring to apt"
-  apt_key:
-    url: "https://download.docker.com/linux/debian/gpg"
-    state: present
-  become: true
-  become_method: sudo
+3) Configure Obsidian Automation + Git // Done
+Remove Unofficial Docker Images & reinstall: // Done
 
 
-3) Bloodhound-CE
-4) Bloodhound Injestor
-
-Configure Task Bar, change desktop wallpaper
+1) Bloodhound-CE
+2) Bloodhound Injestor
+3) Configure Task Bar, change desktop wallpaper
