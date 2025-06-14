@@ -1,0 +1,89 @@
+---
+- name: "Copying Desktop Image to /usr/share/backgrounds"
+  copy:
+    src: "hackthebox-fav.jpg"
+    dest: "/usr/share/backgrounds/hackthebox-fav.jpg"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    force: true # Ensure the file is always copied
+  become: true
+  become_method: "sudo"
+
+- name: "Reading Desktop Background Profile"
+  dconf:
+    key: "/org/mate/desktop/background/picture-filename"
+    state: "read"
+  register: "desktop_background"
+
+- name: "Updating Desktop Background Profile"
+  shell: 
+    cmd: "dconf write /org/mate/desktop/background/picture-filename \"'/usr/share/backgrounds/hackthebox-fav.jpg'\""
+  when: desktop_background.value != '/usr/share/backgrounds/hackthebox-fav.jpg'
+  changed_when: false
+
+- name: "Check of the presence of /opt/flatpak-icons"
+  stat:
+    path: "/opt/flatpak-icons"
+  register: flat_remix
+  changed_when: false
+
+- name: "Git Cloning https://github.com/perumal-j/flatpak-icons.git"
+  git:
+    repo: "https://github.com/perumal-j/flatpak-icons.git"
+    dest: "/opt/flatpak-icons"
+    version: "master"
+  become: true
+  become_method: "sudo"
+  when: not flat_remix.stat.exists
+
+- name: "Modifying flat-remix Directory Owner"
+  file:
+    path: "/opt/flatpak-icons"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Creating Desktop Launchers"
+  template:
+    src: "launchers.j2"
+    dest: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/{{ item.0 }}.desktop"
+  loop: "{{  DesktopLaunchers | zip(AppPaths, IconPaths) }}"
+  vars:
+    DesktopLauncher: "{{ item.0 }}"
+    AppPath: "{{ item.1 }}"
+    IconPath: "{{ item.2 }}"
+
+- name: Ensure temporary directory exists
+  file:
+    path: /tmp/panel-configs
+    state: directory
+    mode: '0755'
+
+- name: Generate dconf configuration files
+  template:
+    src: panel-object.j2
+    dest: "/tmp/panel-configs/{{ item.name }}.dconf"
+  loop: "{{ apps }}"
+  
+- name: "Deploying Templated Script for Object ID List"
+  template:
+    src: "object-id-list.sh.j2"
+    dest: "/tmp/object-id-list.sh"
+    mode: '0755'
+
+- name: "Check if object-id-list.sh exists"
+  stat: 
+    path: "/tmp/object-id-list.sh"
+  register: object_id_list_check
+  changed_when: false
+
+- name: "Load dconf configurations and update object-id-list"
+  shell: "/tmp/object-id-list.sh"
+  when: object_id_list_check.stat.exists
+  changed_when: false
+

@@ -1,0 +1,37 @@
+---
+- name: "Removing Go Package"
+  apt:
+    name: golang-go
+    state: absent
+    purge: yes
+  become: true
+  become_method: sudo
+
+- name: "Check if Golang exists"
+  stat:
+    path: "/usr/local/go/bin/go"
+  register: golang_exists
+  changed_when: false
+
+- name: "Copying golanginstall.sh"
+  copy:
+    src: "golanginstall.sh"
+    dest: "/tmp/golanginstall.sh"
+    mode: 0755
+  when: not golang_exists.stat.exists
+  
+- name: "Executing Bash Script to Install Golang"
+  shell: "/tmp/golanginstall.sh"
+  when: not golang_exists.stat.exists
+
+- name: "Installing Kerbrute"
+  shell: "go install github.com/ropnop/kerbrute@master"
+  environment:
+    PATH: "/usr/local/go/bin"
+  changed_when: false
+
+- name: "Moving Kerbrute to Bin Path"
+  copy:
+    src: "{{ ansible_env.HOME }}/go/bin/kerbrute"
+    dest: "{{ ansible_env.HOME }}/.local/bin/"
+    mode: 0750

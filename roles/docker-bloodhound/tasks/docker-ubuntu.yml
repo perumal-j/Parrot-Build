@@ -1,0 +1,63 @@
+---
+- name: "Remove podman and docker-compose"
+  package:
+    name:
+      - podman
+      - docker-compose
+    state: absent
+  become: true
+  become_method: sudo
+
+- name: "Check the presence of /etc/apt/sources.list.d/docker.list"
+  stat:
+    path: /etc/apt/sources.list.d/docker.list
+  register: docker_list
+  changed_when: false
+
+- name: "Add Docker's official GPG key"
+  shell: |
+    sudo install -m 0755 -d /etc/apt/keyrings /
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc /
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+  when: not docker_list.stat.exists
+
+- name: "Add the repository to Apt sources"
+  shell: |
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+      $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  when: not docker_list.stat.exists
+
+- name: "Updating Apt Cache"
+  command: apt-get update
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Installing Docker"
+  package:
+    name: 
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+      - docker-buildx-plugin
+    state: present
+  become: true
+  become_method: sudo
+
+- name: "Check where current user is in docker group"
+  shell: "id -nG | grep docker"
+  register: docker_group
+  ignore_errors: true
+  changed_when: false
+
+- name: "Adding Current User to Docker Group"
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: true
+  become: true
+  become_method: sudo
+  when: docker_group.rc != 0

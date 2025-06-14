@@ -1,0 +1,81 @@
+---
+- name: "Check if Python UV exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/uv"
+  register: uv_manager_exists
+  changed_when: false
+
+- name: "Copying uv-install.sh"
+  copy:
+    src: "uv-install.sh"
+    dest: "/tmp/uv-install.sh"
+    mode: 0755
+
+- name: "Installing Python UV"
+  shell: /tmp/uv-install.sh
+  when: not uv_manager_exists.stat.exists
+
+- name: "Removing Netexec"
+  apt:
+    name: netexec
+    state: absent
+    purge: yes
+  become: true
+  become_method: sudo 
+
+- name: "Check if NetExec exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/netexec"
+  register: netexec_exists
+  changed_when: false
+
+- name: "Installing Netexec"
+  shell: |
+    pipx ensurepath --force /
+    pipx install git+https://github.com/Pennyw0rth/NetExec
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.cargo/bin:/usr/bin/"
+  when: not netexec_exists.stat.exists
+
+
+- name: "Uninstall old Impacket"
+  apt:
+    name: python3-impacket
+    state: absent
+    purge: yes
+  become: true
+  become_method: sudo
+
+- name: "Check if Impacket Exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/share/uv/tools/impacket/bin"
+  register: "impacket_exists"
+  changed_when: false
+
+- name: "Check if sshuttle Exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/sshuttle"
+  register: "sshuttle_exists"
+  changed_when: false
+
+- name: "Installing {{ item }}"
+  shell:
+    cmd: uv tool install {{ item }}
+  loop: "{{ UVtools }}"
+  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists
+        
+- name: "Downloading Certipy from GitHub"
+  git:
+    repo: "https://github.com/ly4k/Certipy"
+    dest: "{{ ansible_env.HOME }}/Certipy"
+
+- name: "Copying Github Download Template"
+  template:
+    src: "uv-manager.j2"
+    dest: "/tmp/uv-manager.sh"
+    mode: 0755
+
+- name: "Executing Bash Script to Install Python UV"
+  shell: "/tmp/uv-manager.sh"
+  changed_when: false
+

@@ -1,0 +1,48 @@
+---
+- name: "Check the presence of /opt/SecLists"
+  stat:
+    path: "/opt/SecLists"
+  register: sec_lists
+  changed_when: false
+
+- name: "Check the presence of /opt/SharpCollection"
+  stat:
+    path: "/opt/SharpCollection"
+  register: sharp_collection
+  changed_when: false
+
+- name: "Installing Tools from GitHub Repositories"
+  git:
+    repo: "{{ item.url }}"
+    dest: "{{ item.destination }}"
+  loop: "{{ GitHubTools }}"
+  become: true
+  become_method: sudo
+  when: not sec_lists.stat.exists or not sharp_collection.stat.exists
+
+  
+- name: "Create Temporary Build Directory"
+  tempfile:
+    state: directory
+  register: build_dir
+  changed_when: false
+
+- name: "Copying golang script to download github releases"
+  copy: 
+    src: "githubdownload.go"
+    dest: "{{ build_dir.path }}/githubdownload.go"
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Downloading GitHub Tools"
+  shell: "go run {{ build_dir.path }}/githubdownload.go {{ item.repo }} {{ item.regex }} {{ item.destination }}"
+  environment:
+    PATH: "/usr/local/go/bin"
+  loop: "{{ GitHubReleases }}"
+  become: true
+  become_method: sudo
+  changed_when: false

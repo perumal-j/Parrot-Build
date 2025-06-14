@@ -1,0 +1,12 @@
+---
+- name: "Install Tmux"
+  package:
+    name: tmux
+    state: present
+  become: true
+  become_method: sudo
+
+- name: "Copying Tmux config"
+  copy:
+    src: tmux.conf
+    dest: "{{ ansible_env.HOME }}/.tmux.conf"

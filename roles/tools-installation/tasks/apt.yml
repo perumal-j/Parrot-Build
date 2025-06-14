@@ -1,0 +1,40 @@
+---
+- name: "Updating Apt Cache"
+  command: apt-get update
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Upgrade All Packages"
+  apt: upgrade=yes force_apt_get=yes
+  become: true
+  become_method: sudo
+
+- name: "Updating Apt Cache"
+  command: apt-get update
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Installing Tools via Apt"
+  package:
+    name:
+      - jq
+      - rlwrap
+      - flameshot
+      - exiftool
+      - ca-certificates
+      - curl
+      - ntpdate
+      - gh
+      - pipx
+      - sublime-text
+      - xclip
+      - remmina
+      - sqlite3
+      - python3-dev
+      - build-essential
+    state: latest
+  become: true
+  become_method: sudo
+

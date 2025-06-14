@@ -1,0 +1,34 @@
+---
+- name: "Install rsyslog"
+  apt:
+    name: rsyslog
+    state: present
+  become: true
+  become_method: sudo
+- name: "Enable rsyslog"
+  service:
+    name: rsyslog
+    state: started
+    enabled: yes
+  become: true
+  become_method: sudo
+
+- name: "Install UFW"
+  apt:
+    name: ufw
+    state: present
+  become: true
+  become_method: sudo
+- name: "Configure UFW"
+  ufw:
+    state: enabled
+    policy: allow
+  become: true
+  become_method: sudo
+- name: "Log SYN packets in INPUT chain"
+  lineinfile:
+    path: /etc/ufw/after.rules
+    line: '-A ufw-after-input -p tcp --syn -j LOG --log-prefix "[UFW-SYN-LOG]"'
+    insertbefore: "# don't delete the 'COMMIT' line or these rules won't be processed"
+  become: true
+  become_method: sudo

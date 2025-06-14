@@ -1,0 +1,152 @@
+---
+- name: "Install AuditD"
+  package:
+    name: auditd
+    state: present
+  become: true
+  become_method: sudo
+
+- name: "Create _laurel User(Laurel Plugin) for AuditD"
+  user:
+    name: _laurel
+    state: present
+    shell: /bin/false
+    create_home: no
+    home: /var/log/laurel
+  become: true
+  become_method: sudo
+
+- name: "Copying AuditD rules"
+  copy:
+    src: audit.rules
+    dest: /etc/audit/rules.d/audit.rules
+    owner: root
+    group: root
+    mode: '0640'
+  become: true
+  become_method: sudo
+
+- name: "Create directories for Laurel"
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0750') }}"
+  loop:
+    - { "path": "/var/log/laurel", "owner": "_laurel", "group": "_laurel" }
+    - { "path": "/tmp/laurel", "owner": "_laurel", "group": "_laurel" }
+    - { "path": "/etc/laurel" }
+  become: true
+  become_method: sudo
+  async: 15 # Allow some time for the directory creation
+  poll: 0 # Don't wait for the task to finish
+  changed_when: false
+
+- name: "Copy laurel/config.toml to /etc/laurel/config.toml"
+  copy:
+    src: laurel/config.toml
+    dest: /etc/laurel/config.toml
+    owner: _laurel
+    group: _laurel
+    mode: '0640'
+  become: true
+  become_method: sudo
+
+- name: "Copy laurel/laurel.conf to /etc/audit/plugins.d/"
+  copy:
+    src: laurel/laurel.conf
+    dest: /etc/audit/plugins.d/laurel.conf
+    owner: root
+    group: root
+    mode: '0640'
+  become: true
+  become_method: sudo
+
+- name: "Check the existence of latest.json file in /tmp"
+  stat: 
+    path: /tmp/latest.json
+  register: latest_json_file
+  changed_when: false
+
+- name: "Check the existence of laurelversioncheck.sh in /tmp"
+  stat: 
+    path: /tmp/laurelversioncheck.sh
+  register: laurel_version_check_file
+  changed_when: false
+
+- name: "Downloading Latest Version of Laurel"
+  get_url:
+        url: "https://api.github.com/repos/threathunters-io/laurel/releases/latest"
+        dest: /tmp/latest.json
+        mode: '0640'
+  when: latest_json_file.stat.exists == false
+
+
+- name: "Copy laurelversioncheck.sh to laurelversioncheck.sh"
+  copy:
+    src: laurelversioncheck.sh
+    dest: /tmp/laurelversioncheck.sh
+    mode: 0760
+  when: laurel_version_check_file.stat.exists == false
+
+- name: "Extracting version number from JSON"
+  shell: /tmp/laurelversioncheck.sh
+  register: laurel_latest_version
+  changed_when: false
+
+
+- name: "Check the Presence of /tmp/laurel-latest.tar.gz"
+  stat:
+    path: /tmp/laurel-latest.tar.gz
+  register: laurel_tar_file
+  changed_when: false
+
+- name: "Downloading laurel"
+  get_url: 
+    url: "{{ laurel_latest_version.stdout }}"
+    dest: /tmp/laurel-latest.tar.gz
+    mode: '0640'
+  when: laurel_tar_file.stat.exists == false
+
+- name: "Extracting laurel" 
+  unarchive:
+    src: /tmp/laurel-latest.tar.gz
+    dest: /tmp/laurel/
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Finding laurel binary"
+  find:
+    paths: /tmp/laurel/
+    patterns: "laurel-*"
+    file_type: directory
+    recurse: yes
+  register: laurel_binary_path
+  changed_when: false
+
+- name: "Check the existence of /usr/local/sbin/laurel"
+  stat: 
+    path: /usr/local/sbin/laurel
+  register: laurel_binary
+  changed_when: false
+
+- name: "Running install -m755 laurel /usr/local/sbin/laurel"
+  command: "install -m755 laurel /usr/local/sbin/laurel"
+  args:
+    chdir: "{{ laurel_binary_path.files[0].path }}/bin/"
+  become: true
+  become_method: sudo
+  when : laurel_binary.stat.exists == false
+      
+- name: "Restart AuditD service"
+  service:
+    name: auditd
+    state: restarted
+  become: true
+  become_method: sudo
+  changed_when: false

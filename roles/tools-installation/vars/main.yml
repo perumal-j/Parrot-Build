@@ -1,0 +1,52 @@
+---
+GitHubTools:
+  - name: SecLists
+    url: "https://github.com/danielmiessler/SecLists"
+    destination: "/opt/SecLists"
+  
+  - name: SharpCollection
+    url: "https://github.com/Flangvik/SharpCollection"
+    destination: "/opt/SharpCollection"
+
+UVtools:
+  - impacket
+  - sshuttle
+
+repositories: 
+  - name: bloodyAD
+    url: "https://github.com/CravateRouge/bloodyAD"
+    destination: "{{ ansible_env.HOME }}/bloodyAD"
+
+  - name: pywhisker
+    url: "https://github.com/ShutdownRepo/pywhisker"
+    destination: "{{ ansible_env.HOME }}/pywhisker"
+
+  - name: targetedKerberoast
+    url: "https://github.com/ShutdownRepo/targetedKerberoast"
+    destination: "/tmp/targetedKerberoast"
+
+
+GitHubReleases:
+  - repo: "jpillora/chisel"
+    regex: "linux_amd64.gz"
+    destination: "/opt/chisel"
+
+  - repo: "jpillora/chisel"
+    regex: "windows_amd64.gz"
+    destination: "/opt/chisel"
+
+  - repo: "peass-ng/PEASS-ng"
+    regex: "linpeas.sh"
+    destination: "/opt/peass"
+
+  - repo: "peass-ng/PEASS-ng"
+    regex: "winPEASx64.exe"
+    destination: "/opt/peass"
+
+  - repo: "SpecterOps/SharpHound"
+    regex: "windows_x86.zip"
+    destination: "/opt/sharphound"
+
+  - repo: "WithSecureLabs/chainsaw"
+    regex: "chainsaw_all_"
+    destination: "/opt/chainsaw"

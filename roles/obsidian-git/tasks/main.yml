@@ -1,0 +1,4 @@
+#SPDX-License-Identifier: MIT-0
+---
+- include_tasks: "git.yml"
+- include_tasks: "obsidian.yml"

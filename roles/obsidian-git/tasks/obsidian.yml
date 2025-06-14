@@ -1,0 +1,55 @@
+---
+- name: "Copying obsidian-download.sh to /tmp"
+  copy:
+    src: "obsidian-download.sh"
+    dest: "/tmp/obsidian-download.sh"
+    mode: 0755
+  
+- name: "Check If Obsidian Exists"
+  stat:
+    path: "/usr/local/bin/obsidian"
+  register: obsidian_exists
+  changed_when: false
+
+- name: "Executing Bash Script to Install Obsidian"
+  shell: "/tmp/obsidian-download.sh"
+  when: not obsidian_exists.stat.exists
+
+- name: "Check if Tech-Notes Exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/Notes/Tech-Notes/.git"
+  register: tech_notes
+  changed_when: false
+
+- name: "Check if Old-Notes Exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/Notes/Old-Notes/.git"
+  register: old_notes
+  changed_when: false
+
+- name: "Check if Notes Exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/Notes"
+  register: notes
+  changed_when: false
+
+- name: "Create Directory ~/Notes"
+  file:
+    path: "{{ ansible_env.HOME }}/Notes"
+    state: directory
+    mode: 0755
+  when: not notes.stat.exists
+
+- name: "Clone Tech-Notes via Git"
+  git:
+    repo: "git@github.com:perumal-j/Tech-Notes.git"
+    dest: "{{ ansible_env.HOME }}/Notes/Tech-Notes"
+    accept_hostkey: yes
+  when: not tech_notes.stat.exists
+
+- name: "Clone Old-Notes via Git"
+  git:
+    repo: "git@github.com:perumal-j/Old-Notes.git"
+    dest: "{{ ansible_env.HOME }}/Notes/Old-Notes"
+    accept_hostkey: yes
+  when: not old_notes.stat.exists

@@ -1,0 +1,9 @@
+---
+# tasks file for tools-installation
+- include_tasks: sublime-text.yml
+- include_tasks: apt.yml
+- include_tasks: golang-tools.yml
+- include_tasks: rust-tools.yml
+- include_tasks: gem-tools.yml
+- include_tasks: github-tools.yml
+- include_tasks: python-tools.yml

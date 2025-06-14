@@ -1,0 +1,45 @@
+
+{% for repo in repositories %}
+git clone {{ repo.url }} {{ repo.destination }} 
+cd {{ repo.destination }}
+
+# Install dependencies with permission checks
+if [ -f "requirements.txt" ]; then
+    # First try without sudo
+    if uv add --script {{ repo.name }}.py -r requirements.txt 2>/dev/null; then
+        echo "Dependencies installed successfully"
+    else
+        echo "Permission denied - retrying with sudo"
+        sudo uv add --script {{ repo.name }}.py -r requirements.txt
+    fi
+else
+    echo "Warning: requirements.txt not found in {{ repo.destination }}. Skipping uv add."
+fi
+
+
+UPDATED_SHEBANG="#!/usr/bin/env -S uv run --script"
+TARGET_FILE={{ repo.name }}.py
+
+if grep -q '^#!' "$TARGET_FILE"; then
+    if [ -w "$TARGET_FILE" ]; then
+        sed -i "1s|^#!.*|$UPDATED_SHEBANG|" "$TARGET_FILE"
+        echo "Shebang updated."
+    else
+        echo "No write permissions - using sudo"
+        sudo sed -i "1s|^#!.*|$UPDATED_SHEBANG|" "$TARGET_FILE"
+        echo "Shebang updated with sudo."
+    fi
+else
+    echo "No shebang found. Not modifying."
+fi
+
+
+if [[ {{ repo.destination }} == /tmp/* ]]; then
+    echo "Directory {{ repo.destination }} is in /tmp/. Copying to $USER/.local/bin"
+    cp {{ repo.destination }}/{{ repo.name }}.py $HOME/.local/bin
+else
+    echo "Directory {{ repo.destination }} is not in /tmp/. No changes needed."
+fi
+
+{% endfor %}
+

@@ -1,0 +1,39 @@
+#SPDX-License-Identifier: MIT-0
+---
+DesktopLaunchers:
+  - "sublime-text"
+  - "vscode"
+  - "firefox"
+  - "burp-suite"
+  - "flameshot"
+
+AppPaths:
+  - "/usr/bin/subl"
+  - "/usr/bin/code"
+  - "/usr/bin/firefox"
+  - "/usr/bin/burpsuite"
+  - "/usr/bin/flameshot"
+
+IconPaths:
+  - "/opt/flatpak-icons/apps/scalable/sublimetext.svg"
+  - "/opt/flatpak-icons/apps/scalable/visual-studio-code.svg"
+  - "/opt/flatpak-icons/apps/scalable/firefox.svg"
+  - "/opt/flatpak-icons/apps/scalable/burp.svg"
+  - "/opt/flatpak-icons/apps/scalable/flameshot.png"
+
+apps:
+  - name: "sublime-text"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
+    id: 261
+  - name: "vscode"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
+    id: 271
+  - name: "firefox"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
+    id: 281
+  - name: "burp-suite"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
+    id: 291
+  - name: "flameshot"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
+    id: 301

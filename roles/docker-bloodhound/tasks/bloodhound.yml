@@ -1,0 +1,163 @@
+---
+- name: "Check the presence of /opt/BloodHound"
+  stat:
+    path: "/opt/BloodHound"
+  register: bloodhound
+  changed_when: false
+
+- name: "Cloning Bloodhound Repository"
+  git:
+    repo: "https://github.com/SpecterOps/BloodHound.git"
+    dest: "/opt/BloodHound"
+  become: true
+  become_method: sudo
+  when: not bloodhound.stat.exists
+
+- name: "Modifying Bloodhound Directory Owner"
+  file:
+    path: "/opt/BloodHound"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Check the presence of /opt/BloodHound/examples/docker-compose/.env"
+  stat:
+    path: "/opt/BloodHound/examples/docker-compose/.env"
+  register: bloodhound_env
+  changed_when: false
+
+- name: "Copying .env.example to .env"
+  copy:
+    src: "/opt/BloodHound/examples/docker-compose/.env.example"
+    dest: "/opt/BloodHound/examples/docker-compose/.env"
+  when: not bloodhound_env.stat.exists
+
+- name: "Check for a line in .env"
+  lineinfile:
+    path: "/opt/BloodHound/examples/docker-compose/.env"
+    regexp: "^BLOODHOUND_PORT="
+    state: present
+    line: "BLOODHOUND_PORT=8888"
+  register: bloodhound_port
+  changed_when: false
+  
+- name: "Modifying Port Number in .env"
+  lineinfile:
+    path: "/opt/BloodHound/examples/docker-compose/.env"
+    regexp: "BLOODHOUND_PORT"
+    line: "BLOODHOUND_PORT=8888"
+  when: not bloodhound_port.changed
+
+- name: "Copying Bloodhound Config Template"
+  template:
+    src: "bloodhound.config.json.j2"
+    dest: "/opt/BloodHound/examples/docker-compose/bloodhound.config.json"
+  
+- name: "Uncomment volumes line 1"
+  lineinfile:
+    path: "/opt/BloodHound/examples/docker-compose/docker-compose.yml"
+    regexp: '^(\s*)#\s*(volumes:)'
+    line: '\1\2'
+    backrefs: yes # This allows the use of backreferences in the line
+
+- name: "Uncomment volumes line 2"
+  lineinfile:
+    path: "/opt/BloodHound/examples/docker-compose/docker-compose.yml"
+    regexp: '^(\s*)#\s*(-\s*\./bloodhound\.config\.json:/bloodhound\.config\.json:ro)'
+    line: '\1\2'
+    backrefs: yes
+
+- name: "Check if Bloodhound is running"
+  command: "sg docker -c 'docker ps -q --filter name=bloodhound'"
+  register: bloodhound_running
+  changed_when: false
+
+- name: "Run Docker Compose Up -d"
+  command: "sg docker -c 'docker compose -f /opt/BloodHound/examples/docker-compose/docker-compose.yml up -d'"
+  args:
+    chdir: "/opt/BloodHound/examples/docker-compose"
+  register: docker_compose_up
+  changed_when: docker_compose_up.stdout != "" # This ensures the task is marked as changed only if there is output from the command
+  when: bloodhound_running.stdout== ""
+
+- name: "Sleep for 20 seconds to ensure BloodHound is fully up"
+  pause:
+    seconds: 20
+  changed_when: false
+
+- name: "Check if Bloodhound Temp Password File Exists"
+  stat: 
+    path: /opt/BloodHound/examples/docker-compose/temp_pass.txt
+  register: bloodhound_temp_password_file
+  changed_when: false
+
+- name: "Extracting Password from Docker Compose Logs"
+  shell: "docker compose logs bloodhound | grep -i '# Initial Password Set To:'| awk -F'Password Set To:' '{print $2}' | awk '{print $1}' > /opt/BloodHound/examples/docker-compose/temp_pass.txt"
+  args:
+    chdir: "/opt/BloodHound/examples/docker-compose"
+  become: true
+  become_method: sudo
+  when: bloodhound_temp_password_file.stat.exists == False
+
+- name: "Second Check To See if Bloodhound Temp Password File Exists"
+  stat: 
+    path: /opt/BloodHound/examples/docker-compose/temp_pass.txt
+  register: bloodhound_temp_pass_second_check
+  changed_when: false
+
+- name: "Check if Bloodhound is running - Second Check"
+  command: "sg docker -c 'docker ps -q --filter name=bloodhound'"
+  register: bloodhound_running_second_check
+  changed_when: false
+
+- name: "Run Docker Compose Down"
+  command: sg docker -c "docker compose -f /opt/BloodHound/examples/docker-compose/docker-compose.yml down"
+  args:
+    chdir: "/opt/BloodHound/examples/docker-compose"
+  changed_when: false
+  when: bloodhound_temp_pass_second_check.stat.size > 20 and bloodhound_running_second_check.stdout != ""
+
+- name: "Check if Bloodhound-ce Ingestor Repository Exists"
+  stat: 
+    path: "/opt/BloodHound.py"
+  register: bloodhound_ce
+  changed_when: false
+
+- name: "Cloning Bloodhound-ce Ingestor Repository"
+  git:
+    repo: "https://github.com/dirkjanm/BloodHound.py.git"
+    dest: "/opt/BloodHound.py"
+    version: "bloodhound-ce"
+    clone: yes
+    update: yes
+    force: yes   # Force update to ensure the latest version is pulled
+  become: true
+  become_method: sudo
+  when: not bloodhound_ce.stat.exists
+
+- name: "Modifying Bloodhound Directory Owner"
+  file:
+    path: "/opt/BloodHound.py"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: " Check if bloodhound-ce-python is installed"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/bloodhound-ce-python"
+  register: bloodhound_ce_python
+  changed_when: false
+
+- name: "Installing Bloodhound-ce Ingestor"
+  shell: |
+    cd /opt/BloodHound.py /
+    pipx install .
+  when: not bloodhound_ce_python.stat.exists

@@ -1,0 +1,13 @@
+# templates/object-id-list.sh.j2
+#!/bin/bash
+
+{% for app in apps %}
+dconf load /org/mate/panel/objects/{{ app.name }}/ < /tmp/panel-configs/{{ app.name }}.dconf
+
+if ! dconf read /org/mate/panel/general/object-id-list | grep -q "'{{ app.name }}'"; then
+    dconf write /org/mate/panel/general/object-id-list "$(dconf read /org/mate/panel/general/object-id-list | sed "s/\]/, '{{ app.name }}']/")"
+    echo "Added {{ app.name }} to panel"
+else
+    echo "{{ app.name }} already exists in panel"
+fi
+{% endfor %}

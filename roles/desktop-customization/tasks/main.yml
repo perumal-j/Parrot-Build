@@ -1,0 +1,4 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for desktop-customization
+- include_tasks: parrot_panel.yml

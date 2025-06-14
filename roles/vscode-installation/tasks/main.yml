@@ -1,0 +1,16 @@
+---
+- name: "Installing Visual Studio Code"
+  include_role: 
+    name: "gantsign.visual-studio-code"
+  vars:
+    users:
+      - username: "{{ ansible_user_id }}"
+        visual_studio_code_extensions:
+          - Codeium.codeium
+          - snyk-security.snyk-vulnerability-scanner
+          - ms-python.python
+          - DEVSENSE.phptools-vscode
+          - ms-vscode.cpptools
+          - golang.Go
+          - rust-lang.rust-analyzer
+          - ms-vscode.cpptools-extension-pack

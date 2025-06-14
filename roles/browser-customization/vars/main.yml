@@ -1,0 +1,16 @@
+---
+FirefoxExtensions:
+  - "darkreader"
+  - "foxyproxy-standard"
+  - "bitwarden-password-manager"
+
+burpsuite_extras_dir: "/usr/local/lib/burpsuite-extras"
+burpsuite_extras_jars:
+  jruby:
+    jar: jruby-complete.jar
+    url: https://repo1.maven.org/maven2/org/jruby/jruby-complete/9.4.3.0/jruby-complete-9.4.3.0.jar
+    checksum: sha256:0ec0d4c7c262bab270212b787c8b9c9e2eba159879fb44df33c3e0809bfc2bcc
+  jython:
+    jar: jython-standalone.jar
+    url: https://repo1.maven.org/maven2/org/python/jython-standalone/2.7.3/jython-standalone-2.7.3.jar
+    checksum: sha256:da7f3d829b148bcfa86b059dc964e3a8556fedb021096c8db07e30c66faab9b4

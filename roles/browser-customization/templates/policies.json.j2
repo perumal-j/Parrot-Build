@@ -1,0 +1,77 @@
+{
+  "policies": {
+    "Certificates": {
+      "Install": ["/usr/local/share/ca-certificates/BurpSuiteCA.der"]
+    },
+    "DisableAppUpdate": true,
+    "DisplayBookmarksToolbar": true,
+    "NoDefaultBookmarks": true,
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "Homepage": {
+      "URL": "https://google.com",
+      "Locked": false,
+      "StartPage": "homepage"
+    },
+    "SearchEngines": {
+      "Default": "Google",
+      "PreventInstalls": true
+    },
+    "SearchSuggestEnabled": false,
+    "DisableTelemetry": true,
+    "CaptivePortal": false,
+    "Cookies": {
+      "Default": true,
+      "AcceptThirdParty": "never",
+      "RejectTracker": true
+    },
+    "DNSOverHTTPS": {
+      "Enabled": false
+    },
+    "UserMessaging": {
+      "WhatsNew": false,
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "UrlbarInterventions": false,
+      "SkipOnboarding": true
+    },
+    "DisableFeedbackCommands": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DontCheckDefaultBrowser": true,
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Cryptomining": true,
+      "Fingerprinting": true
+    },
+    "Extensions": {
+      "Install": [{% for extension in FirefoxExtensions %}
+"https://addons.mozilla.org/firefox/downloads/latest/{{ extension }}/latest.xpi"{{ "," if not loop.last }}
+{% endfor %}],
+      "Uninstall": ["bad_addon_id@mozilla.org"],
+      "Locked":  ["addon_id@mozilla.org"]
+    },
+    "FirefoxHome": {
+      "Search": true,
+      "TopSites": false,
+      "Highlights": false,
+      "Pocket": false,
+      "Snippets": false,
+      "Locked": false
+    },
+    "HardwareAcceleration": true,
+    "NetworkPrediction": false,
+    "PopupBlocking": {
+      "Allow": ["https://crypt.parrot.sh",
+                "https://pad.parrot.sh"],
+      "Default": false,
+      "Locked": false
+    },
+    "PromptForDownloadLocation": true,
+    "SupportMenu": {
+      "Title": "Parrot Support",
+      "URL": "https://community.parrotsec.org",
+      "AccessKey": "S"
+    }
+  }
+}

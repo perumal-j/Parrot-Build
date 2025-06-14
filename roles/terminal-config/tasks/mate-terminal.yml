@@ -1,0 +1,46 @@
+---
+- name: "Copy Bashrc"
+  copy:
+    src: "bashrc"
+    dest: "{{ ansible_env.HOME }}/.bashrc"
+  changed_when: false
+  
+- name: "Activate Modified Bashrc"
+  shell: "source {{ ansible_env.HOME }}/.bashrc"
+  args:
+    executable: /bin/bash
+  changed_when: false
+
+- name: "Copy Profile File"
+  copy:
+    src: "profile"
+    dest: "{{ ansible_env.HOME }}/.profile"
+
+- name: "Reading Existing Terminal Profiles"
+  vars:
+    list_terminal_profiles: "dconf list /org/mate/terminal/profiles/"
+  ansible.builtin.command: "{{ list_terminal_profiles }}"
+  register: "terminal_profiles"
+  changed_when: false
+
+- name: "Storing Terminal Profiles from /files"
+  shell:
+    cmd: "dconf load /org/mate/terminal/profiles/yt/ < {{ role_path }}/files/terminalprofile.conf"
+  when: "'yt/' not in terminal_profiles.stdout" 
+
+- name: "Reading Current Mate Profiles"
+  dconf:
+    key: "/org/mate/terminal/global/profile-list"
+    state: "read"
+  register: "profile_list"
+
+- name: "Profile List is Empty, Fixing it"
+  set_fact:
+    profile_list: 
+      value: '["default"]'
+  when: "profile_list.value is none"
+
+- name: "Updating Profile List"
+  shell: 
+    cmd: "dconf write /org/mate/terminal/global/profile-list \"['yt']\""
+  when: "'yt' not in profile_list.value"
