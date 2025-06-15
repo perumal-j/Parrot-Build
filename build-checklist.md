@@ -67,3 +67,5 @@ Fix Burp Cert Issue // Not Fixed
 2) Bloodhound Injestor // Done
 Git pull https://github.com/daniruiz/flat-remix for icon download  // Done
 3) Configure Task Bar, change desktop wallpaper // Done
+
+---> Home Directory Group changes to "docker" after execution. Please fix it.
