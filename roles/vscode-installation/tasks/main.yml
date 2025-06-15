@@ -14,3 +14,9 @@
           - golang.Go
           - rust-lang.rust-analyzer
           - ms-vscode.cpptools-extension-pack
+
+- name: "Removing Apt Source List Conflict"
+  file:
+    path: "/etc/apt/sources.list.d/vscode.sources"
+    state: absent
+  when: ansible_distribution|lower == 'parrot' or ansible_distribution == 'debian'
