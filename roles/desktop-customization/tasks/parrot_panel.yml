@@ -32,7 +32,6 @@
   git:
     repo: "https://github.com/perumal-j/flatpak-icons.git"
     dest: "/opt/flatpak-icons"
-    version: "master"
   become: true
   become_method: "sudo"
   when: not flat_remix.stat.exists
