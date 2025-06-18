@@ -21,7 +21,7 @@ IconPaths:
   - "/opt/flatpak-icons/apps/scalable/burp.svg"
   - "/opt/flatpak-icons/apps/scalable/flameshot.png"
 
-parrot-apps:
+parrot_apps:
   - name: "sublime-text"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
     id: 261
@@ -39,7 +39,7 @@ parrot-apps:
     id: 301
 
 
-ubuntu-apps:
+ubuntu_apps:
   - name: "sublime-text"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
     id: 89

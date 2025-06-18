@@ -63,18 +63,22 @@
     state: directory
     mode: '0755'
 
+- name: "Debug ansible_distribution"
+  debug:
+    msg: "ansible_distribution: {{ ansible_distribution|lower }}"
+
 - name: "Generate dconf configuration files - Parrot"
   template:
     src: panel-object.j2
     dest: "/tmp/panel-configs/{{ item.name }}.dconf"
-  loop: "{{ parrot-apps }}"
+  loop: "{{ parrot_apps }}"
   when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian'
 
 - name: "Generate dconf configuration files - Ubuntu"
   template:
     src: panel-object.j2
     dest: "/tmp/panel-configs/{{ item.name }}.dconf"
-  loop: "{{ ubuntu-apps }}"
+  loop: "{{ ubuntu_apps }}"
   when: ansible_distribution|lower == 'ubuntu'
   
 - name: "Deploying Templated Script for Object ID List - Parrot"

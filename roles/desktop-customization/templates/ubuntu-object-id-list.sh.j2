@@ -1,7 +1,7 @@
 # templates/object-id-list.sh.j2
 #!/bin/bash
 
-{% for app in ubuntu-apps %}
+{% for app in ubuntu_apps %}
 dconf load /org/mate/panel/objects/{{ app.name }}/ < /tmp/panel-configs/{{ app.name }}.dconf
 
 if ! dconf read /org/mate/panel/general/object-id-list | grep -q "'{{ app.name }}'"; then
