@@ -21,7 +21,7 @@ IconPaths:
   - "/opt/flatpak-icons/apps/scalable/burp.svg"
   - "/opt/flatpak-icons/apps/scalable/flameshot.png"
 
-apps:
+parrot-apps:
   - name: "sublime-text"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
     id: 261
@@ -37,3 +37,21 @@ apps:
   - name: "flameshot"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
     id: 301
+
+
+ubuntu-apps:
+  - name: "sublime-text"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
+    id: 89
+  - name: "vscode"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
+    id: 99
+  - name: "firefox"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
+    id: 109
+  - name: "burp-suite"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
+    id: 119
+  - name: "flameshot"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
+    id: 129
