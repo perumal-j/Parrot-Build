@@ -21,4 +21,4 @@
     state: absent
   become: true
   become_method: sudo
-  when: ansible_distribution|lower == 'parrot' or ansible_distribution == 'debian'
+  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian' or ansible_distribution|lower == 'ubuntu'
