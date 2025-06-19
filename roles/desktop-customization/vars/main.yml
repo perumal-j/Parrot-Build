@@ -4,6 +4,7 @@ DesktopLaunchers:
   - "sublime-text"
   - "vscode"
   - "firefox"
+  - "obsidian"
   - "burp-suite"
   - "flameshot"
 
@@ -11,6 +12,7 @@ AppPaths:
   - "/usr/bin/subl"
   - "/usr/bin/code"
   - "/usr/bin/firefox"
+  - "/usr/local/bin/obsidian"
   - "/usr/bin/burpsuite"
   - "/usr/bin/flameshot"
 
@@ -18,6 +20,7 @@ IconPaths:
   - "/opt/flatpak-icons/apps/scalable/sublimetext.svg"
   - "/opt/flatpak-icons/apps/scalable/visual-studio-code.svg"
   - "/opt/flatpak-icons/apps/scalable/firefox.svg"
+  - "/opt/flatpak-icons/apps/scalable/obsidian-icon.svg"
   - "/opt/flatpak-icons/apps/scalable/burp.svg"
   - "/opt/flatpak-icons/apps/scalable/flameshot.png"
 
@@ -31,12 +34,15 @@ parrot_apps:
   - name: "firefox"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
     id: 281
+  - name: "obsidian"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
+    id: 291
   - name: "burp-suite"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
-    id: 291
+    id: 301
   - name: "flameshot"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
-    id: 301
+    id: 311
 
 
 ubuntu_apps:
@@ -49,9 +55,12 @@ ubuntu_apps:
   - name: "firefox"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
     id: 109
+  - name: "obsidian"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
+    id: 119
   - name: "burp-suite"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
-    id: 119
+    id: 129
   - name: "flameshot"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
-    id: 129
+    id: 139
