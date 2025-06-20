@@ -57,8 +57,8 @@
 - name: "Adding Current User to Docker Group"
   user:
     name: "{{ ansible_user_id }}"
-    group: docker
-    state: present
+    groups: docker
+    append: true
   become: true
   become_method: sudo
-  when: not docker_group.stdout
+  when: docker_group.rc != 0
