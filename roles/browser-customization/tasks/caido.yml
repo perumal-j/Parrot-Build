@@ -1,0 +1,46 @@
+---
+- name: "Check the existence of caido-latest.json file in /tmp"
+  stat: 
+    path: /tmp/caido-latest.json
+  register: latest_caido_json_file
+  changed_when: false
+
+- name: "Downloading Latest Version of Laurel"
+  get_url:
+        url: "https://api.github.com/repos/caido/caido/releases/latest"
+        dest: /tmp/caido-latest.json
+        mode: '0640'
+  when: latest_caido_json_file.stat.exists == false
+
+- name: "Check the presence of /tmp/downloadcaido.sh"
+  stat:
+    path: /tmp/downloadcaido.sh
+  register: caido_download_file
+  changed_when: false
+
+- name: "Copy downloadcaido.sh to /tmp/downloadcaido.sh"
+  copy:
+    src: downloadcaido.sh
+    dest: /tmp/downloadcaido.sh
+    mode: 0760
+  when: caido_download_file.stat.exists == false
+
+- name: "Extracting Caido URL from JSON"
+  shell: /tmp/downloadcaido.sh
+  register: caido_url
+  changed_when: false
+
+- name: "Check the existence of /usr/local/bin/caido"
+  stat:
+    path: /usr/local/bin/caido
+  register: caido_binary
+  changed_when: false
+
+- name: "Downloading Caido"
+  get_url:
+    url: "{{ caido_url.stdout }}"
+    dest: /usr/local/bin/caido
+    mode: '0755'
+  become: true
+  become_method: sudo
+  when: caido_binary.stat.exists == false

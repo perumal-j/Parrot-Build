@@ -6,6 +6,7 @@ DesktopLaunchers:
   - "firefox"
   - "obsidian"
   - "burp-suite"
+  - "caido"
   - "flameshot"
 
 AppPaths:
@@ -14,6 +15,7 @@ AppPaths:
   - "/usr/bin/firefox"
   - "/usr/local/bin/obsidian"
   - "/usr/bin/burpsuite"
+  - "/usr/local/bin/caido"
   - "/usr/bin/flameshot"
 
 IconPaths:
@@ -22,6 +24,7 @@ IconPaths:
   - "/opt/flatpak-icons/apps/scalable/firefox.svg"
   - "/opt/flatpak-icons/apps/scalable/obsidian-icon.svg"
   - "/opt/flatpak-icons/apps/scalable/burp.svg"
+  - "/opt/flatpak-icons/apps/scalable/caido.png"
   - "/opt/flatpak-icons/apps/scalable/flameshot.png"
 
 parrot_apps:
@@ -40,9 +43,12 @@ parrot_apps:
   - name: "burp-suite"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
     id: 301
+  - name: "caido"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/caido.desktop"
+    id: 311
   - name: "flameshot"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
-    id: 311
+    id: 321
 
 
 ubuntu_apps:
@@ -61,6 +67,9 @@ ubuntu_apps:
   - name: "burp-suite"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
     id: 129
+  - name: "caido"
+    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/caido.desktop"
+    id: 139
   - name: "flameshot"
     desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
-    id: 139
+    id: 149
