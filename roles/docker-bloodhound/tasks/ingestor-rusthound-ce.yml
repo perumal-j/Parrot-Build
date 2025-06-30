@@ -24,6 +24,28 @@
   become_method: sudo
   changed_when: false
 
+
+- name: "Updating APT Cache"
+  command: apt-get update
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Installing RustHound-CE Dependencies"
+  package:
+    name:
+      - gcc 
+      - clang 
+      - libclang-dev 
+      - libgssapi-krb5-2 
+      - libkrb5-dev 
+      - libsasl2-modules-gssapi-mit 
+      - musl-tools 
+      - gcc-mingw-w64-x86-64
+    state: latest
+  become: true
+  become_method: sudo
+
 - name: "Check the presence of RustHound-CE"
   stat:
     path: "{ ansible.env.HOME }/.cargo/bin/rusthound-ce"
