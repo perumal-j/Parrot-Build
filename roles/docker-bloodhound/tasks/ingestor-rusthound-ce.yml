@@ -1,0 +1,37 @@
+---
+- name: "Check the presence of /opt/RustHound-CE"
+  stat:
+    path: "/opt/RustHound-CE"
+  register: rusthound_ce
+  changed_when: false
+
+- name: "Cloning RustHound-CE Repository"
+  git:
+    repo: "https://github.com/g0h4n/RustHound-CE.git"
+    dest: "/opt/RustHound-CE"
+  become: true
+  become_method: sudo
+  when: not rusthound_ce.stat.exists
+
+- name: "Modifying RustHound-CE Directory Owner"
+  file:
+    path: "/opt/BloodRustHound-CE"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Check the presence of RustHound-CE"
+  stat:
+    path: "{ ansible.env.HOME }/.cargo/bin/rusthound-ce"
+  register: rusthound_ce_bin
+  changed_when: false
+
+- name: "Build Repository-CE from Source"
+  command: "cargo install rusthound-ce"
+  args:
+    chdir: "/opt/RustHound-CE"
+  when: not rusthound_ce_bin.stat.exists

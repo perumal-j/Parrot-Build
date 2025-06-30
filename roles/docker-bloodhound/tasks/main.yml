@@ -11,3 +11,6 @@
   when: os_id == 'ubuntu'
 
 - include_tasks: bloodhound.yml
+
+- include_tasks: ingestor-rusthound-ce.yml
+  when: os_id == 'debian' or os_id == 'parrot' or os_id == 'ubuntu'
