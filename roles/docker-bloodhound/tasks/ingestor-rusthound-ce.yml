@@ -15,7 +15,7 @@
 
 - name: "Modifying RustHound-CE Directory Owner"
   file:
-    path: "/opt/BloodRustHound-CE"
+    path: "/opt/RustHound-CE"
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     state: directory
