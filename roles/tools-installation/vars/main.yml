@@ -12,15 +12,24 @@ UVtools:
   - impacket
   - sshuttle
 
-repositories: 
-  - name: bloodyAD
-    url: "https://github.com/CravateRouge/bloodyAD"
-    destination: "{{ ansible_env.HOME }}/bloodyAD"
-
+UVtoolsGit:
+  - name: NetExec
+    url: "git+https://github.com/Pennyw0rth/NetExec"
+ 
+  - name: Certipy
+    url: "git+https://github.com/ly4k/Certipy"
+  
   - name: pywhisker
-    url: "https://github.com/ShutdownRepo/pywhisker"
-    destination: "{{ ansible_env.HOME }}/pywhisker"
+    url: "git+https://github.com/ShutdownRepo/pywhisker"
+  
+  - name: bloodyAD
+    url: "git+https://github.com/CravateRouge/bloodyAD"
 
+  - name: pwntools
+    url: "git+https://github.com/Gallopsled/pwntools"
+
+
+repositories: 
   - name: targetedKerberoast
     url: "https://github.com/ShutdownRepo/targetedKerberoast"
     destination: "/tmp/targetedKerberoast"

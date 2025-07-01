@@ -29,14 +29,35 @@
   register: netexec_exists
   changed_when: false
 
-- name: "Installing Netexec"
-  shell: |
-    pipx ensurepath --force /
-    pipx install git+https://github.com/Pennyw0rth/NetExec
-  environment:
-    PATH: "{{ ansible_env.HOME }}/.cargo/bin:/usr/bin/"
-  when: not netexec_exists.stat.exists
+- name: "Check if Certipy exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/certipy"
+  register: certipy_exists
+  changed_when: false
 
+- name: "Check if pywhisker exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/pywhisker"
+  register: pywhisker_exists
+  changed_when: false
+
+- name: "Check if bloodyAD exists"
+  stat: 
+    path: "{{ ansible_env.HOME }}/.local/bin/bloodyAD"
+  register: bloodyAD_exists
+  changed_when: false
+
+- name: "Check if pwntools repository exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/share/uv/tools/pwntools"
+  register: pwntools_exists
+  changed_when: false
+
+- name: "Installing Netexec, Certipy, pywhisker, bloodyAD and pwntools"
+  shell:
+    cmd: uv tool install {{ item.url }}
+  loop: "{{ UVtoolsGit }}"
+  when: not certipy_exists.stat.exists or not netexec_exists.stat.exists or not pywhisker_exists.stat.exists or not bloodyAD_exists.stat.exists or not pwntools_exists.stat.exists
 
 - name: "Uninstall old Impacket"
   apt:
@@ -63,12 +84,7 @@
     cmd: uv tool install {{ item }}
   loop: "{{ UVtools }}"
   when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists
-        
-- name: "Downloading Certipy from GitHub"
-  git:
-    repo: "https://github.com/ly4k/Certipy"
-    dest: "{{ ansible_env.HOME }}/Certipy"
-
+   
 - name: "Copying Github Download Template"
   template:
     src: "uv-manager.j2"
@@ -79,3 +95,15 @@
   shell: "/tmp/uv-manager.sh"
   changed_when: false
 
+- name: "Check if targetedKerberoast exists"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/targetedKerberoast"
+  register: targetedKerberoast
+  changed_when: false
+
+- name: "Copying targetedKerberoast to .local/bin"
+  copy:
+    src: "/tmp/targetedKerberoast/targetedKerberoast.py"
+    dest: "{{ ansible_env.HOME }}/.local/bin/targetedKerberoast"
+    mode: 0755
+  when: not targetedKerberoast.stat.exists

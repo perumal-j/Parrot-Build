@@ -121,35 +121,6 @@
   changed_when: false
   when: bloodhound_temp_pass_second_check.stat.size > 20 and bloodhound_running_second_check.stdout != ""
 
-- name: "Check if Bloodhound-ce Ingestor Repository Exists"
-  stat: 
-    path: "/opt/BloodHound.py"
-  register: bloodhound_ce
-  changed_when: false
-
-- name: "Cloning Bloodhound-ce Ingestor Repository"
-  git:
-    repo: "https://github.com/dirkjanm/BloodHound.py.git"
-    dest: "/opt/BloodHound.py"
-    version: "bloodhound-ce"
-    clone: yes
-    update: yes
-    force: yes   # Force update to ensure the latest version is pulled
-  become: true
-  become_method: sudo
-  when: not bloodhound_ce.stat.exists
-
-- name: "Modifying Bloodhound Directory Owner"
-  file:
-    path: "/opt/BloodHound.py"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    state: directory
-    recurse: true
-  become: true
-  become_method: sudo
-  changed_when: false
-
 - name: " Check if bloodhound-ce-python is installed"
   stat:
     path: "{{ ansible_env.HOME }}/.local/bin/bloodhound-ce-python"
@@ -158,6 +129,5 @@
 
 - name: "Installing Bloodhound-ce Ingestor"
   shell: |
-    cd /opt/BloodHound.py /
-    pipx install .
+    uv tool install git+https://github.com/dirkjanm/BloodHound.py.git@bloodhound-ce
   when: not bloodhound_ce_python.stat.exists
