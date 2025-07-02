@@ -31,6 +31,15 @@
   become_method: sudo
   changed_when: false
 
+- name: "Force install specific version of libcom-err2"
+  apt:
+    name: libcom-err2=1.47.0-2+b2
+    state: present
+    force: yes
+  become: true
+  become_method: sudo
+  changed_when: false
+
 - name: "Installing RustHound-CE Dependencies"
   package:
     name:
