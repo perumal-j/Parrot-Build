@@ -52,7 +52,7 @@
   register: rusthound_ce_bin
   changed_when: false
 
-- name: "Build Repository-CE from Source"
+- name: "Build RustHound-CE from Source"
   command: "cargo install rusthound-ce"
   args:
     chdir: "/opt/RustHound-CE"

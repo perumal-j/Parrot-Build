@@ -6,10 +6,13 @@
   changed_when: false
 
 - name: "Downloading Latest Version of Laurel"
-  get_url:
-        url: "https://api.github.com/repos/caido/caido/releases/latest"
-        dest: /tmp/caido-latest.json
-        mode: '0640'
+  uri:
+    url: "https://api.github.com/repos/caido/caido/releases/latest"
+    method: GET    
+    headers:
+      Authorization: "token {{ github_api_key }}"
+    dest: /tmp/caido-latest.json
+    mode: '0640'
   when: latest_caido_json_file.stat.exists == false
 
 - name: "Check the presence of /tmp/downloadcaido.sh"
