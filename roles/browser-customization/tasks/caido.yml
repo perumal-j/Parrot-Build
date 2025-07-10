@@ -52,7 +52,7 @@
     mode: '0755'
   become: true
   become_method: sudo
-  when: caido_binary.stat.exists == false
+  when: caido_binary.stat.exists == false and ansible_distribution == "Ubuntu"
 
 - name: "Making Caido executable"
   shell: |
@@ -62,4 +62,4 @@
     executable: /bin/bash
   become: true
   become_method: sudo
-  when: caido_binary_bash.stat.exists == false
+  when: caido_binary_bash.stat.exists == false and ansible_distribution == "Ubuntu"
