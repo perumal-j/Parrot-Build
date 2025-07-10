@@ -39,6 +39,7 @@
   become: true
   become_method: sudo
   changed_when: false
+  when: ansible_distribution == "Debian"
 
 - name: "Installing RustHound-CE Dependencies"
   package:

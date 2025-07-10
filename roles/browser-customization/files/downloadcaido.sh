@@ -6,7 +6,7 @@ ARCH=$(uname -m)
 if [ "$ARCH" = "x86_64" ]; then
 	ARCH="x86_64"
 elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-	ARCH="AArch64"
+	ARCH="aarch64"
 else
 	echo "Unsupported Architecture: $ARCH"
 	exit 1
