@@ -36,14 +36,30 @@
 - name: "Check the existence of /usr/local/bin/caido"
   stat:
     path: /usr/local/bin/caido
+  register: caido_binary_bash
+  changed_when: false
+
+- name: "Check the existence of /opt/caido"
+  stat:
+    path: /opt/caido
   register: caido_binary
   changed_when: false
 
 - name: "Downloading Caido"
   get_url:
     url: "{{ caido_url.stdout }}"
-    dest: /usr/local/bin/caido
+    dest: /opt/caido
     mode: '0755'
   become: true
   become_method: sudo
   when: caido_binary.stat.exists == false
+
+- name: "Making Caido executable"
+  shell: |
+    bash -c "echo -e '#!/bin/bash\n/opt/caido --no-sandbox' > /usr/local/bin/caido" 
+    chmod +x /usr/local/bin/caido
+  args:
+    executable: /bin/bash
+  become: true
+  become_method: sudo
+  when: caido_binary_bash.stat.exists == false
