@@ -18,3 +18,12 @@
 - name: "Installing Feroxbuster"
   shell: "{{ ansible_env.HOME }}/.cargo/bin/cargo install feroxbuster"
   changed_when: false
+
+- name: "Installing RustScan"
+  cargo:
+    package: 
+      -  rustscan
+      -  feroxbuster
+    state: present
+  become: true
+  become_method: sudo

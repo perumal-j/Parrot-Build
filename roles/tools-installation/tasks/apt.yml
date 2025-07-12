@@ -38,6 +38,7 @@
       - libssl-dev 
       - libffi-dev
       - ldap-utils
+      - powershell
     state: latest
   become: true
   become_method: sudo
