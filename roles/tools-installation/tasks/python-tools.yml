@@ -22,7 +22,7 @@
     purge: yes
   become: true
   become_method: sudo 
-
+  
 - name: "Check if NetExec exists"
   stat:
     path: "{{ ansible_env.HOME }}/.local/bin/netexec"
