@@ -42,4 +42,5 @@
     state: latest
   become: true
   become_method: sudo
+  ignore_errors: true
 
