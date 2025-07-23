@@ -26,4 +26,4 @@
     create: yes
   become: true
   become_method: sudo
-  when: not sublime_text_file.stat.exists
+  changed_when: false
