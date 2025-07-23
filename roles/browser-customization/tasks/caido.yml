@@ -5,7 +5,7 @@
   register: latest_caido_json_file
   changed_when: false
 
-- name: "Downloading Latest Version of Laurel"
+- name: "Downloading Latest Version of Caido"
   uri:
     url: "https://api.github.com/repos/caido/caido/releases/latest"
     method: GET    
