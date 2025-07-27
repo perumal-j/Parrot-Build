@@ -53,11 +53,17 @@
   register: pwntools_exists
   changed_when: false
 
-- name: "Installing Netexec, Certipy, pywhisker, bloodyAD and pwntools"
+- name: "Check if gettgtpkinit exists"
+  stat: 
+    path: "{{ ansible_env.HOME }}/.local/bin/gettgtpkinit"
+  register: gettgtpkinit_exists
+  changed_when: false
+
+- name: "Installing Netexec, Certipy, pywhisker, bloodyAD, pwntools & gettgtpkinit"
   shell:
     cmd: uv tool install {{ item.url }}
   loop: "{{ UVtoolsGit }}"
-  when: not certipy_exists.stat.exists or not netexec_exists.stat.exists or not pywhisker_exists.stat.exists or not bloodyAD_exists.stat.exists or not pwntools_exists.stat.exists
+  when: not certipy_exists.stat.exists or not netexec_exists.stat.exists or not pywhisker_exists.stat.exists or not bloodyAD_exists.stat.exists or not pwntools_exists.stat.exists or not gettgtpkinit_exists.stat.exists
 
 - name: "Uninstall old Impacket"
   apt:
@@ -107,3 +113,60 @@
     dest: "{{ ansible_env.HOME }}/.local/bin/targetedKerberoast"
     mode: 0755
   when: not targetedKerberoast.stat.exists
+
+- name: "Check presence of PKINITtools"
+  stat:
+    path: "/opt/PKINITtools"
+  register: PKINITtools
+  changed_when: false
+
+- name: "Downloading PKINITtools from Github"
+  git:
+    repo: https://github.com/dirkjanm/PKINITtools.git
+    dest: "/opt/PKINITtools"
+    version: master
+  become: true
+  become_method: sudo
+  when: not PKINITtools.stat.exists
+
+- name: "Modifying PKINITtools Directory Owner"
+  file:
+    path: "/opt/PKINITtools"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Check the presence of gettgtpkinit.py"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/gettgtpkinit"
+  register: gettgtpkinit
+  changed_when: false
+
+- name: "Adding Dependencies to PKINITtools"
+  shell: |
+    cd /opt/PKINITtools
+    /home/perumalj/.local/bin/uv add --script /opt/PKINITtools/gettgtpkinit.py -r /opt/PKINITtools/requirements.txt
+  become: true
+  become_method: sudo
+  when: not gettgtpkinit.stat.exists
+
+- name: "Tweaking Shebang"
+  replace:
+    path: "/opt/PKINITtools/gettgtpkinit.py"
+    regexp: "#!/usr/bin/env python3"
+    replace: "#!/usr/bin/env -S uv run --script"
+  become: true
+  become_method: sudo
+
+- name: "Adding gettgtpkinit.py to .local/bin"
+  copy:
+    src: "/opt/PKINITtools/gettgtpkinit.py"
+    dest: "{{ ansible_env.HOME }}/.local/bin/gettgtpkinit"
+    mode: 0755
+  become: true
+  become_method: sudo
+  when: not gettgtpkinit.stat.exists

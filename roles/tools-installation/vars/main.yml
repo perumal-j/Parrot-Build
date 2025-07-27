@@ -27,6 +27,9 @@ UVtoolsGit:
 
   - name: pwntools
     url: "git+https://github.com/Gallopsled/pwntools"
+  
+  # - name: oscrypto #PKINITTools Dependency
+  #   url: "git+https://github.com/wbond/oscrypto"
 
 
 repositories: 

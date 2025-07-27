@@ -44,7 +44,7 @@
     state: latest
   become: true
   become_method: sudo
-  when: ansible_distribunsible_distribution|lower == 'ubuntu'
+  when: ansible_distribution|lower == 'ubuntu'
 
 
 - name: "Installing Tools via Apt - Parrot"
@@ -70,9 +70,7 @@
       - libffi-dev
       - ldap-utils
       - powershell
-      - python3.12-dev
     state: latest
   become: true
   become_method: sudo
-  when: ansible_distribunsible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian'
-
+  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian'
