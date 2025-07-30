@@ -1,0 +1,8 @@
+---
+- name: "Disabling NTP Update"
+  shell:
+    cmd: "timedatectl set-ntp off"
+  become: true
+  become_method: sudo
+  changed_when: false
+  when: ansible_distribution | lower == 'ubuntu' or ansible_distribution | lower == 'parrot' or ansible_distribution | lower == 'debian'
