@@ -8,6 +8,10 @@ GitHubTools:
     url: "https://github.com/Flangvik/SharpCollection"
     destination: "/opt/SharpCollection"
 
+  - name: MSSQLHound
+    url: "https://github.com/SpecterOps/MSSQLHound"
+    destination: "/opt/MSSQLHound"
+
 UVtools:
   - impacket
   - sshuttle
