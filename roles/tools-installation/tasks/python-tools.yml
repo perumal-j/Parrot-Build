@@ -172,8 +172,9 @@
   when: not gettgtpkinit.stat.exists
 
 - name: "Upgrading UV tools"
-  shell: uv tool upgrade --all
+  shell: "{{ ansible_env.HOME }}/.local/bin/uv tool upgrade --all"
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Parrot" or ansible_distribution == "Debian"
   become: true
   become_method: sudo
   changed_when: false
+  # ignore_errors: true
