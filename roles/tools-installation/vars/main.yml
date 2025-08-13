@@ -31,6 +31,9 @@ UVtoolsGit:
 
   - name: pwntools
     url: "git+https://github.com/Gallopsled/pwntools"
+
+  - name: ldeep
+    url: "git+https://github.com/franc-pentest/ldeep"
   
   # - name: oscrypto #PKINITTools Dependency
   #   url: "git+https://github.com/wbond/oscrypto"

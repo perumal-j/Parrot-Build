@@ -59,11 +59,17 @@
   register: gettgtpkinit_exists
   changed_when: false
 
-- name: "Installing Netexec, Certipy, pywhisker, bloodyAD, pwntools & gettgtpkinit"
+- name: "Check if ldeep exists"
+  stat: 
+    path: "{{ ansible_env.HOME }}/.local/bin/ldeep"
+  register: ldeep_exists
+  changed_when: false
+
+- name: "Installing Netexec, Certipy, pywhisker, bloodyAD, pwntools, gettgtpkinit & ldeep_exists"
   shell:
     cmd: uv tool install {{ item.url }}
   loop: "{{ UVtoolsGit }}"
-  when: not certipy_exists.stat.exists or not netexec_exists.stat.exists or not pywhisker_exists.stat.exists or not bloodyAD_exists.stat.exists or not pwntools_exists.stat.exists or not gettgtpkinit_exists.stat.exists
+  when: not certipy_exists.stat.exists or not netexec_exists.stat.exists or not pywhisker_exists.stat.exists or not bloodyAD_exists.stat.exists or not pwntools_exists.stat.exists or not gettgtpkinit_exists.stat.exists or not ldeep_exists.stat.exists
 
 - name: "Uninstall old Impacket"
   apt:
