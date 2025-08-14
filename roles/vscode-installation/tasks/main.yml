@@ -1,4 +1,12 @@
 ---
+- name: "Removing Apt Source List Conflict"
+  file:
+    path: "/etc/apt/sources.list.d/vscode.sources"
+    state: absent
+  become: true
+  become_method: sudo
+  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian' or ansible_distribution|lower == 'ubuntu'
+
 - name: "Installing Visual Studio Code"
   include_role: 
     name: "gantsign.visual-studio-code"
@@ -14,11 +22,3 @@
           - golang.Go
           - rust-lang.rust-analyzer
           - ms-vscode.cpptools-extension-pack
-
-- name: "Removing Apt Source List Conflict"
-  file:
-    path: "/etc/apt/sources.list.d/vscode.sources"
-    state: absent
-  become: true
-  become_method: sudo
-  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian' or ansible_distribution|lower == 'ubuntu'
