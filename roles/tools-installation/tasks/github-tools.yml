@@ -20,7 +20,23 @@
   become_method: sudo
   when: not sec_lists.stat.exists or not sharp_collection.stat.exists
 
-  
+- name: "Check the presence of /opt/hash-id.py"
+  stat:
+    path: "/opt/hash-id.py"
+  register: hash_id
+  changed_when: false
+
+- name: "Installing hash-id.py"
+  get_url:
+    url: "https://gitlab.com/kalilinux/packages/hash-identifier/-/raw/kali/master/hash-id.py"
+    dest: "/opt/hash-id.py"
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+  become_method: sudo
+  when: not hash_id.stat.exists
+
 - name: "Create Temporary Build Directory"
   tempfile:
     state: directory

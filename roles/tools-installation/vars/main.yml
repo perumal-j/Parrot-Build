@@ -12,6 +12,7 @@ GitHubTools:
     url: "https://github.com/SpecterOps/MSSQLHound"
     destination: "/opt/MSSQLHound"
 
+
 UVtools:
   - impacket
   - sshuttle
