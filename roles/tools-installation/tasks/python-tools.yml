@@ -184,3 +184,37 @@
   become_method: sudo
   changed_when: false
   # ignore_errors: true
+
+- name: :"Check the presence of SMB_Killer"
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/SMB_Killer.py"
+  register: smb_killer
+  changed_when: false
+
+
+- name: "Git Cloning SMB_Killer"
+  git:
+    repo: "https://github.com/overgrowncarrot1/SMB_Killer.git"
+    dest: "/opt/SMB_Killer"
+  become: true
+  become_method: sudo 
+  when: not smb_killer.stat.exists
+
+- name: "Modifying SMB_Killer Directory Owner"
+  file:
+    path: "/opt/SMB_Killer"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Adding SMB_Killer to .local/bin"
+  copy:
+    src: "/opt/SMB_Killer/SMB_Killer.py"
+    dest: "{{ ansible_env.HOME }}/.local/bin/SMB_Killer.py"
+    mode: 0755
+  when: not smb_killer.stat.exists
+
