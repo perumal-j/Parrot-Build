@@ -39,6 +39,15 @@
   register: caido_binary_bash
   changed_when: false
 
+- name: "Downloading Caido"
+  get_url:
+    url: "{{ caido_url.stdout }}"
+    dest: /usr/local/bin/caido
+    mode: '0755'
+  become: true
+  become_method: sudo
+  when: caido_binary_bash.stat.exists == false
+
 - name: "Check the existence of /opt/caido"
   stat:
     path: /opt/caido
