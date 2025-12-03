@@ -3,6 +3,7 @@ FirefoxExtensions:
   - "darkreader"
   - "foxyproxy-standard"
   - "bitwarden-password-manager"
+  - "hacktools"
 
 burpsuite_extras_dir: "/usr/local/lib/burpsuite-extras"
 burpsuite_extras_jars:
