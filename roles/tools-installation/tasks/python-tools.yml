@@ -69,7 +69,7 @@
   shell:
     cmd: uv tool install {{ item.url }}
   loop: "{{ UVtoolsGit }}"
-  when: not certipy_exists.stat.exists or not pywhisker_exists.stat.exists or not bloodyAD_exists.stat.exists or not pwntools_exists.stat.exists or not gettgtpkinit_exists.stat.exists or not ldeep_exists.stat.exists
+  when: not certipy_exists.stat.exists and not pywhisker_exists.stat.exists and not bloodyAD_exists.stat.exists and not pwntools_exists.stat.exists and not gettgtpkinit_exists.stat.exists and not ldeep_exists.stat.exists
 
 - name: "Installing NetExec via pipx"
   shell:
