@@ -62,3 +62,24 @@
   become: true
   become_method: sudo
   changed_when: false
+
+- name: "Change owner of downloaded GitHub Tools"
+  file:
+    path: "{{ item.destination }}"
+    owner: perumalj
+    group: perumalj
+    state: directory
+  loop: "{{ GitHubReleases }}"
+  become: true
+  become_method: sudo
+
+- name: "Recursively change owner of files in GitHub Tools directories"
+  file:
+    path: "{{ item.destination }}"
+    owner: perumalj
+    group: perumalj
+    recurse: yes
+  loop: "{{ GitHubReleases }}"
+  become: true
+  become_method: sudo
+

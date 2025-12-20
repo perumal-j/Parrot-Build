@@ -71,3 +71,11 @@ GitHubReleases:
   - repo: "WithSecureLabs/chainsaw"
     regex: "chainsaw_all_"
     destination: "/opt/chainsaw"
+
+  - repo: "shadow1ng/fscan"
+    regex: "fscan"
+    destination: "/opt/fscan"
+
+  - repo: "shadow1ng/fscan"
+    regex: "fscan.exe"
+    destination: "/opt/fscan"
