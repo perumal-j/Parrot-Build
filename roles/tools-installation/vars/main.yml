@@ -76,6 +76,6 @@ GitHubReleases:
     regex: "fscan"
     destination: "/opt/fscan"
 
-  - repo: "shadow1ng/fscan"
-    regex: "fscan.exe"
-    destination: "/opt/fscan"
+  # - repo: "shadow1ng/fscan"
+  #   regex: "fscan.exe"
+  #   destination: "/opt/fscan"

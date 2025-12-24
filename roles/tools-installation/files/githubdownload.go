@@ -22,6 +22,7 @@ func GetGithubReleasesLatest(repo string) string {
 
 	// Make a GET request to the URL
 	resp, err := http.Get(url)
+
 	if err != nil {
 		fmt.Println("Error:", err)
 		return ""
