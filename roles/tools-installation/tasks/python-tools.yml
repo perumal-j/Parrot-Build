@@ -26,8 +26,12 @@
 - name: "Check if NetExec exists"
   stat:
     path: "{{ ansible_env.HOME }}/.local/bin/netexec"
-  register: netexec_exists
+  register: netexec
   changed_when: false
+
+- name: Debug HOME on the control machine
+  debug:
+    msg: "{{ lookup('env', 'HOME') }}"
 
 - name: "Check if Certipy exists"
   stat:
@@ -75,7 +79,7 @@
   shell:
     cmd: pipx install {{ item.url }}
   loop: "{{ PIPToolsGit }}"
-  when: not netexec_exists.stat.exists
+  when: not netexec.stat.exists
 
 - name: "Uninstall old Impacket"
   apt:
