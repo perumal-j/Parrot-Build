@@ -39,6 +39,38 @@ func GetGithubReleasesLatest(repo string) string {
 	return string(body) // Return the raw JSON response as a string
 }
 
+// Get tag_name value from github releases json response
+func GetGithubReleaseTagName(meta_data string) string {
+	var data map[string]interface{}
+	err := json.Unmarshal([]byte(meta_data), &data)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return ""
+	}
+	tag_name, ok := data["tag_name"].(string)
+	if !ok {
+		fmt.Println("tag_name not found in JSON data")
+	}
+	return tag_name
+}
+
+// ReadFileAsString reads the content of a .txt file and returns it as a string
+func ReadFileAsString(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// Read the entire file
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
+
 func GetGithubReleaseUrls(meta_data string, regex string) []string {
 	// Get URLs of all release files that match the regex
 	var data map[string]interface{}
@@ -345,17 +377,25 @@ func UnifiedExtractionByteStream(repo string, regex string, output_directory str
 			}
 		}
 	}
+
+	file, err := os.Create(output_directory + "/tag_name.txt")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return err
+	}
+	defer file.Close()
+	_, err = io.Copy(file, bytes.NewReader([]byte(GetGithubReleaseTagName(meta_data))))
+	if err != nil {
+		fmt.Println("Error copying file:", err)
+		return err
+	}
 	return nil
 }
-
-// func main() {
-// 	UnifiedExtractionByteStream("threathunters-io/laurel", "86_64-glibc.tar.gz", "/home/perumalj/Code/dir_chisel")
-// }
 
 func main() {
 	if len(os.Args) != 4 {
 		fmt.Println("Usage: go run githubdownload_byte_stream.go <repo> <regex> <output_directory>")
-		fmt.Println("For Example: go run githubdownload_byte_stream.go 'threathunters-io/laurel' '86_64-glibc.tar.gz' '/home/perumalj/Code/dir_chisel'")
+		fmt.Println("For Example: go run githubdownload_byte_stream.go 'shadow1ng/fscan' 'fcan.exe' 'home/user/tools/fscan'")
 		return
 	}
 
@@ -363,8 +403,27 @@ func main() {
 	regex := os.Args[2]
 	output_directory := os.Args[3]
 
-	err := UnifiedExtractionByteStream(repo, regex, output_directory)
+	localTag, err := ReadFileAsString(output_directory + "/tag_name.txt")
 	if err != nil {
 		fmt.Println("Error:", err)
+	}
+
+	releasePage := GetGithubReleasesLatest(repo)
+	if releasePage == "" {
+		fmt.Println("Error:", err)
+	}
+
+	remoteTag := GetGithubReleaseTagName(releasePage)
+
+	if localTag == remoteTag {
+		fmt.Println("Latest version is already installed:", localTag)
+		return
+	}
+	if localTag != remoteTag {
+		UnifiedExtractionByteStream(repo, regex, output_directory)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
 	}
 }
