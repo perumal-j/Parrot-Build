@@ -7,7 +7,7 @@
 
 - name: "Check if Rust exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.cargo/bin/rustc"
+    path: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/rustc"
   register: rust_exists
   changed_when: false
 
@@ -16,9 +16,9 @@
   when: not rust_exists.stat.exists
 
 - name: "Installing Feroxbuster"
-  shell: "{{ ansible_env.HOME }}/.cargo/bin/cargo install feroxbuster"
+  shell: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/cargo install feroxbuster"
   changed_when: false
 
 - name: "Installing Rustscan"
-  shell: "{{ ansible_env.HOME }}/.cargo/bin/cargo install rustscan"
+  shell: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/cargo install rustscan"
   changed_when: false

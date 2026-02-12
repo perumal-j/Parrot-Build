@@ -32,6 +32,6 @@
 
 - name: "Moving Kerbrute to Bin Path"
   copy:
-    src: "{{ ansible_env.HOME }}/go/bin/kerbrute"
-    dest: "{{ ansible_env.HOME }}/.local/bin/"
+    src: "{{ ansible_facts['env']['HOME'] }}/go/bin/kerbrute"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/"
     mode: 0750

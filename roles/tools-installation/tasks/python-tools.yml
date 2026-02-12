@@ -1,7 +1,7 @@
 ---
 - name: "Check if Python UV exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/uv"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/uv"
   register: uv_manager_exists
   changed_when: false
 
@@ -25,7 +25,7 @@
   
 - name: "Check if NetExec exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/netexec"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/netexec"
   register: netexec
   changed_when: false
 
@@ -35,37 +35,37 @@
 
 - name: "Check if Certipy exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/certipy"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/certipy"
   register: certipy_exists
   changed_when: false
 
 - name: "Check if pywhisker exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/pywhisker"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/pywhisker"
   register: pywhisker_exists
   changed_when: false
 
 - name: "Check if bloodyAD exists"
   stat: 
-    path: "{{ ansible_env.HOME }}/.local/bin/bloodyAD"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/bloodyAD"
   register: bloodyAD_exists
   changed_when: false
 
 - name: "Check if pwntools repository exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/share/uv/tools/pwntools"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/share/uv/tools/pwntools"
   register: pwntools_exists
   changed_when: false
 
 - name: "Check if gettgtpkinit exists"
   stat: 
-    path: "{{ ansible_env.HOME }}/.local/bin/gettgtpkinit"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/gettgtpkinit"
   register: gettgtpkinit_exists
   changed_when: false
 
 - name: "Check if ldeep exists"
   stat: 
-    path: "{{ ansible_env.HOME }}/.local/bin/ldeep"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/ldeep"
   register: ldeep_exists
   changed_when: false
 
@@ -91,17 +91,17 @@
 
 - name: "Check if Impacket Exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/share/uv/tools/impacket/bin"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/share/uv/tools/impacket/bin"
   register: "impacket_exists"
   changed_when: false
 
 - name: "Check if sshuttle Exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/sshuttle"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/sshuttle"
   register: "sshuttle_exists"
   changed_when: false
 
-- name: "Installing {{ item }}"
+- name: "Installing Impacket and sshuttle via UV"
   shell:
     cmd: uv tool install {{ item }}
   loop: "{{ UVtools }}"
@@ -119,14 +119,14 @@
 
 - name: "Check if targetedKerberoast exists"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/targetedKerberoast"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/targetedKerberoast"
   register: targetedKerberoast
   changed_when: false
 
 - name: "Copying targetedKerberoast to .local/bin"
   copy:
     src: "/tmp/targetedKerberoast/targetedKerberoast.py"
-    dest: "{{ ansible_env.HOME }}/.local/bin/targetedKerberoast"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/targetedKerberoast"
     mode: 0755
   when: not targetedKerberoast.stat.exists
 
@@ -148,8 +148,8 @@
 - name: "Modifying PKINITtools Directory Owner"
   file:
     path: "/opt/PKINITtools"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     state: directory
     recurse: true
   become: true
@@ -158,7 +158,7 @@
 
 - name: "Check the presence of gettgtpkinit.py"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/gettgtpkinit"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/gettgtpkinit"
   register: gettgtpkinit
   changed_when: false
 
@@ -181,15 +181,15 @@
 - name: "Adding gettgtpkinit.py to .local/bin"
   copy:
     src: "/opt/PKINITtools/gettgtpkinit.py"
-    dest: "{{ ansible_env.HOME }}/.local/bin/gettgtpkinit"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/gettgtpkinit"
     mode: 0755
   become: true
   become_method: sudo
   when: not gettgtpkinit.stat.exists
 
 - name: "Upgrading UV tools"
-  shell: "{{ ansible_env.HOME }}/.local/bin/uv tool upgrade --all"
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Parrot" or ansible_distribution == "Debian"
+  shell: "{{ ansible_facts['env']['HOME'] }}/.local/bin/uv tool upgrade --all"
+  when: ansible_facts['distribution'] == "Ubuntu" or ansible_facts['distribution'] == "Parrot" or ansible_facts['distribution'] == "Debian"
   become: true
   become_method: sudo
   changed_when: false
@@ -197,7 +197,7 @@
 
 - name: :"Check the presence of SMB_Killer"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/SMB_Killer.py"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/SMB_Killer.py"
   register: smb_killer
   changed_when: false
 
@@ -213,8 +213,8 @@
 - name: "Modifying SMB_Killer Directory Owner"
   file:
     path: "/opt/SMB_Killer"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     state: directory
     recurse: true
   become: true
@@ -224,7 +224,7 @@
 - name: "Adding SMB_Killer to .local/bin"
   copy:
     src: "/opt/SMB_Killer/SMB_Killer.py"
-    dest: "{{ ansible_env.HOME }}/.local/bin/SMB_Killer.py"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/SMB_Killer.py"
     mode: 0755
   when: not smb_killer.stat.exists
 

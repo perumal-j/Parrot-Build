@@ -6,7 +6,7 @@
     # dest: "/etc/firefox/policies/policies.json"
   become: true
   become_method: sudo
-  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian'
+  when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
 
 - name: "Copying Firefox Policies"
   template:
@@ -15,5 +15,5 @@
     dest: "/etc/firefox/policies/policies.json"
   become: true
   become_method: sudo
-  when: ansible_distribution|lower == 'ubuntu'
+  when: ansible_facts['distribution']|lower == 'ubuntu'
  

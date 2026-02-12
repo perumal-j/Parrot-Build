@@ -17,25 +17,25 @@
 
 - name: "Check if Tech-Notes Exists"
   stat:
-    path: "{{ ansible_env.HOME }}/Notes/Tech-Notes/.git"
+    path: "{{ ansible_facts['env']['HOME'] }}/Notes/Tech-Notes/.git"
   register: tech_notes
   changed_when: false
 
 - name: "Check if Old-Notes Exists"
   stat:
-    path: "{{ ansible_env.HOME }}/Notes/Old-Notes/.git"
+    path: "{{ ansible_facts['env']['HOME'] }}/Notes/Old-Notes/.git"
   register: old_notes
   changed_when: false
 
 - name: "Check if Notes Exists"
   stat:
-    path: "{{ ansible_env.HOME }}/Notes"
+    path: "{{ ansible_facts['env']['HOME'] }}/Notes"
   register: notes
   changed_when: false
 
 - name: "Create Directory ~/Notes"
   file:
-    path: "{{ ansible_env.HOME }}/Notes"
+    path: "{{ ansible_facts['env']['HOME'] }}/Notes"
     state: directory
     mode: 0755
   when: not notes.stat.exists
@@ -43,13 +43,13 @@
 - name: "Clone Tech-Notes via Git"
   git:
     repo: "git@github.com:perumal-j/Tech-Notes.git"
-    dest: "{{ ansible_env.HOME }}/Notes/Tech-Notes"
+    dest: "{{ ansible_facts['env']['HOME'] }}/Notes/Tech-Notes"
     accept_hostkey: yes
   when: not tech_notes.stat.exists
 
 - name: "Clone Old-Notes via Git"
   git:
     repo: "git@github.com:perumal-j/Old-Notes.git"
-    dest: "{{ ansible_env.HOME }}/Notes/Old-Notes"
+    dest: "{{ ansible_facts['env']['HOME'] }}/Notes/Old-Notes"
     accept_hostkey: yes
   when: not old_notes.stat.exists

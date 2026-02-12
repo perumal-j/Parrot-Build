@@ -16,8 +16,8 @@
 - name: "Modifying RustHound-CE Directory Owner"
   file:
     path: "/opt/RustHound-CE"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     state: directory
     recurse: true
   become: true
@@ -39,7 +39,7 @@
   become: true
   become_method: sudo
   changed_when: false
-  when: ansible_distribution == "Debian"
+  when: ansible_facts['distribution'] == "Debian"
 
 - name: "Installing RustHound-CE Dependencies"
   package:
@@ -58,7 +58,7 @@
 
 - name: "Check the presence of RustHound-CE"
   stat:
-    path: "{ ansible.env.HOME }/.cargo/bin/rusthound-ce"
+    path: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/rusthound-ce"
   register: rusthound_ce_bin
   changed_when: false
 

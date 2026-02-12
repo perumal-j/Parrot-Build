@@ -5,14 +5,14 @@
     state: absent
   become: true
   become_method: sudo
-  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian' or ansible_distribution|lower == 'ubuntu'
+  when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian' or ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: "Installing Visual Studio Code"
   include_role: 
     name: "gantsign.visual-studio-code"
   vars:
     users:
-      - username: "{{ ansible_user_id }}"
+      - username: "{{ ansible_facts['user_id'] }}"
         visual_studio_code_extensions:
           - Codeium.codeium
           - snyk-security.snyk-vulnerability-scanner

@@ -16,8 +16,8 @@
 - name: "Modifying Bloodhound Directory Owner"
   file:
     path: "/opt/BloodHound"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     state: directory
     recurse: true
   become: true
@@ -123,7 +123,7 @@
 
 - name: " Check if bloodhound-ce-python is installed"
   stat:
-    path: "{{ ansible_env.HOME }}/.local/bin/bloodhound-ce-python"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/bloodhound-ce-python"
   register: bloodhound_ce_python
   changed_when: false
 

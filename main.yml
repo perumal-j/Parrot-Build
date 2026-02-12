@@ -2,11 +2,12 @@
 - name: "Building Parrot"
   hosts: localhost
   connection: local
+  gather_facts: true
  
   vars_files:
-    - "{{ ansible_env.HOME }}/.ansible/secrets.yml"
+    - "{{ lookup('env', 'HOME') }}/.ansible/secrets.yml"
  
-  pre_tasks:
+  pre_tasks:   
     - name: Verify GitHub Authentication
       uri:
         url: "https://api.github.com/rate_limit"
@@ -15,6 +16,7 @@
           Authorization: "token {{ github_api_key }}"
       register: auth_check
       failed_when: auth_check.json.rate.limit != 5000
+
 
     - name: Show Current Rate Limit
       debug:

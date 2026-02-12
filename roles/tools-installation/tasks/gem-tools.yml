@@ -28,13 +28,13 @@
       - evil-winrm
 
   - name: "Get Ruby Version Directory"
-    shell: "ls {{ ansible_env.HOME }}/.local/share/gem/ruby | head -n 1"
+    shell: "ls {{ ansible_facts['env']['HOME'] }}/.local/share/gem/ruby | head -n 1"
     register: ruby_version
     changed_when: false
 
   - name: "Adding ruby BIN PATH to .bashrc"
     lineinfile:
-      path: "{{ ansible_env.HOME }}/.bashrc"
-      line: "export PATH=$PATH:{{ ansible_env.HOME }}/.local/share/gem/ruby/{{ ruby_version.stdout }}/bin"      
+      path: "{{ ansible_facts['env']['HOME'] }}/.bashrc"
+      line: "export PATH=$PATH:{{ ansible_facts['env']['HOME'] }}/.local/share/gem/ruby/{{ ruby_version.stdout }}/bin"      
       state: present
     changed_when: false

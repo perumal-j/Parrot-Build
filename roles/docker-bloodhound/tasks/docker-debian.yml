@@ -48,17 +48,18 @@
   become_method: sudo
 
 - name: "Check where current user is in docker group"
-  shell: "id -nG | grep docker"
+  shell: "id -nG"
   register: docker_group
-  ignore_errors: true
+  changed_when: false
+  failed_when: false
   become: true
   become_method: sudo
 
 - name: "Adding Current User to Docker Group"
   user:
-    name: "{{ ansible_user_id }}"
+    name: "{{ ansible_facts['user_id'] }}"
     groups: docker
     append: true
   become: true
   become_method: sudo
-  when: docker_group.rc != 0
+  when: "'docker' not in docker_group.stdout.split()"

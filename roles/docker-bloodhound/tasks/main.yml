@@ -1,7 +1,7 @@
 ---
 - name: "Check OS ID from /etc/os-release"
   set_fact:
-    os_id: "{{ ansible_distribution|lower }}"
+    os_id: "{{ ansible_facts['distribution']|lower }}"
   changed_when: false
 
 - include_tasks: docker-debian.yml

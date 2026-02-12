@@ -1,13 +1,13 @@
 ---
 - name: "Check the presense of .ssh in home directory"
   stat:
-    path: "{{ ansible_env.HOME }}/.ssh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
   register: ssh_exists
   changed_when: false
 
 - name: "Creating .ssh in home directory"
   file:
-    path: "{{ ansible_env.HOME }}/.ssh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
     state: directory
     mode: 0700
   when: not ssh_exists.stat.exists
@@ -15,7 +15,7 @@
 - name: "Add SSH private key"
   copy:
     content: "{{ git_private_key }}"
-    dest: "{{ ansible_env.HOME }}/.ssh/id_rsa"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_rsa"
     mode: 0600
 
 - name: "Configure Git User"

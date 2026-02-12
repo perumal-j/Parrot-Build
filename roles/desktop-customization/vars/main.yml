@@ -29,47 +29,47 @@ IconPaths:
 
 parrot_apps:
   - name: "sublime-text"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
     id: 261
   - name: "vscode"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
     id: 271
   - name: "firefox"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
     id: 281
   - name: "obsidian"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
     id: 291
   - name: "burp-suite"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
     id: 301
   - name: "caido"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/caido.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/caido.desktop"
     id: 311
   - name: "flameshot"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
     id: 321
 
 
 ubuntu_apps:
   - name: "sublime-text"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
     id: 89
   - name: "vscode"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
     id: 99
   - name: "firefox"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
     id: 109
   - name: "obsidian"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
     id: 119
   - name: "burp-suite"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
     id: 129
   - name: "caido"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/caido.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/caido.desktop"
     id: 139
   - name: "flameshot"
-    desktop: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
+    desktop: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
     id: 149

@@ -1,7 +1,7 @@
 #!/bin/bash
 sudo apt-get update
 sudo apt-get install pipx -y
-pipx install --include-deps ansible
+pipx install --include-deps ansible-core
 pipx ensurepath
 
 # Install locales package if missing
@@ -9,6 +9,9 @@ sudo apt-get install locales -y
 
 # Generate UTF-8 locale
 sudo locale-gen en_US.UTF-8
+
+# Install Ansible Collection dependencies
+ansible-galaxy collection install community.general
 
 # Update system-wide locale settings
 sudo update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8

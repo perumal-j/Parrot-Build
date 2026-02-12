@@ -2,11 +2,11 @@
 - name: "Copy Bashrc"
   copy:
     src: "bashrc"
-    dest: "{{ ansible_env.HOME }}/.bashrc"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.bashrc"
   changed_when: false
   
 - name: "Activate Modified Bashrc"
-  shell: "source {{ ansible_env.HOME }}/.bashrc"
+  shell: "source {{ ansible_facts['env']['HOME'] }}/.bashrc"
   args:
     executable: /bin/bash
   changed_when: false
@@ -14,7 +14,7 @@
 - name: "Copy Profile File"
   copy:
     src: "profile"
-    dest: "{{ ansible_env.HOME }}/.profile"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.profile"
 
 - name: "Reading Existing Terminal Profiles"
   vars:

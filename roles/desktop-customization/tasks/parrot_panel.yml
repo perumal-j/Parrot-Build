@@ -39,8 +39,8 @@
 - name: "Modifying flat-remix Directory Owner"
   file:
     path: "/opt/flatpak-icons"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     state: directory
     recurse: true
   become: true
@@ -50,7 +50,7 @@
 - name: "Creating Desktop Launchers"
   template:
     src: "launchers.j2"
-    dest: "/home/{{ ansible_user_id }}/.config/mate/panel2.d/default/launchers/{{ item.0 }}.desktop"
+    dest: "/home/{{ ansible_facts['user_id'] }}/.config/mate/panel2.d/default/launchers/{{ item.0 }}.desktop"
   loop: "{{  DesktopLaunchers | zip(AppPaths, IconPaths) }}"
   vars:
     DesktopLauncher: "{{ item.0 }}"
@@ -63,37 +63,37 @@
     state: directory
     mode: '0755'
 
-- name: "Debug ansible_distribution"
+- name: "Debug ansible_facts['distribution']"
   debug:
-    msg: "ansible_distribution: {{ ansible_distribution|lower }}"
+    msg: "ansible_facts['distribution']: {{ ansible_facts['distribution']|lower }}"
 
 - name: "Generate dconf configuration files - Parrot"
   template:
     src: panel-object.j2
     dest: "/tmp/panel-configs/{{ item.name }}.dconf"
   loop: "{{ parrot_apps }}"
-  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian'
+  when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
 
 - name: "Generate dconf configuration files - Ubuntu"
   template:
     src: panel-object.j2
     dest: "/tmp/panel-configs/{{ item.name }}.dconf"
   loop: "{{ ubuntu_apps }}"
-  when: ansible_distribution|lower == 'ubuntu'
+  when: ansible_facts['distribution']|lower == 'ubuntu'
   
 - name: "Deploying Templated Script for Object ID List - Parrot"
   template:
     src: "parrot-object-id-list.sh.j2"
     dest: "/tmp/object-id-list.sh"
     mode: '0755'
-  when: ansible_distribution|lower == 'parrot' or ansible_distribution|lower == 'debian'
+  when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
 
 - name: "Deploying Templated Script for Object ID List - Ubuntu"
   template:
     src: "ubuntu-object-id-list.sh.j2"
     dest: "/tmp/object-id-list.sh"
     mode: '0755'
-  when: ansible_distribution|lower == 'ubuntu'
+  when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: "Check if object-id-list.sh exists"
   stat: 
