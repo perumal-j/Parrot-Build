@@ -7,7 +7,7 @@
   
 - name: "Check If Obsidian Exists"
   stat:
-    path: "/usr/local/bin/obsidian"
+    path: "/opt/obsidian"
   register: obsidian_exists
   changed_when: false
 
