@@ -66,8 +66,8 @@
 - name: "Change owner of downloaded GitHub Tools"
   file:
     path: "{{ item.destination }}"
-    owner: perumalj
-    group: perumalj
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     state: directory
   loop: "{{ GitHubReleases }}"
   become: true
@@ -76,8 +76,8 @@
 - name: "Recursively change owner of files in GitHub Tools directories"
   file:
     path: "{{ item.destination }}"
-    owner: perumalj
-    group: perumalj
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     recurse: yes
   loop: "{{ GitHubReleases }}"
   become: true

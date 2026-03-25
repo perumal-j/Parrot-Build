@@ -137,4 +137,4 @@
 - name: "Copying Burpsuite Community Config Template"
   template:
     src: "UserConfigCommunity.json.j2"
-    dest: "/home/{{ ansible_facts['user_id'] }}/.BurpSuite/UserConfigCommunity.json"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.BurpSuite/UserConfigCommunity.json"

@@ -19,9 +19,10 @@
     dest: "/tmp/golanginstall.sh"
     mode: 0755
   when: not golang_exists.stat.exists
-  
+
 - name: "Executing Bash Script to Install Golang"
   shell: "/tmp/golanginstall.sh"
+  become: yes
   when: not golang_exists.stat.exists
 
 - name: "Installing Kerbrute"

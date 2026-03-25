@@ -1,4 +1,75 @@
 ---
+- name: Remove Firefox Snap package
+  become: true
+  community.general.snap:
+    name: firefox
+    state: absent
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: Create directory for APT keyrings
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: Import Mozilla APT repository signing key
+  become: true
+  ansible.builtin.get_url:
+    url: https://packages.mozilla.org/apt/repo-signing-key.gpg
+    dest: /etc/apt/keyrings/packages.mozilla.org.asc
+    mode: '0644'
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: Add Mozilla APT repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main"
+    state: present
+    filename: mozilla
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: Set Firefox PPA priority (Prevent Ubuntu from reinstalling Snap)
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/apt/preferences.d/mozilla
+    content: |
+      Package: *
+      Pin: origin packages.mozilla.org
+      Pin-Priority: 1000
+      Package: firefox*
+      Pin: release o=Ubuntu
+      Pin-Priority: -1
+    mode: '0644'
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Updating Apt Cache"
+  command: apt-get update
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: Install Firefox native package
+  become: true
+  ansible.builtin.apt:
+    name: firefox
+    state: present
+    update_cache: yes
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
 - name: "Copying Firefox Policies"
   template:
     src: "policies.json.j2"
@@ -7,6 +78,16 @@
   become: true
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
+
+- name: "Ensure Firefox policies directory exists"
+  file:
+    path: "/etc/firefox/policies"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: "Copying Firefox Policies"
   template:
