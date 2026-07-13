@@ -1,6 +1,5 @@
 ---
 - name: Remove Firefox Snap package
-  become: true
   community.general.snap:
     name: firefox
     state: absent
@@ -9,7 +8,6 @@
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: Create directory for APT keyrings
-  become: true
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
@@ -19,7 +17,6 @@
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: Import Mozilla APT repository signing key
-  become: true
   ansible.builtin.get_url:
     url: https://packages.mozilla.org/apt/repo-signing-key.gpg
     dest: /etc/apt/keyrings/packages.mozilla.org.asc
@@ -28,18 +25,20 @@
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
-- name: Add Mozilla APT repository
-  become: true
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main"
+- name: Add Mozilla APT repository (Deb822 format)
+  ansible.builtin.deb822_repository:
+    name: mozilla
+    types: deb
+    uris: https://packages.mozilla.org/apt
+    suites: mozilla
+    components: main
+    signed_by: /etc/apt/keyrings/packages.mozilla.org.asc
     state: present
-    filename: mozilla
   become: true
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: Set Firefox PPA priority (Prevent Ubuntu from reinstalling Snap)
-  become: true
   ansible.builtin.copy:
     dest: /etc/apt/preferences.d/mozilla
     content: |
@@ -61,8 +60,7 @@
   changed_when: false
 
 - name: Install Firefox native package
-  become: true
-  ansible.builtin.apt:
+   ansible.builtin.apt:
     name: firefox
     state: present
     update_cache: yes
