@@ -60,7 +60,7 @@
   changed_when: false
 
 - name: Install Firefox native package
-   ansible.builtin.apt:
+  ansible.builtin.apt:
     name: firefox
     state: present
     update_cache: yes
