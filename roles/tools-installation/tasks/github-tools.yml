@@ -11,6 +11,12 @@
   register: sharp_collection
   changed_when: false
 
+- name: "Check the presence of /opt/username-anarchy"
+  stat:
+    path: "/opt/username-anarchy"
+  register: username_anarchy
+  changed_when: false 
+
 - name: "Installing Tools from GitHub Repositories"
   git:
     repo: "{{ item.url }}"
@@ -18,7 +24,7 @@
   loop: "{{ GitHubTools }}"
   become: true
   become_method: sudo
-  when: not sec_lists.stat.exists or not sharp_collection.stat.exists
+  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists
 
 - name: "Check the presence of /opt/hash-id.py"
   stat:

@@ -12,6 +12,10 @@ GitHubTools:
     url: "https://github.com/SpecterOps/MSSQLHound"
     destination: "/opt/MSSQLHound"
 
+  - name: username-anarchy
+    url: "https://github.com/urbanadventurer/username-anarchy"
+    destination: "/opt/username-anarchy"
+
 
 UVtools:
   - impacket
