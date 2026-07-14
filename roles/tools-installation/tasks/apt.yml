@@ -26,6 +26,7 @@
       - exiftool
       - ca-certificates
       - curl
+      - hydra
       # - ntpdate
       - gh
       - pipx
