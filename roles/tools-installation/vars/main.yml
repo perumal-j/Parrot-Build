@@ -16,6 +16,10 @@ GitHubTools:
     url: "https://github.com/urbanadventurer/username-anarchy"
     destination: "/opt/username-anarchy"
 
+  - name: Security-Wordlist
+    url: "https://github.com/DragonJAR/Security-Wordlist"
+    destination: "/opt/Security-Wordlist"
+
 
 UVtools:
   - impacket
