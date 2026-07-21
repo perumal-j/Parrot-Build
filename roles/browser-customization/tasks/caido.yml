@@ -1,19 +1,92 @@
 ---
+# --- Fetch latest release metadata ---
+
 - name: "Check the existence of caido-latest.json file in /tmp"
-  stat: 
+  stat:
     path: /tmp/caido-latest.json
-  register: latest_caido_json_file
+  register: latest_caido_release_data
   changed_when: false
 
 - name: "Downloading Latest Version of Caido"
   uri:
     url: "https://api.github.com/repos/caido/caido/releases/latest"
-    method: GET    
+    method: GET
     headers:
       Authorization: "token {{ github_api_key }}"
     dest: /tmp/caido-latest.json
     mode: '0640'
-  when: latest_caido_json_file.stat.exists == false
+  when: not latest_caido_release_data.stat.exists
+
+- name: "Read caido-latest.json from disk"
+  slurp:
+    src: /tmp/caido-latest.json
+  register: caido_release_file
+  changed_when: false
+
+- name: "Parse Release JSON"
+  set_fact:
+    caido_release_json: "{{ caido_release_file.content | b64decode | from_json }}"
+  changed_when: false
+
+- name: "Set Latest version of Caido"
+  set_fact:
+    caido_latest_version: "{{ caido_release_json.tag_name }}"
+  changed_when: false
+
+- name: "Show Latest version of Caido"
+  debug:
+    msg: "Latest version of Caido: {{ caido_latest_version }} Found."
+
+# --- Compare against currently installed version ---
+
+- name: "Check for existing version reference file"
+  stat:
+    path: /opt/current_caido_version.txt
+  register: caido_version_file
+  changed_when: false
+
+- name: "Copy caido_latest_version to /opt/current_caido_version.txt if it doesn't exist"
+  copy:
+    content: "{{ caido_latest_version }}"
+    dest: /opt/current_caido_version.txt
+    mode: '0644'
+  become: true
+  become_method: sudo
+  when: not caido_version_file.stat.exists
+
+- name: "Read currently installed version"
+  slurp:
+    src: /opt/current_caido_version.txt
+  register: caido_installed_version_raw
+  when: caido_version_file.stat.exists
+  changed_when: false
+
+- name: "Parse Currently Installed Version"
+  set_fact:
+    caido_installed_version: "{{ caido_installed_version_raw.content | b64decode | trim }}"
+  when: caido_version_file.stat.exists
+  changed_when: false
+
+- name: "Show installed vs latest version"
+  debug:
+    msg: "Installed: {{ caido_installed_version }} | Latest: {{ caido_latest_version }}"
+
+- name: "Determine if update is required"
+  set_fact:
+    caido_update_required: "{{ caido_installed_version != caido_latest_version }}"
+
+- name: "Remove outdated binaries so download tasks re-trigger"
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/bin/caido
+    - /opt/caido
+  become: true
+  become_method: sudo
+  when: caido_update_required and caido_installed_version != 'none'
+
+# --- Download helper script ---
 
 - name: "Check the presence of /tmp/downloadcaido.sh"
   stat:
@@ -25,13 +98,15 @@
   copy:
     src: downloadcaido.sh
     dest: /tmp/downloadcaido.sh
-    mode: 0760
-  when: caido_download_file.stat.exists == false
+    mode: '0760'
+  when: not caido_download_file.stat.exists
 
 - name: "Extracting Caido URL from JSON"
   shell: /tmp/downloadcaido.sh
   register: caido_url
   changed_when: false
+
+# --- Install / update binary ---
 
 - name: "Check the existence of /usr/local/bin/caido"
   stat:
@@ -45,8 +120,16 @@
     dest: /usr/local/bin/caido
     mode: '0755'
   become: true
-  become_method: sudo
-  when: caido_binary_bash.stat.exists == false
+  when: not caido_binary_bash.stat.exists
+
+- name: "Change owner and group of the file"
+  ansible.builtin.file:
+    path: "/usr/local/bin/caido"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    state: file
+  become: true
+  when: caido_binary_bash.stat.exists
 
 - name: "Check the existence of /opt/caido"
   stat:
@@ -54,21 +137,20 @@
   register: caido_binary
   changed_when: false
 
+
 - name: "Downloading Caido"
   get_url:
     url: "{{ caido_url.stdout }}"
     dest: /opt/caido
     mode: '0755'
   become: true
-  become_method: sudo
-  when: caido_binary.stat.exists == false and ansible_facts['distribution'] == "Ubuntu"
+  when: not caido_binary.stat.exists and ansible_facts['distribution'] == "Ubuntu"
 
 - name: "Making Caido executable"
   shell: |
-    bash -c "echo -e '#!/bin/bash\n/opt/caido --no-sandbox' > /usr/local/bin/caido" 
+    echo -e '#!/bin/bash\n/opt/caido --no-sandbox' > /usr/local/bin/caido
     chmod +x /usr/local/bin/caido
   args:
     executable: /bin/bash
   become: true
-  become_method: sudo
-  when: caido_binary_bash.stat.exists == false and ansible_facts['distribution'] == "Ubuntu"
+  when: not caido_binary_bash.stat.exists and ansible_facts['distribution'] == "Ubuntu"

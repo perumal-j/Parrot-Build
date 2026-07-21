@@ -1,13 +1,4 @@
 ---
-- name: "Install system dependencies for Python security tools"
-  apt:
-    name:
-      - libkrb5-dev
-      - python3-dev
-      - build-essential
-    state: present
-  become: yes
-
 - name: "Check if Python UV exists"
   stat:
     path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/uv"
@@ -112,7 +103,7 @@
 
 - name: "Installing Impacket and sshuttle via UV"
   shell:
-    cmd: uv tool install {{ item }}
+    cmd: "uv tool install {{ item }}"
   loop: "{{ UVtools }}"
   when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists
    
@@ -174,7 +165,7 @@
 - name: "Adding Dependencies to PKINITtools"
   shell: |
     cd /opt/PKINITtools
-    {{ ansible_facts['env']['HOME'] }}/.local/bin/uv add --script /opt/PKINITtools/gettgtpkinit.py -r /opt/PKINITtools/requirements.txt
+    /home/perumalj/.local/bin/uv add --script /opt/PKINITtools/gettgtpkinit.py -r /opt/PKINITtools/requirements.txt
   become: true
   become_method: sudo
   when: not gettgtpkinit.stat.exists
