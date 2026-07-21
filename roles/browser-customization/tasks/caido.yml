@@ -45,15 +45,6 @@
   register: caido_version_file
   changed_when: false
 
-- name: "Copy caido_latest_version to /opt/current_caido_version.txt if it doesn't exist"
-  copy:
-    content: "{{ caido_latest_version }}"
-    dest: /opt/current_caido_version.txt
-    mode: '0644'
-  become: true
-  become_method: sudo
-  when: not caido_version_file.stat.exists
-
 - name: "Read currently installed version"
   slurp:
     src: /opt/current_caido_version.txt
@@ -61,10 +52,16 @@
   when: caido_version_file.stat.exists
   changed_when: false
 
-- name: "Parse Currently Installed Version"
+- name: "Set installed version fact (from file)"
   set_fact:
     caido_installed_version: "{{ caido_installed_version_raw.content | b64decode | trim }}"
   when: caido_version_file.stat.exists
+  changed_when: false
+
+- name: "Set installed version fact (no file present yet)"
+  set_fact:
+    caido_installed_version: "none"
+  when: not caido_version_file.stat.exists
   changed_when: false
 
 - name: "Show installed vs latest version"
@@ -74,6 +71,10 @@
 - name: "Determine if update is required"
   set_fact:
     caido_update_required: "{{ caido_installed_version != caido_latest_version }}"
+
+- name: "Show whether an update will be performed"
+  debug:
+    msg: "Update required: {{ caido_update_required }}"
 
 - name: "Remove outdated binaries so download tasks re-trigger"
   file:
@@ -86,27 +87,29 @@
   become_method: sudo
   when: caido_update_required and caido_installed_version != 'none'
 
-# --- Download helper script ---
+# --- Download helper script (only needed if we're actually going to install/update) ---
 
 - name: "Check the presence of /tmp/downloadcaido.sh"
   stat:
     path: /tmp/downloadcaido.sh
   register: caido_download_file
   changed_when: false
+  when: caido_update_required
 
 - name: "Copy downloadcaido.sh to /tmp/downloadcaido.sh"
   copy:
     src: downloadcaido.sh
     dest: /tmp/downloadcaido.sh
     mode: '0760'
-  when: not caido_download_file.stat.exists
+  when: caido_update_required and not caido_download_file.stat.exists
 
 - name: "Extracting Caido URL from JSON"
   shell: /tmp/downloadcaido.sh
   register: caido_url
   changed_when: false
+  when: caido_update_required
 
-# --- Install / update binary ---
+# --- Install / update binary (only when a new version is available) ---
 
 - name: "Check the existence of /usr/local/bin/caido"
   stat:
@@ -114,22 +117,22 @@
   register: caido_binary_bash
   changed_when: false
 
-- name: "Downloading Caido"
+- name: "Downloading Caido (bash wrapper location)"
   get_url:
     url: "{{ caido_url.stdout }}"
     dest: /usr/local/bin/caido
     mode: '0755'
   become: true
-  when: not caido_binary_bash.stat.exists
+  when: caido_update_required
 
 - name: "Change owner and group of the file"
   ansible.builtin.file:
     path: "/usr/local/bin/caido"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
     state: file
   become: true
-  when: caido_binary_bash.stat.exists
+  when: caido_update_required or caido_binary_bash.stat.exists
 
 - name: "Check the existence of /opt/caido"
   stat:
@@ -137,14 +140,13 @@
   register: caido_binary
   changed_when: false
 
-
-- name: "Downloading Caido"
+- name: "Downloading Caido (opt binary)"
   get_url:
     url: "{{ caido_url.stdout }}"
     dest: /opt/caido
     mode: '0755'
   become: true
-  when: not caido_binary.stat.exists and ansible_facts['distribution'] == "Ubuntu"
+  when: caido_update_required and ansible_facts['distribution'] == "Ubuntu"
 
 - name: "Making Caido executable"
   shell: |
@@ -153,4 +155,15 @@
   args:
     executable: /bin/bash
   become: true
-  when: not caido_binary_bash.stat.exists and ansible_facts['distribution'] == "Ubuntu"
+  when: caido_update_required and ansible_facts['distribution'] == "Ubuntu"
+
+# --- Record the newly installed version ---
+
+- name: "Update version reference file after successful install"
+  copy:
+    content: "{{ caido_latest_version }}"
+    dest: /opt/current_caido_version.txt
+    mode: '0644'
+  become: true
+  become_method: sudo
+  when: caido_update_required
