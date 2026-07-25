@@ -77,6 +77,7 @@
       - libffi-dev
       - ldap-utils
       - powershell
+      - acl
     state: latest
   become: true
   become_method: sudo
