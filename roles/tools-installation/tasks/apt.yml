@@ -78,6 +78,8 @@
       - ldap-utils
       - powershell
       - acl
+      - gpg
+      - apt-transport-https
     state: latest
   become: true
   become_method: sudo

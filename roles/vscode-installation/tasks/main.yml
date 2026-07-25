@@ -1,25 +1,62 @@
 ---
+- name: "Check the presence of /etc/apt/sources.list.d/vscode.sources"
+  stat:
+    path: "/etc/apt/sources.list.d/vscode.sources"
+  register: vscode_list
+  changed_when: false
+
 - name: "Removing Apt Source List Conflict"
   file:
     path: "/etc/apt/sources.list.d/vscode.sources"
     state: absent
   become: true
   become_method: sudo
-  when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian' or ansible_facts['distribution']|lower == 'ubuntu'
+  when: vscode_list.stat.exists
+
+- name: "Downloading Microsoft GPG key"
+  get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /tmp/microsoft.asc
+    mode: "0644"
+  become: true
+  when: ansible_facts['distribution']|lower in ['parrot', 'debian', 'ubuntu']
+  changed_when: false
+
+- name: "Installing Microsoft GPG key"
+  shell: gpg --dearmor < /tmp/microsoft.asc > /usr/share/keyrings/microsoft.gpg
+  args:
+    creates: /usr/share/keyrings/microsoft.gpg
+  become: true
+  when: ansible_facts['distribution']|lower in ['parrot', 'debian', 'ubuntu']
+
+- name: "Adding VS Code apt repository"
+  apt_repository:
+    repo: "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
+    filename: vscode
+    state: present
+  become: true
+  when: ansible_facts['distribution']|lower in ['parrot', 'debian', 'ubuntu']
 
 - name: "Installing Visual Studio Code"
-  include_role: 
-    name: "gantsign.visual-studio-code"
-  vars:
-    users:
-      - username: "{{ ansible_facts['user_id'] }}"
-        visual_studio_code_extensions:
-          - Codeium.codeium
-          - snyk-security.snyk-vulnerability-scanner
-          - ms-python.python
-          - DEVSENSE.phptools-vscode
-          - ms-vscode.cpptools
-          - golang.Go
-          - rust-lang.rust-analyzer
-          - ms-vscode.cpptools-extension-pack
-    
+  apt:
+    name: code
+    state: present
+    update_cache: true
+  become: true
+  when: ansible_facts['distribution']|lower in ['parrot', 'debian', 'ubuntu']
+
+- name: "Installing Visual Studio Code Extensions"
+  command: "code --install-extension {{ item }} --force"
+  loop:
+    - Codeium.codeium
+    - snyk-security.snyk-vulnerability-scanner
+    - ms-python.python
+    - DEVSENSE.phptools-vscode
+    - ms-vscode.cpptools
+    - golang.Go
+    - rust-lang.rust-analyzer
+    - ms-vscode.cpptools-extension-pack
+  become: true
+  become_user: "{{ ansible_facts['user_id'] }}"
+  register: ext_install
+  changed_when: "'is already installed' not in ext_install.stdout"

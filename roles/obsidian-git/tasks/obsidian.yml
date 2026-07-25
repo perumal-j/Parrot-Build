@@ -11,9 +11,60 @@
   register: obsidian_exists
   changed_when: false
 
+- name: "Check the existence of /tmp/obsidian-release-metadata.json"
+  stat:
+    path: "/tmp/obsidian-release-metadata.json"
+  register: obsidian_release_metadata
+  changed_when: false
+
+- name: "Download latest Obsidian release metadata"
+  get_url:
+    url: https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest
+    dest: /tmp/obsidian-release-metadata.json
+    mode: "0644"
+  when: not obsidian_release_metadata.stat.exists
+  
+- name: "jq latest obsidian version from obsidian-release-metadata.json"
+  set_fact:
+    obsidian_latest_version: "{{ (lookup('file', '/tmp/obsidian-release-metadata.json') | from_json).tag_name }}"
+
+- name: "Check the presence of /opt/obsidian_current_version.txt"
+  stat:
+    path: "/opt/obsidian_current_version.txt"
+  register: obsidian_version_file
+  changed_when: false
+
+- name: "Writing Current Version of Obsidian to file /opt/obsidian_current_version.txt"
+  file:
+    path: "/opt/obsidian_current_version.txt"
+    content: "{{ obsidian_latest_version }}"
+    state: present
+  become: true
+  become_method: sudo
+  when: not obsidian_version_file.stat.exists
+
+- name: "Read Current Version of Obsidian from file /opt/obsidian_current_version.txt"
+  set_fact:
+    obsidian_current_version: "{{ lookup('file', '/opt/obsidian_current_version.txt') }}"
+  when: obsidian_version_file.stat.exists
+
+- name: "Compare obsidian_current_version with obsidian_latest_version"
+  set_fact:
+    obsidian_update_required: "{{ obsidian_current_version != obsidian_latest_version }}"
+  when: obsidian_version_file.stat.exists
+
 - name: "Executing Bash Script to Install Obsidian"
   shell: "/tmp/obsidian-download.sh"
-  when: not obsidian_exists.stat.exists
+  when: obsidian_update_required
+
+- name: "Store the latest version in the Current Version File"
+  copy:
+    dest: "/opt/obsidian_current_version.txt"
+    content: "{{ obsidian_latest_version }}"
+    mode: "0644"
+  become: true
+  become_method: sudo
+  when: obsidian_update_required
 
 - name: "Check if Tech-Notes Exists"
   stat:
