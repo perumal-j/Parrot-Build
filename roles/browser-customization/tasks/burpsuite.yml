@@ -63,12 +63,92 @@
   become: true
   become_method: sudo
 
+- name: "Check the presence of /tmp/burpsuite-releases-metadata.json"
+  stat:
+    path: "/tmp/burpsuite-releases-metadata.json"
+  register: burpsuite_metadata
+  changed_when: false
+  
+- name: "Downloading Burpsuite releases metadata"
+  get_url:
+    url: "https://portswigger.net/burp/releases/data"
+    dest: "/tmp/burpsuite-releases-metadata.json"
+  register: burpsuite_metadata
+  become: true
+  become_method: sudo
+  when: not burpsuite_metadata.stat.exists
+
+- name: "Read burpsuite-releases-metadata.json from disk"
+  slurp:
+    src: /tmp/burpsuite-releases-metadata.json
+  register: burpsuite_release_file
+  changed_when: false
+
+- name: "Parse Burpsuite Release JSON"
+  set_fact:
+    burpsuitie_release_json: "{{ burpsuite_release_file.content | b64decode | from_json }}"
+  changed_when: false
+
+- name: "Extract latest stable Desktop release"
+  set_fact:
+    burpsuite_latest_version: "{{ (burpsuitie_release_json.ResultSet.Results | selectattr('releaseChannels', 'contains', 'Stable') | selectattr('categories', 'contains', 'Desktop') | first).version }}"
+
+- name: "Check the existence of /opt/current_versions directory"
+  stat:
+    path: "/opt/current_versions"
+  register: current_versions
+  changed_when: false
+
+- name: "Creating /opt/current_versions directory"
+  file:
+    path: "/opt/current_versions"
+    state: directory
+    mode: 0755
+  become: true
+  become_method: sudo
+  when: not current_versions.stat.exists
+
+- name: "Presence of /opt/current_versions/burpsuite_current_version.txt"
+  stat:
+    path: "/opt/current_versions/burpsuite_current_version.txt"
+  register: burpsuite_version_file
+  changed_when: false
+
+- name: "Writing Current Version to file /opt/current_versions/burpsuite_current_version.txt"
+  copy:
+    dest: "/opt/current_versions/burpsuite_current_version.txt"
+    content: "{{ burpsuite_latest_version }}"
+    mode: '0644'
+  become: true
+  become_method: sudo
+  when: not burpsuite_version_file.stat.exists
+
+- name: "Read Current Version from file /opt/current_versions/burpsuite_current_version.txt"
+  set_fact:
+    burpsuite_current_version: "{{ lookup('file', '/opt/current_versions/burpsuite_current_version.txt') }}"
+  when: burpsuite_version_file.stat.exists
+
+- name: "Compare burpsuite_current_version with burpsuite_latest_version"
+  set_fact:
+    burpsuite_update_required: "{{ burpsuite_current_version != burpsuite_latest_version }}"
+  when: burpsuite_version_file.stat.exists
+
 - name: "Downloading latest Burpsuite"
   get_url:
-    url: "https://portswigger.net/burp/releases/download?product=community&type=jar"
+    url: "https://portswigger.net/burp/releases/startdownload?product=desktop&version={{ burpsuite_latest_version }}&type=Jar"
     dest: "/opt/burpsuite.jar"
   become: true
   become_method: sudo
+  when: burpsuite_update_required
+
+- name: "Store the Burpsuite latest version in the current version file"
+  copy:
+    dest: "/opt/current_versions/burpsuite_current_version.txt"
+    content: "{{ burpsuite_latest_version }}"
+    mode: "0644"
+  become: true
+  become_method: sudo
+  when: burpsuite_update_required
 
 - name: "Creating /usr/bin/burpsuite"
   copy:

@@ -39,15 +39,30 @@
 
 # --- Compare against currently installed version ---
 
+- name: "Check the existence of /opt/current_versions directory"
+  stat:
+    path: "/opt/current_versions"
+  register: current_versions
+  changed_when: false
+
+- name: "Creating /opt/current_versions directory"
+  file:
+    path: "/opt/current_versions"
+    state: directory
+    mode: 0755
+  become: true
+  become_method: sudo
+  when: not current_versions.stat.exists
+
 - name: "Check for existing version reference file"
   stat:
-    path: /opt/current_caido_version.txt
+    path: /opt/current_versions/current_caido_version.txt
   register: caido_version_file
   changed_when: false
 
 - name: "Read currently installed version"
   slurp:
-    src: /opt/current_caido_version.txt
+    src: /opt/current_versions/current_caido_version.txt
   register: caido_installed_version_raw
   when: caido_version_file.stat.exists
   changed_when: false
@@ -162,7 +177,7 @@
 - name: "Update version reference file after successful install"
   copy:
     content: "{{ caido_latest_version }}"
-    dest: /opt/current_caido_version.txt
+    dest: /opt/current_versions/current_caido_version.txt
     mode: '0644'
   become: true
   become_method: sudo

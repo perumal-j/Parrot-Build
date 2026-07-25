@@ -17,7 +17,6 @@
       register: auth_check
       failed_when: auth_check.json.rate.limit != 5000
 
-
     - name: Show Current Rate Limit
       debug:
         msg: "Authentication Successful! Remaining requests: {{ auth_check.json.rate.remaining }} / {{ auth_check.json.rate.limit }}"

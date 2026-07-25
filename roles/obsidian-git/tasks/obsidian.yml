@@ -28,24 +28,39 @@
   set_fact:
     obsidian_latest_version: "{{ (lookup('file', '/tmp/obsidian-release-metadata.json') | from_json).tag_name }}"
 
-- name: "Check the presence of /opt/obsidian_current_version.txt"
+- name: "Check the existence of /opt/current_versions directory"
   stat:
-    path: "/opt/obsidian_current_version.txt"
+    path: "/opt/current_versions"
+  register: current_versions
+  changed_when: false
+
+- name: "Creating /opt/current_versions directory"
+  file:
+    path: "/opt/current_versions"
+    state: directory
+    mode: 0755
+  become: true
+  become_method: sudo
+  when: not current_versions.stat.exists
+
+- name: "Check the presence of /opt/current_versions/obsidian_current_version.txt"
+  stat:
+    path: "/opt/current_versions/obsidian_current_version.txt"
   register: obsidian_version_file
   changed_when: false
 
-- name: "Writing Current Version of Obsidian to file /opt/obsidian_current_version.txt"
-  file:
-    path: "/opt/obsidian_current_version.txt"
+- name: "Writing Current Version of Obsidian to file /opt/current_versions/obsidian_current_version.txt"
+  copy:
+    dest: "/opt/current_versions/obsidian_current_version.txt"
     content: "{{ obsidian_latest_version }}"
-    state: present
+    mode: "0644"
   become: true
   become_method: sudo
   when: not obsidian_version_file.stat.exists
 
-- name: "Read Current Version of Obsidian from file /opt/obsidian_current_version.txt"
+- name: "Read Current Version of Obsidian from file /opt/current_versions/obsidian_current_version.txt"
   set_fact:
-    obsidian_current_version: "{{ lookup('file', '/opt/obsidian_current_version.txt') }}"
+    obsidian_current_version: "{{ lookup('file', '/opt/current_versions/obsidian_current_version.txt') }}"
   when: obsidian_version_file.stat.exists
 
 - name: "Compare obsidian_current_version with obsidian_latest_version"
@@ -59,7 +74,7 @@
 
 - name: "Store the latest version in the Current Version File"
   copy:
-    dest: "/opt/obsidian_current_version.txt"
+    dest: "/opt/current_versions/obsidian_current_version.txt"
     content: "{{ obsidian_latest_version }}"
     mode: "0644"
   become: true
