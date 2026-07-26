@@ -20,6 +20,10 @@ GitHubTools:
     url: "https://github.com/DragonJAR/Security-Wordlist"
     destination: "/opt/Security-Wordlist"
 
+  - name: static-binaries
+    url: "https://github.com/andrew-d/static-binaries"
+    destination: "/opt/static-binaries"
+
 
 UVtools:
   - impacket
