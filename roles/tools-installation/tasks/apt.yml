@@ -47,6 +47,7 @@
       - gobuster
       - krb5-user
       - unrar
+      - python3-pyftpdlib
     state: latest
   become: true
   become_method: sudo
@@ -80,6 +81,7 @@
       - acl
       - gpg
       - apt-transport-https
+      - python3-pyftpdlib
     state: latest
   become: true
   become_method: sudo
