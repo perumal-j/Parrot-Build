@@ -22,7 +22,7 @@ export LC_ALL=en_US.UTF-8
 
 sudo systemctl stop unattended-upgrades
 
-$HOME/.local/bin/ansible-galaxy install -r requirements.yml
+# $HOME/.local/bin/ansible-galaxy install -r requirements.yml
 
 # Tweak Ansible configuration
-echo "  ignore_errors: true" >> $HOME/.ansible/roles/gantsign.visual-studio-code/tasks/install-extensions.yml
+# echo "  ignore_errors: true" >> $HOME/.ansible/roles/gantsign.visual-studio-code/tasks/install-extensions.yml
