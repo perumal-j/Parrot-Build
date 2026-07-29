@@ -133,10 +133,15 @@
     burpsuite_update_required: "{{ burpsuite_current_version != burpsuite_latest_version }}"
   when: burpsuite_version_file.stat.exists
 
+- name: "Print burpsuite_update_required status"
+  debug:
+    msg: "{{ burpsuite_update_required }}"
+
 - name: "Downloading latest Burpsuite"
   get_url:
     url: "https://portswigger.net/burp/releases/startdownload?product=desktop&version={{ burpsuite_latest_version }}&type=Jar"
     dest: "/opt/burpsuite.jar"
+    force: yes
   become: true
   become_method: sudo
   when: burpsuite_update_required
