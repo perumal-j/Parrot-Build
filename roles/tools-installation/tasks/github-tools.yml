@@ -44,6 +44,16 @@
   become_method: sudo
   when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists
 
+- name: "Change owner of downloaded GitHub Projects"
+  file:
+    path: "{{ item.destination }}"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
+    state: directory
+  loop: "{{ GitHubTools }}"
+  become: true
+  become_method: sudo
+
 - name: "Check the presence of /opt/hash-id.py"
   stat:
     path: "/opt/hash-id.py"
