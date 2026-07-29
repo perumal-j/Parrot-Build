@@ -24,6 +24,10 @@ GitHubTools:
     url: "https://github.com/andrew-d/static-binaries"
     destination: "/opt/static-binaries"
 
+  - name: mhtml-converter
+    url: "https://github.com/perumal-j/mhtml-converter"
+    destination: "/opt/mhtml-converter"
+
 
 UVtools:
   - impacket
