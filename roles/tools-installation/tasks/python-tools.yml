@@ -101,11 +101,17 @@
   register: "sshuttle_exists"
   changed_when: false
 
+- name: "Check if updog exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/updog"
+  register: "updog_exists"
+  changed_when: false
+
 - name: "Installing Impacket and sshuttle via UV"
   shell:
     cmd: "uv tool install {{ item }}"
   loop: "{{ UVtools }}"
-  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists
+  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists
    
 - name: "Copying Github Download Template"
   template:

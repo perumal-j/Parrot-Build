@@ -48,6 +48,7 @@
       - krb5-user
       - unrar
       - python3-pyftpdlib
+      - 7zip
     state: latest
   become: true
   become_method: sudo
