@@ -28,6 +28,10 @@ GitHubTools:
     url: "https://github.com/perumal-j/mhtml-converter"
     destination: "/opt/mhtml-converter"
 
+  - name: phpbash
+    url: "https://github.com/Arrexel/phpbash"
+    destination: "/opt/phpbash"
+
 
 UVtools:
   - impacket
