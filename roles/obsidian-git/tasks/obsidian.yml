@@ -71,6 +71,7 @@
 - name: "Executing Bash Script to Install Obsidian"
   shell: "/tmp/obsidian-download.sh"
   when: obsidian_update_required
+  ignore_errors: true
 
 - name: "Store the latest version in the Current Version File"
   copy:
