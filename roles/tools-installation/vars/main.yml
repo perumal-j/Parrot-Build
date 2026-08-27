@@ -32,6 +32,10 @@ GitHubTools:
     url: "https://github.com/Arrexel/phpbash"
     destination: "/opt/phpbash"
 
+  - name: PayloadsAllTheThings
+    url: "https://github.com/swisskyrepo/PayloadsAllTheThings"
+    destination: "/opt/PayloadsAllTheThings"
+
 
 UVtools:
   - impacket

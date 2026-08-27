@@ -41,6 +41,12 @@
   register: phpbash
   changed_when: false 
 
+- name: "Check the presence of /opt/PayloadsAllTheThings"
+  stat:
+    path: "/opt/PayloadsAllTheThings"
+  register: payloadsallthethings
+  changed_when: false 
+
 - name: "Installing Tools from GitHub Repositories"
   git:
     repo: "{{ item.url }}"
@@ -48,7 +54,7 @@
   loop: "{{ GitHubTools }}"
   become: true
   become_method: sudo
-  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists
+  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists or not payloadsallthethings.stat.exists
 
 - name: "Change owner of downloaded GitHub Projects"
   file:
