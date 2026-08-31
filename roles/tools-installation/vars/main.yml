@@ -41,6 +41,7 @@ UVtools:
   - impacket
   - sshuttle
   - updog
+  - scrapy
 
 PIPToolsGit:
   - name: NetExec

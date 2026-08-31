@@ -121,11 +121,17 @@
   register: "updog_exists"
   changed_when: false
 
-- name: "Installing Impacket and sshuttle via UV"
+- name: "Check if scrapy exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/scrapy"
+  register: "scrapy_exists"
+  changed_when: false
+
+- name: "Installing Impacket, sshuttle, Updog & Scrapy via UV"
   shell:
     cmd: "uv tool install {{ item }}"
   loop: "{{ UVtools }}"
-  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists
+  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists
    
 - name: "Copying Github Download Template"
   template:
