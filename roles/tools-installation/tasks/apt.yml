@@ -52,6 +52,7 @@
       - fierce
       - dnsrecon
       - amass
+      - sublist3r
     state: latest
   become: true
   become_method: sudo
@@ -89,6 +90,7 @@
       - fierce
       - dnsrecon
       - amass
+      - sublist3r
     state: latest
   become: true
   become_method: sudo
