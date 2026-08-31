@@ -49,6 +49,8 @@
       - unrar
       - python3-pyftpdlib
       - 7zip
+      - fierce
+      - dnsrecon
     state: latest
   become: true
   become_method: sudo
@@ -83,6 +85,8 @@
       - gpg
       - apt-transport-https
       - python3-pyftpdlib
+      - fierce
+      - dnsrecon
     state: latest
   become: true
   become_method: sudo
