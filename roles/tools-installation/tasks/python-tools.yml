@@ -282,3 +282,88 @@
   become: true
   become_method: sudo
   when: not ReconSpiderPy.stat.exists
+
+- name: "Check if theHarvester is already cloned"
+  stat:
+    path: "/opt/theHarvester"
+  register: theHarvester_precheck
+
+- name: "git clone https://github.com/laramies/theHarvester.git"
+  git:
+    repo: "https://github.com/laramies/theHarvester.git"
+    dest: "/opt/theHarvester"
+  become: true
+  become_method: sudo
+  when: not theHarvester_precheck.stat.exists
+
+- name: "Check the presence of /opt/theHarvester"
+  stat:
+    path: "/opt/theHarvester"
+  register: theHarvester
+  changed_when: false
+
+- name: "Change the owner of /opt/theHarvester"
+  file:
+    path: "/opt/theHarvester"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  when: theHarvester.stat.exists
+
+- name: "Installing theHarvester"
+  shell: "uv sync"
+  args:
+    chdir: "/opt/theHarvester"
+  when: theHarvester.stat.exists
+
+- name: "Check if FinalRecon is already cloned"
+  stat:
+    path: "/opt/FinalRecon"
+  register: FinalRecon_precheck
+
+- name: "git clone https://github.com/thewhiteh4t/FinalRecon.git"
+  git:
+    repo: "https://github.com/thewhiteh4t/FinalRecon.git"
+    dest: "/opt/FinalRecon"
+  become: true
+  become_method: sudo
+  when: not FinalRecon_precheck.stat.exists
+
+- name: "Check the presence of /opt/FinalRecon"
+  stat:
+    path: "/opt/FinalRecon"
+  register: FinalRecon
+  changed_when: false
+
+- name: "Change the owner of /opt/FinalRecon"
+  file:
+    path: "/opt/FinalRecon"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  when: FinalRecon.stat.exists
+
+- name: "uv venv"
+  shell: "uv venv"
+  args:
+    chdir: "/opt/FinalRecon"
+  when: FinalRecon.stat.exists
+  # consider: creates: /opt/FinalRecon/.venv/bin/python  (see note below)
+
+- name: "uv pip install -r requirements.txt"
+  shell: "uv pip install -r requirements.txt"
+  args:
+    chdir: "/opt/FinalRecon"
+  when: FinalRecon.stat.exists
+
+- name: "chmod +x ./finalrecon.py"
+  shell: "chmod +x ./finalrecon.py"
+  args:
+    chdir: "/opt/FinalRecon"
+  when: FinalRecon.stat.exists
