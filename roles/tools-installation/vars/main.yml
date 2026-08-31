@@ -46,6 +46,9 @@ PIPToolsGit:
   - name: NetExec
     url: "git+https://github.com/Pennyw0rth/NetExec"
 
+  - name: WafW00f
+    url: "git+https://github.com/EnableSecurity/wafw00f"
+
 
 UVtoolsGit: 
   - name: Certipy
