@@ -51,6 +51,7 @@
       - 7zip
       - fierce
       - dnsrecon
+      - amass
     state: latest
   become: true
   become_method: sudo
@@ -87,6 +88,7 @@
       - python3-pyftpdlib
       - fierce
       - dnsrecon
+      - amass
     state: latest
   become: true
   become_method: sudo
