@@ -283,6 +283,23 @@
   become_method: sudo
   when: not ReconSpiderPy.stat.exists
 
+- name: "Check the presence of ReconSpider.py in PATH"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/ReconSpider.py"
+  register: ReconSpiderBIN
+  changed_when: false
+
+
+- name: "Moving ReconSpider.py to /$HOME/.local/bin"
+  copy:
+    src: "/opt/ReconSpider.py"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/ReconSpider.py"
+    mode: 0755
+  become: true
+  become_method: sudo
+  when: not ReconSpiderBIN.stat.exists
+
+
 - name: "Check if theHarvester is already cloned"
   stat:
     path: "/opt/theHarvester"
