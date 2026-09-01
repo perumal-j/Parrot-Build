@@ -51,7 +51,6 @@
       - 7zip
       - fierce
       - dnsrecon
-      - amass
       - sublist3r
     state: latest
   become: true
