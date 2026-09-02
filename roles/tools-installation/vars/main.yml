@@ -36,13 +36,11 @@ GitHubTools:
     url: "https://github.com/swisskyrepo/PayloadsAllTheThings"
     destination: "/opt/PayloadsAllTheThings"
 
-
 UVtools:
   - impacket
   - sshuttle
   - updog
   - scrapy
-  - volatility3
 
 PIPToolsGit:
   - name: NetExec
