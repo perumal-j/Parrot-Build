@@ -52,6 +52,7 @@
       - fierce
       - dnsrecon
       - sublist3r
+      - wireshark
     state: latest
   become: true
   become_method: sudo
@@ -90,6 +91,7 @@
       - dnsrecon
       - amass
       - sublist3r
+      - wireshark
     state: latest
   become: true
   become_method: sudo
