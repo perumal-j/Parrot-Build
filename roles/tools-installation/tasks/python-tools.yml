@@ -283,22 +283,18 @@
   become_method: sudo
   when: not ReconSpiderPy.stat.exists
 
-- name: "Check the presence of ReconSpider.py in PATH"
+- name: "Check the presence of ReconSpider in PATH"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/ReconSpider.py"
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/reconspider"
   register: ReconSpiderBIN
   changed_when: false
 
-
-- name: "Moving ReconSpider.py to /$HOME/.local/bin"
+- name: "Moving reconspider.sh to .local/bin"
   copy:
-    src: "/opt/ReconSpider.py"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/ReconSpider.py"
+    src: "reconspider.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/reconspider"
     mode: 0755
-  become: true
-  become_method: sudo
   when: not ReconSpiderBIN.stat.exists
-
 
 - name: "Check if theHarvester is already cloned"
   stat:
@@ -366,21 +362,38 @@
   become_method: sudo
   when: FinalRecon.stat.exists
 
-- name: "uv venv"
+- name: "Check the presence of /opt/FinalRecon/.venv/bin/python"
+  stat:
+    path: "/opt/FinalRecon/.venv/bin/python"
+  register: FinalRecon_venv
+  changed_when: false
+
+- name: "uv venv for FinalRecon"
   shell: "uv venv"
   args:
     chdir: "/opt/FinalRecon"
-  when: FinalRecon.stat.exists
-  # consider: creates: /opt/FinalRecon/.venv/bin/python  (see note below)
+  when: not FinalRecon_venv.stat.exists
 
 - name: "uv pip install -r requirements.txt"
   shell: "uv pip install -r requirements.txt"
   args:
     chdir: "/opt/FinalRecon"
-  when: FinalRecon.stat.exists
+  when: not FinalRecon_venv.stat.exists
 
 - name: "chmod +x ./finalrecon.py"
   shell: "chmod +x ./finalrecon.py"
   args:
     chdir: "/opt/FinalRecon"
   when: FinalRecon.stat.exists
+
+- name: "Check the presence of finalrecon"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/finalrecon"
+  register: finalrecon
+
+- name: "Adding FinalRecon to .local/bin"
+  copy:
+    src: "/opt/FinalRecon/finalrecon.py"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/finalrecon"
+    mode: 0755
+  when: not finalrecon.stat.exists
