@@ -42,6 +42,7 @@ UVtools:
   - sshuttle
   - updog
   - scrapy
+  - volatility3
 
 PIPToolsGit:
   - name: NetExec
