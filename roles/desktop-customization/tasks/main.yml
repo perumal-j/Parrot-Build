@@ -2,3 +2,6 @@
 ---
 # tasks file for desktop-customization
 - include_tasks: parrot_panel.yml
+
+- include_tasks: flameshot-gui.yml
+  when: ansible_facts['distribution']|lower == 'parrot'

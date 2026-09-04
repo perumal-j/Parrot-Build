@@ -82,3 +82,10 @@ ubuntu_apps:
   - name: "flameshot"
     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
     id: 159
+
+
+shortcut_name: "flameshot"
+shortcut_command: "flameshot gui"
+shortcut_binding: "<Alt>a"
+new_slot: "custom6"
+new_path: "/org/mate/desktop/keybindings/{{ new_slot }}/"

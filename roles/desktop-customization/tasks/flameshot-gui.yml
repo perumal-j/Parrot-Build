@@ -1,0 +1,41 @@
+---
+- name: "Read Current Custom Keybings List"
+  command: "dconf read /org/mate/desktop/keybindings/custom-keybindings"
+  register: "custom_keybindings"
+  changed_when: false
+
+- name: "Parse Existing List (empty list if none is set yet)"
+  set_fact:
+    custom_keybindings_list: "{{ (custom_keybindings.stdout | trim | from_yaml) if custom_keybindings.stdout | trim else [] }}"
+  changed_when: false
+
+- name: "Set up Flameshot shortcut (only if not already present)"
+  when: new_path not in custom_keybindings_list
+  block:
+    - name: "Build merged list with the new path appended"
+      set_fact:
+        merged_paths: "{{ custom_keybindings_list + [new_path] }}"
+
+    - name: "Write back the merged custom keybindings list"
+      dconf:
+        key: "/org/mate/desktop/keybindings/custom-keybindings"
+        value: "{{ merged_paths }}"
+        state: "present"
+      
+    - name: "Set the shortcut name"
+      dconf:
+        key: "{{ new_path }}name"
+        value: "'{{ shortcut_name }}'"
+        state: present
+
+    - name: "Set the shortcut action (command to run)"
+      dconf:
+        key: "{{ new_path }}action"
+        value: "'{{ shortcut_command }}'"
+        state: present
+
+    - name: "Set the key binding"
+      dconf:
+        key: "{{ new_path }}binding"
+        value: "'{{ shortcut_binding }}'"
+        state: present
