@@ -18,10 +18,13 @@
   changed_when: false
 
 - name: "Download latest Obsidian release metadata"
-  get_url:
-    url: https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest
+  uri:
+    url: "https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest"
+    method: GET    
+    headers:
+      Authorization: "token {{ github_api_key }}"
     dest: /tmp/obsidian-release-metadata.json
-    mode: "0644"
+    mode: '0640'
   when: not obsidian_release_metadata.stat.exists
   
 - name: "jq latest obsidian version from obsidian-release-metadata.json"
