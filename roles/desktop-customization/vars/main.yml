@@ -57,31 +57,31 @@ parrot_apps:
     id: 331
 
 
-ubuntu_apps:
-  - name: "sublime-text"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
-    id: 89
-  - name: "vscode"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
-    id: 99
-  - name: "firefox"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
-    id: 109
-  - name: "brave-browser"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/brave-browser.desktop"
-    id: 119
-  - name: "obsidian"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
-    id: 129
-  - name: "burp-suite"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
-    id: 139
-  - name: "caido"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/caido.desktop"
-    id: 149
-  - name: "flameshot"
-    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
-    id: 159
+# ubuntu_apps:
+#   - name: "sublime-text"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/sublime-text.desktop"
+#     id: 89
+#   - name: "vscode"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/vscode.desktop"
+#     id: 99
+#   - name: "firefox"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/firefox.desktop"
+#     id: 109
+#   - name: "brave-browser"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/brave-browser.desktop"
+#     id: 119
+#   - name: "obsidian"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/obsidian.desktop"
+#     id: 129
+#   - name: "burp-suite"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/burp-suite.desktop"
+#     id: 139
+#   - name: "caido"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/caido.desktop"
+#     id: 149
+#   - name: "flameshot"
+#     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
+#     id: 159
 
 
 shortcut_name: "flameshot"

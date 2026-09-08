@@ -76,26 +76,12 @@
   loop: "{{ parrot_apps }}"
   when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
 
-- name: "Generate dconf configuration files - Ubuntu"
-  template:
-    src: panel-object.j2
-    dest: "/tmp/panel-configs/{{ item.name }}.dconf"
-  loop: "{{ ubuntu_apps }}"
-  when: ansible_facts['distribution']|lower == 'ubuntu'
-  
 - name: "Deploying Templated Script for Object ID List - Parrot"
   template:
     src: "parrot-object-id-list.sh.j2"
     dest: "/tmp/object-id-list.sh"
     mode: '0755'
   when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
-
-- name: "Deploying Templated Script for Object ID List - Ubuntu"
-  template:
-    src: "ubuntu-object-id-list.sh.j2"
-    dest: "/tmp/object-id-list.sh"
-    mode: '0755'
-  when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: "Check if object-id-list.sh exists"
   stat: 

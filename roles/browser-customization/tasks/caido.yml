@@ -138,7 +138,7 @@
     dest: /usr/local/bin/caido
     mode: '0755'
   become: true
-  when: caido_update_required
+  when: caido_update_required 
 
 - name: "Change owner and group of the file"
   ansible.builtin.file:

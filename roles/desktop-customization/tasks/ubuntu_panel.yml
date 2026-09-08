@@ -1,0 +1,68 @@
+---
+- name: "Check of the presence of /opt/flatpak-icons"
+  stat:
+    path: "/opt/flatpak-icons"
+  register: flat_remix
+  changed_when: false
+
+- name: "Git Cloning https://github.com/perumal-j/flatpak-icons.git"
+  git:
+    repo: "https://github.com/perumal-j/flatpak-icons.git"
+    dest: "/opt/flatpak-icons"
+  become: true
+  become_method: "sudo"
+  when: not flat_remix.stat.exists
+
+- name: "Modifying flat-remix Directory Owner"
+  file:
+    path: "/opt/flatpak-icons"
+    owner: "{{ ansible_facts['user_id'] }}"
+    group: "{{ ansible_facts['user_id'] }}"
+    state: directory
+    recurse: true
+  become: true
+  become_method: sudo
+  changed_when: false
+
+- name: "Creating Desktop Launchers"
+  template:
+    src: "launchers.j2"
+    dest: "/usr/share/applications/{{ item.0 }}.desktop"
+  loop: "{{  DesktopLaunchers | zip(AppPaths, IconPaths) }}"
+  vars:
+    DesktopLauncher: "{{ item.0 }}"
+    AppPath: "{{ item.1 }}"
+    IconPath: "{{ item.2 }}"
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Changing Privileges of Desktop Launchers"
+  shell: chmod +x /usr/share/applications/{{ item.0 }}.desktop
+  loop: "{{  DesktopLaunchers | zip(AppPaths, IconPaths) }}"
+  vars:
+    DesktopLauncher: "{{ item.0 }}"
+    AppPath: "{{ item.1 }}"
+    IconPath: "{{ item.2 }}"
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Execute sudo update-desktop-database"
+  shell: update-desktop-database
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: Ensure temporary directory exists
+  file:
+    path: /tmp/panel-configs
+    state: directory
+    mode: '0755'
+
+- name: "Debug ansible_facts['distribution']"
+  debug:
+    msg: "ansible_facts['distribution']: {{ ansible_facts['distribution']|lower }}"
+
+
+

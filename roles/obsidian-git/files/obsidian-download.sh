@@ -14,7 +14,8 @@ elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
 	jq -r '.assets[].browser_download_url' /tmp/obsidian-release-metadata.json | grep "$ARCH" | xargs curl -sL -o /tmp/obsidian-latest.AppImage
 	chmod +x /tmp/obsidian-latest.AppImage
 	sudo mv /tmp/obsidian-latest.AppImage /opt/obsidian
-	sudo bash -c "echo -e '#!/bin/bash\n/opt/obsidian --no-sandbox' > /usr/local/bin/obsidian"
+	# sudo bash -c "echo -e '#!/bin/bash\n/opt/obsidian --no-sandbox' > /usr/local/bin/obsidian"
+	sudo mv /opt/obsidian /usr/local/bin/obsidian
 	sudo chmod +x /usr/local/bin/obsidian
 
 else
