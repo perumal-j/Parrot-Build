@@ -53,6 +53,11 @@
       - dnsrecon
       - sublist3r
       - wireshark
+      - libkrb5-dev
+      - pkg-config
+      - libreadline-dev
+      - libncurses-dev
+      - libfuse2
     state: latest
   become: true
   become_method: sudo
@@ -92,6 +97,11 @@
       - amass
       - sublist3r
       - wireshark
+      - libkrb5-dev
+      - pkg-config
+      - libreadline-dev
+      - libncurses-dev
+      - libfuse2
     state: latest
   become: true
   become_method: sudo
