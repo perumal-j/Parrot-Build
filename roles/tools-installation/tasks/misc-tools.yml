@@ -1,0 +1,40 @@
+---
+- name: "Downloading Footprinting-wordlist.zip from URL"
+  get_url:
+    url: "https://academy.hackthebox.com/storage/resources/Footprinting-wordlist.zip"
+    dest: "/tmp/Footprinting-wordlist.zip"
+
+
+- name: "Check the existence of /tmp/Footprinting-wordlist.zip"
+  stat: 
+    path: "/tmp/Footprinting-wordlist.zip"
+  register: footprinting_wordlist
+  changed_when: false
+
+- name: "Extracting Footprinting-wordlist.zip"
+  unarchive:
+    src: "/tmp/Footprinting-wordlist.zip"
+    dest: "/opt"
+  become: true
+  become_method: sudo
+  when: footprinting_wordlist.stat.exists
+
+- name: "Downloading Footprinting-wordlist.zip from URL"
+  get_url:
+    url: "https://pentestmonkey.net/tools/smtp-user-enum/smtp-user-enum-1.2.tar.gz"
+    dest: "/tmp/smtp-user-enum-1.2.tar.gz"
+
+
+- name: "Check the existence of /tmp/smtp-user-enum-1.2.tar.gz"
+  stat: 
+    path: "/tmp/smtp-user-enum-1.2.tar.gz"
+  register: smtp_user_enum
+  changed_when: false
+
+- name: "Extracting smtp-user-enum-1.2.tar.gz"
+  unarchive:
+    src: "/tmp/smtp-user-enum-1.2.tar.gz"
+    dest: "/opt"
+  become: true
+  become_method: sudo
+  when: smtp_user_enum.stat.exists

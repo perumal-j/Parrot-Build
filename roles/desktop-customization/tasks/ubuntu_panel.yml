@@ -27,7 +27,7 @@
 - name: "Creating Desktop Launchers"
   template:
     src: "launchers.j2"
-    dest: "/usr/share/applications/{{ item.0 }}.desktop"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/share/applications/{{ item.0 }}.desktop"
   loop: "{{  DesktopLaunchers | zip(AppPaths, IconPaths) }}"
   vars:
     DesktopLauncher: "{{ item.0 }}"
@@ -38,7 +38,7 @@
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - name: "Changing Privileges of Desktop Launchers"
-  shell: chmod +x /usr/share/applications/{{ item.0 }}.desktop
+  shell: "chmod +x {{ ansible_facts['env']['HOME'] }}/.local/share/applications/{{ item.0 }}.desktop"
   loop: "{{  DesktopLaunchers | zip(AppPaths, IconPaths) }}"
   vars:
     DesktopLauncher: "{{ item.0 }}"

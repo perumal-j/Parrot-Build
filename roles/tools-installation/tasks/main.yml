@@ -8,4 +8,4 @@
 - include_tasks: github-tools.yml
 - include_tasks: python-tools.yml
 - include_tasks: brave-browser.yml
-
+- include_tasks: misc-tools.yml
