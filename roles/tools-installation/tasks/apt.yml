@@ -58,6 +58,8 @@
       - libreadline-dev
       - libncurses-dev
       - libfuse2
+      - onesixtyone
+      - crunch
     state: latest
   become: true
   become_method: sudo
