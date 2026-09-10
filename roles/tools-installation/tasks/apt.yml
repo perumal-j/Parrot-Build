@@ -60,6 +60,7 @@
       - libfuse2
       - onesixtyone
       - crunch
+      - braa
     state: latest
   become: true
   become_method: sudo
