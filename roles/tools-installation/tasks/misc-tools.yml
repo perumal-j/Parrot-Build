@@ -24,7 +24,6 @@
     url: "https://pentestmonkey.net/tools/smtp-user-enum/smtp-user-enum-1.2.tar.gz"
     dest: "/tmp/smtp-user-enum-1.2.tar.gz"
 
-
 - name: "Check the existence of /tmp/smtp-user-enum-1.2.tar.gz"
   stat: 
     path: "/tmp/smtp-user-enum-1.2.tar.gz"
