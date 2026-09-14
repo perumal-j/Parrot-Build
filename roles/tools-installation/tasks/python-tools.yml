@@ -127,11 +127,17 @@
   register: "scrapy_exists"
   changed_when: false
 
+- name: "Check if XSStrike exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/xsstrike"
+  register: "XSStrike"
+  changed_when: false
+
 - name: "Installing Impacket, sshuttle, Updog, Scrapy via UV"
   shell:
     cmd: "uv tool install {{ item }}"
   loop: "{{ UVtools }}"
-  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists
+  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists
    
 - name: "Check if volatility3 tool is already installed"
   shell: "uv tool list"

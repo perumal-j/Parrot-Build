@@ -36,11 +36,16 @@ GitHubTools:
     url: "https://github.com/swisskyrepo/PayloadsAllTheThings"
     destination: "/opt/PayloadsAllTheThings"
 
+  - name: xss-payload-list
+    url: "https://github.com/payload-box/xss-payload-list"
+    destination: "/opt/xss-payload-list"
+
 UVtools:
   - impacket
   - sshuttle
   - updog
   - scrapy
+  - xsstrike
 
 PIPToolsGit:
   - name: NetExec
