@@ -61,12 +61,9 @@
       - onesixtyone
       - crunch
       - braa
-<<<<<<< HEAD
       - evolution
       - cifs-utils
-=======
       - fonts-jetbrains-mono
->>>>>>> af72da93730b240bc25515b22184cccba7ee63bf
     state: latest
   become: true
   become_method: sudo
@@ -111,12 +108,9 @@
       - libreadline-dev
       - libncurses-dev
       - libfuse2
-<<<<<<< HEAD
       - evolution
       - cifs-utils
-=======
       - fonts-jetbrains-mono
->>>>>>> af72da93730b240bc25515b22184cccba7ee63bf
     state: latest
   become: true
   become_method: sudo
