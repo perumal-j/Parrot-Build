@@ -61,6 +61,8 @@
       - onesixtyone
       - crunch
       - braa
+      - evolution
+      - cifs-utils
     state: latest
   become: true
   become_method: sudo
@@ -105,6 +107,8 @@
       - libreadline-dev
       - libncurses-dev
       - libfuse2
+      - evolution
+      - cifs-utils
     state: latest
   become: true
   become_method: sudo
