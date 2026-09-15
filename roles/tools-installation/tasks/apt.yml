@@ -61,6 +61,7 @@
       - onesixtyone
       - crunch
       - braa
+      - fonts-jetbrains-mono
     state: latest
   become: true
   become_method: sudo
@@ -105,6 +106,7 @@
       - libreadline-dev
       - libncurses-dev
       - libfuse2
+      - fonts-jetbrains-mono
     state: latest
   become: true
   become_method: sudo
