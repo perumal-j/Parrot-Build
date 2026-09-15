@@ -64,6 +64,7 @@
       - evolution
       - cifs-utils
       - fonts-jetbrains-mono
+      - smbmap
     state: latest
   become: true
   become_method: sudo
@@ -111,6 +112,7 @@
       - evolution
       - cifs-utils
       - fonts-jetbrains-mono
+      - smbmap
     state: latest
   become: true
   become_method: sudo
