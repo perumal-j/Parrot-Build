@@ -65,6 +65,13 @@
       - cifs-utils
       - fonts-jetbrains-mono
       - smbmap
+      - lftp
+      - ncftp
+      - claws-mail
+      - geary
+      - mailutils
+      - sendemail
+      - dbeaver
     state: latest
   become: true
   become_method: sudo
@@ -113,6 +120,13 @@
       - cifs-utils
       - fonts-jetbrains-mono
       - smbmap
+      - lftp
+      - ncftp
+      - claws-mail
+      - geary
+      - mailutils
+      - sendemail
+      - dbeaver
     state: latest
   become: true
   become_method: sudo
