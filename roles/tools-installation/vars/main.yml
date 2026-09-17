@@ -109,3 +109,4 @@ GitHubReleases:
   - repo: "shadow1ng/fscan"
     regex: "fscan"
     destination: "/opt/fscan"
+
