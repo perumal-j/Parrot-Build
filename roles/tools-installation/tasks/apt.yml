@@ -72,6 +72,7 @@
       - mailutils
       - sendemail
       - dbeaver
+      - crowbar
     state: latest
   become: true
   become_method: sudo
@@ -127,6 +128,7 @@
       - mailutils
       - sendemail
       - dbeaver
+      - crowbar
     state: latest
   become: true
   become_method: sudo
