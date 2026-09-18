@@ -73,6 +73,7 @@
       - sendemail
       - dbeaver
       - crowbar
+      - rdesktop
     state: latest
   become: true
   become_method: sudo
@@ -129,6 +130,7 @@
       - sendemail
       - dbeaver
       - crowbar
+      - rdesktop
     state: latest
   become: true
   become_method: sudo
