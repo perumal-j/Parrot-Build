@@ -37,3 +37,98 @@
   become: true
   become_method: sudo
   when: smtp_user_enum.stat.exists
+
+- name: "Check the presence of Sqlcmd"
+  stat:
+    path: "/tmp/sqlcmd-latest.json"
+  register: sqlcmd_metadata
+  changed_when: false
+
+- name: "Downloading Metadata of Sqlcmd" 
+  get_url:
+    url: "https://api.github.com/repos/microsoft/go-sqlcmd/releases/latest"
+    dest: "/tmp/sqlcmd-latest.json"
+    mode: '0640'
+    headers:
+      Authorization: "token {{ github_api_key }}"
+  when: not sqlcmd_metadata.stat.exists
+
+- name: "Check the presence of sqlcmd-latest.json post Downloading"
+  stat:
+    path: "/tmp/sqlcmd-latest.json"
+  register: sqlcmd_metadata_post_download
+  changed_when: false
+
+- name: "Read sqlcmd-latest.json from disk"
+  slurp:
+    src: "/tmp/sqlcmd-latest.json"
+  register: sqlcmd_release_file
+  when: sqlcmd_metadata_post_download.stat.exists
+
+- name: "Parse Sqlcmd Release JSON /tmp/sqlcmd-latest.json"
+  set_fact:
+    sqlcmd_release_json: "{{ sqlcmd_release_file.content | b64decode | from_json }}"
+  changed_when: false
+
+- name: "Extract latest stable release of Sqlcmd"
+  set_fact:
+    sqlcmd_latest_version: "{{ sqlcmd_release_json.tag_name }}"
+
+- name: "Print Sqlcmd Version"
+  debug:
+    var: sqlcmd_latest_version
+
+- name: "Check the existence of Sqlcmd"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/sqlcmd"
+  register: sqlcmd_exists
+  changed_when: false
+
+- name: "Create an empty sqlcmd_current_version.txt"
+  file:
+    path: "/opt/current_versions/sqlcmd_current_version.txt"
+    state: touch
+    mode: 0644
+  become: true
+  become_method: sudo
+  when: not sqlcmd_exists.stat.exists
+
+- name: "Check the presence of /opt/current_versions/sqlcmd_current_version.txt"
+  stat:
+    path: "/opt/current_versions/sqlcmd_current_version.txt"
+  register: sqlcmd_version_file
+  changed_when: false
+
+- name: "Read Current Version from file /opt/current_versions/sqlcmd_current_version.txt"
+  set_fact:
+    sqlcmd_current_version: "{{ lookup('file', '/opt/current_versions/sqlcmd_current_version.txt') }}"
+  when: sqlcmd_version_file.stat.exists
+
+- name: "Compare sqlcmd_current_version with sqlcmd_latest_version"
+  set_fact:
+    sqlcmd_update_required: "{{ sqlcmd_current_version != sqlcmd_latest_version }}"
+  when: sqlcmd_version_file.stat.exists
+
+- name: "Downloading Sqlcmd"
+  get_url:
+    url: "https://github.com/microsoft/go-sqlcmd/releases/download/{{ sqlcmd_latest_version }}/sqlcmd-linux-amd64.tar.bz2"
+    dest: "/tmp/sqlcmd-linux-amd64.tar.bz2"
+    mode: '0640'
+    headers:
+      Authorization: "token {{ github_api_key }}"
+  when: sqlcmd_update_required
+
+- name: "Store latest version in the current version file"
+  copy:
+    dest: "/opt/current_versions/sqlcmd_current_version.txt"
+    content: "{{ sqlcmd_latest_version }}"
+    mode: "0644"
+  become: true
+  become_method: sudo
+  when: sqlcmd_update_required
+
+- name: "Extracting Sqlcmd"
+  unarchive:
+    src: "/tmp/sqlcmd-linux-amd64.tar.bz2"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+  when: sqlcmd_update_required
