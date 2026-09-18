@@ -74,6 +74,7 @@
       - dbeaver
       - crowbar
       - rdesktop
+      - subfinder
     state: latest
   become: true
   become_method: sudo
@@ -131,6 +132,7 @@
       - dbeaver
       - crowbar
       - rdesktop
+      - subfinder
     state: latest
   become: true
   become_method: sudo
