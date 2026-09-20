@@ -52,6 +52,7 @@ UVtools:
   - xsstrike
   - defaultcreds-cheat-sheet
   - uploadserver
+  - wsgidav
 
 PIPToolsGit:
   - name: NetExec

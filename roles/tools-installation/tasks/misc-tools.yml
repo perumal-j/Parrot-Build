@@ -132,3 +132,28 @@
     src: "/tmp/sqlcmd-linux-amd64.tar.bz2"
     dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
   when: sqlcmd_update_required
+
+- name: "Check the existence of wsgidav"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/wsgidav"
+  register: wsgidav_exists
+  changed_when: false
+
+- name: "Refreshing bashrc"
+  shell: ". {{ ansible_facts['env']['HOME'] }}/.bashrc"
+  changed_when: false
+
+- name: "Check that the wsgidav environment is healthy"
+  command: 
+    argv:
+      - "{{ ansible_facts['env']['HOME'] }}/.local/share/uv/tools/wsgidav/bin/python"
+      - -c
+      - import wsgidav, cheroot, lxml
+  register: wsgidav_env_check
+  ignore_errors: true
+  when: wsgidav_exists.stat.exists
+
+- name: "Install wsgidav with cheroot and lxml"
+  command: "uv tool install wsgidav --with cheroot --with lxml"
+  when: not wsgidav_env_check.rc == 0 and wsgidav_exists.stat.exists
+
