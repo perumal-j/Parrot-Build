@@ -39,6 +39,10 @@ GitHubTools:
   - name: xss-payload-list
     url: "https://github.com/payload-box/xss-payload-list"
     destination: "/opt/xss-payload-list"
+  
+  - name: subbrute
+    url: "https://github.com/TheRook/subbrute"
+    destination: "/opt/subbrute"
 
 UVtools:
   - impacket
@@ -46,6 +50,7 @@ UVtools:
   - updog
   - scrapy
   - xsstrike
+  - defaultcreds-cheat-sheet
 
 PIPToolsGit:
   - name: NetExec
