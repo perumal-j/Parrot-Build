@@ -151,11 +151,22 @@
   register: "wsgidav"
   changed_when: false
 
-- name: "Installing Impacket, sshuttle, Updog, Scrapy, XSStrike, defaultcreds-cheat-sheet, uploadserver, wsgidav via UV"
+- name: "Check if pypykatz exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/pypykatz"
+  register: "pypykatz"
+  changed_when: false
+
+- name: "Installing Impacket, sshuttle, Updog, Scrapy, XSStrike, defaultcreds-cheat-sheet, uploadserver, wsgidav, pypykatz via UV"
   shell:
     cmd: "uv tool install {{ item }}"
   loop: "{{ UVtools }}"
-  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists or not creds.stat.exists or not uploadserver.stat.exists or not wsgidav.stat.exists
+  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists or not creds.stat.exists or not uploadserver.stat.exists or not wsgidav.stat.exists or not pypykatz.stat.exists
+
+- name: "Upgrading all UV tools"
+  shell:
+    cmd: "uv tool upgrade --all"
+  changed_when: false
 
 - name: "Check if volatility3 tool is already installed"
   shell: "uv tool list"

@@ -53,6 +53,7 @@ UVtools:
   - defaultcreds-cheat-sheet
   - uploadserver
   - wsgidav
+  - pypykatz
 
 PIPToolsGit:
   - name: NetExec
