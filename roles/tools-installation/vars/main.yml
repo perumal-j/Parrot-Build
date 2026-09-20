@@ -51,6 +51,7 @@ UVtools:
   - scrapy
   - xsstrike
   - defaultcreds-cheat-sheet
+  - uploadserver
 
 PIPToolsGit:
   - name: NetExec

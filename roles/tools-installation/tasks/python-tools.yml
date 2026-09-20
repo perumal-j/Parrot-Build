@@ -139,11 +139,17 @@
   register: "creds"
   changed_when: false
 
-- name: "Installing Impacket, sshuttle, Updog, Scrapy, XSStrike, defaultcreds-cheat-sheet via UV"
+- name: "Check if uploadserver exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/uploadserver"
+  register: "uploadserver"
+  changed_when: false
+
+- name: "Installing Impacket, sshuttle, Updog, Scrapy, XSStrike, defaultcreds-cheat-sheet, uploadserver via UV"
   shell:
     cmd: "uv tool install {{ item }}"
   loop: "{{ UVtools }}"
-  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists or not creds.stat.exists
+  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists or not creds.stat.exists or not uploadserver.stat.exists
    
 - name: "Check if volatility3 tool is already installed"
   shell: "uv tool list"
