@@ -71,15 +71,11 @@
       - geary
       - mailutils
       - sendemail
-      - dbeaver
-      - crowbar
       - rdesktop
-      - subfinder
     state: latest
   become: true
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'ubuntu'
-
 
 - name: "Installing Tools via Apt - Parrot"
   package:

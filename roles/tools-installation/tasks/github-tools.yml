@@ -59,6 +59,18 @@
   register: subbrute
   changed_when: false 
 
+- name: "Check the presence of /opt/statistically-likely-usernames"
+  stat:
+    path: "/opt/statistically-likely-usernames"
+  register: statistically_likely_usernames
+  changed_when: false 
+
+- name: "Check the presence of /opt/aspnetCryptTools"
+  stat:
+    path: "/opt/aspnetCryptTools"
+  register: aspnetCryptTools
+  changed_when: false 
+
 - name: "Installing Tools from GitHub Repositories"
   git:
     repo: "{{ item.url }}"
@@ -66,7 +78,7 @@
   loop: "{{ GitHubTools }}"
   become: true
   become_method: sudo
-  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists or not payloadsallthethings.stat.exists or not xss_payload_list.stat.exists or not subbrute.stat.exists
+  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists or not payloadsallthethings.stat.exists or not xss_payload_list.stat.exists or not subbrute.stat.exists or not statistically_likely_usernames.stat.exists or not aspnetCryptTools.stat.exists
 
 - name: "Change owner of downloaded GitHub Projects"
   file:

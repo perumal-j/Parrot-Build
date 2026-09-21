@@ -44,6 +44,14 @@ GitHubTools:
     url: "https://github.com/TheRook/subbrute"
     destination: "/opt/subbrute"
 
+  - name: statistically-likely-usernames
+    url: "https://github.com/insidetrust/statistically-likely-usernames"
+    destination: "/opt/statistically-likely-usernames" 
+
+  - name: aspnetCryptTools
+    url: "https://github.com/liquidsec/aspnetCryptTools"
+    destination: "/opt/aspnetCryptTools" 
+
 UVtools:
   - impacket
   - sshuttle
