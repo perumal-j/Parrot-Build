@@ -64,6 +64,11 @@ GitHubTools:
     url: "https://github.com/AlessandroZ/LaZagne"
     destination: "/opt/LaZagne"
 
+  - name: firefox_decrypt
+    url: "https://github.com/unode/firefox_decrypt"
+    destination: "/opt/firefox_decrypt"
+
+
 UVtools:
   - impacket
   - sshuttle
@@ -144,3 +149,7 @@ GitHubReleases:
   - repo: "AlessandroZ/LaZagne"
     regex: "LaZagne"
     destination: "/opt/lazagne"
+
+  - repo: "SnaffCon/Snaffler"
+    regex: "Snaffler.exe"
+    destination: "/opt/snaffler"
