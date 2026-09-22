@@ -11,7 +11,7 @@ import (
 	"fmt"           // for formatted I/O
 	"io"            // for reading response body
 	"net/http"      // for HTTP requests
-	"os"            //	 for file operations
+	"os"            // for file operations
 	"path/filepath" // for file path manipulation
 	"regexp"        // for unzipping files
 	"strings"       // for string manipulation
@@ -196,21 +196,29 @@ func ExtractGz(compressedData []byte, output_directory string) error {
 	return nil
 }
 
-func ExtractTar(compressedData []byte, output_directory string) error {
-	// Decompress the data
-	if len(compressedData) < 10 || !bytes.HasPrefix(compressedData, []byte{0x1f, 0x8b}) {
-		return nil
-	}
-
+// ExtractTarGz decompresses a gzipped tarball (.tar.gz / .tgz) and extracts its contents
+func ExtractTarGz(compressedData []byte, output_directory string) error {
 	reader := bytes.NewReader(compressedData)
 
 	gzipReader, err := gzip.NewReader(reader)
 	if err != nil {
 		fmt.Println("Error creating gzip reader:", err)
+		return err
 	}
 	defer gzipReader.Close()
 
-	tarReader := tar.NewReader(gzipReader)
+	return extractTarReader(gzipReader, output_directory)
+}
+
+// ExtractTar extracts a plain (non-gzipped) .tar archive
+func ExtractTar(data []byte, output_directory string) error {
+	reader := bytes.NewReader(data)
+	return extractTarReader(reader, output_directory)
+}
+
+// extractTarReader does the actual tar extraction from any io.Reader
+func extractTarReader(r io.Reader, output_directory string) error {
+	tarReader := tar.NewReader(r)
 
 	for {
 		header, err := tarReader.Next()
@@ -318,6 +326,23 @@ func ExtractZip(compressedData []byte, output_directory string) error {
 	return nil
 }
 
+// SaveRaw writes the downloaded bytes to output_directory/fileName exactly as-is,
+// used for any file whose extension doesn't match a known archive format.
+func SaveRaw(data []byte, output_directory string, fileName string) error {
+	file, err := os.Create(filepath.Join(output_directory, fileName))
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return err
+	}
+	defer file.Close()
+	_, err = io.Copy(file, bytes.NewReader(data))
+	if err != nil {
+		fmt.Println("Error copying file:", err)
+		return err
+	}
+	return nil
+}
+
 func EnsureDirectoryExists(path string) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		// Create the directory
@@ -328,6 +353,8 @@ func EnsureDirectoryExists(path string) {
 	}
 }
 
+// dispatch by file extension: recognized archive types get extracted,
+// everything else (whatever the regex matched) is saved as-is.
 func UnifiedExtractionByteStream(repo string, regex string, output_directory string) error {
 
 	EnsureDirectoryExists(output_directory)
@@ -342,38 +369,40 @@ func UnifiedExtractionByteStream(repo string, regex string, output_directory str
 		buffer, err := DownloadToBuffer(url)
 		if err != nil {
 			fmt.Println("Error Downloading the Buffer:", err)
+			continue
 		}
 
 		binaryName := ExtractFileNameFromURL(url)
+		lowerName := strings.ToLower(binaryName)
 
-		if strings.HasSuffix(binaryName, "tar.gz") {
+		switch {
+		case strings.HasSuffix(lowerName, ".tar.gz"), strings.HasSuffix(lowerName, ".tgz"):
+			err = ExtractTarGz(buffer.Bytes(), output_directory)
+			if err != nil {
+				fmt.Println("Error Extracting Tar.Gz:", err)
+			}
+		case strings.HasSuffix(lowerName, ".tar"):
 			err = ExtractTar(buffer.Bytes(), output_directory)
 			if err != nil {
 				fmt.Println("Error Extracting Tar:", err)
 			}
-		} else if strings.HasSuffix(binaryName, "zip") {
+		case strings.HasSuffix(lowerName, ".zip"):
 			err = ExtractZip(buffer.Bytes(), output_directory)
 			if err != nil {
 				fmt.Println("Error Extracting Zip:", err)
 			}
-		} else if strings.HasSuffix(binaryName, "gz") {
+		case strings.HasSuffix(lowerName, ".gz"):
+			// plain gzip (single file), not a tarball
 			err = ExtractGz(buffer.Bytes(), output_directory)
 			if err != nil {
-				fmt.Println("Error Extracing Gz:", err)
+				fmt.Println("Error Extracting Gz:", err)
 			}
-
-		} else {
-			// if not a tar.gz or zip file, save that file as it is
-			file, err := os.Create(filepath.Join(output_directory, binaryName))
+		default:
+			// Not a recognized archive extension: save the file as-is,
+			// whatever type it is (binary, script, txt, etc.)
+			err = SaveRaw(buffer.Bytes(), output_directory, binaryName)
 			if err != nil {
-				fmt.Println("Error creating file:", err)
-				return err
-			}
-			defer file.Close()
-			_, err = io.Copy(file, bytes.NewReader(buffer.Bytes()))
-			if err != nil {
-				fmt.Println("Error copying file:", err)
-				return err
+				fmt.Println("Error Saving Raw File:", err)
 			}
 		}
 	}

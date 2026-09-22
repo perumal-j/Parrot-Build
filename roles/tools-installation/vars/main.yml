@@ -70,6 +70,9 @@ PIPToolsGit:
   - name: WafW00f
     url: "git+https://github.com/EnableSecurity/wafw00f"
 
+  - name: DonPAPI
+    url: "git+https://github.com/login-securite/DonPAPI"
+
 
 UVtoolsGit: 
   - name: Certipy
@@ -107,11 +110,11 @@ GitHubReleases:
     destination: "/opt/chisel"
 
   - repo: "peass-ng/PEASS-ng"
-    regex: "linpeas.sh"
+    regex: "linpeas"
     destination: "/opt/peass"
 
   - repo: "peass-ng/PEASS-ng"
-    regex: "winPEASx64.exe"
+    regex: "winPEAS"
     destination: "/opt/peass"
 
   - repo: "SpecterOps/SharpHound"
@@ -126,3 +129,6 @@ GitHubReleases:
     regex: "fscan"
     destination: "/opt/fscan"
 
+  - repo: "AlessandroZ/LaZagne"
+    regex: "LaZagne"
+    destination: "/opt/lazagne"

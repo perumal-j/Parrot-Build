@@ -43,6 +43,12 @@
   register: wafw00f
   changed_when: false
 
+- name: "Check if DonPAPI exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/donpapi"
+  register: donpapi
+  changed_when: false
+
 - name: Debug HOME on the control machine
   debug:
     msg: "{{ lookup('env', 'HOME') }}"
@@ -89,11 +95,11 @@
   loop: "{{ UVtoolsGit }}"
   when: not certipy_exists.stat.exists and not pywhisker_exists.stat.exists and not bloodyAD_exists.stat.exists and not pwntools_exists.stat.exists and not gettgtpkinit_exists.stat.exists and not ldeep_exists.stat.exists
 
-- name: "Installing NetExec & wafw00f via pipx"
+- name: "Installing NetExec, wafw00f, & DonPAPI via pipx"
   shell:
     cmd: pipx install {{ item.url }}
   loop: "{{ PIPToolsGit }}"
-  when: not netexec.stat.exists or not wafw00f.stat.exists
+  when: not netexec.stat.exists or not wafw00f.stat.exists or not donpapi.stat.exists
 
 - name: "Uninstall old Impacket"
   apt:
