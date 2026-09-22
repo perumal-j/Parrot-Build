@@ -155,7 +155,6 @@
   loop: "{{ GitHubReleases }}"
   become: true
   become_method: sudo
-  changed_when: false
 
 - name: "Change owner of downloaded GitHub Tools"
   file:

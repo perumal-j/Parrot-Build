@@ -151,5 +151,5 @@ GitHubReleases:
     destination: "/opt/lazagne"
 
   - repo: "SnaffCon/Snaffler"
-    regex: "Snaffler.exe"
+    regex: "Snaffler"
     destination: "/opt/snaffler"
