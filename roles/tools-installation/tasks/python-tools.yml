@@ -459,3 +459,16 @@
     dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/theharvester"
     mode: 0755
   when: not theharvester.stat.exists
+
+- name: "Check the presence of linkedin2username in PATH"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linkedin2username"
+  register: linkedin2usernamebin
+  changed_when: false
+
+- name: "Moving linkedin2username.sh to .local/bin"
+  copy:
+    src: "linkedin2username.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linkedin2username"
+    mode: 0755
+  when: not linkedin2usernamebin.stat.exists

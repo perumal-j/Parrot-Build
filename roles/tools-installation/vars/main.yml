@@ -52,6 +52,18 @@ GitHubTools:
     url: "https://github.com/liquidsec/aspnetCryptTools"
     destination: "/opt/aspnetCryptTools" 
 
+  - name: linkedin2username
+    url: "https://github.com/initstring/linkedin2username"
+    destination: "/opt/linkedin2username" 
+
+  - name: mimipenguin
+    url: "https://github.com/huntergregal/mimipenguin"
+    destination: "/opt/mimipenguin"
+
+  - name: LaZagne
+    url: "https://github.com/AlessandroZ/LaZagne"
+    destination: "/opt/LaZagne"
+
 UVtools:
   - impacket
   - sshuttle
@@ -106,7 +118,7 @@ GitHubReleases:
     destination: "/opt/chisel"
 
   - repo: "jpillora/chisel"
-    regex: "windows_amd64.gz"
+    regex: "windows_amd64.zip"
     destination: "/opt/chisel"
 
   - repo: "peass-ng/PEASS-ng"
