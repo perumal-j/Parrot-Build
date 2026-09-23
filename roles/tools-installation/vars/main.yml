@@ -72,6 +72,10 @@ GitHubTools:
     url: "https://github.com/topotam/PetitPotam"
     destination: "/opt/petitpotam"
 
+  - name: Invoke-TheHash
+    url: "https://github.com/Kevin-Robertson/Invoke-TheHash"
+    destination: "/opt/invoke-thehash"
+
 UVtools:
   - impacket
   - sshuttle

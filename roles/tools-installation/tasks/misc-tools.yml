@@ -1,25 +1,64 @@
 ---
-- name: "Downloading Footprinting-wordlist.zip from URL"
-  get_url:
-    url: "https://academy.hackthebox.com/storage/resources/Footprinting-wordlist.zip"
-    dest: "/tmp/Footprinting-wordlist.zip"
-
-
-- name: "Check the existence of /tmp/Footprinting-wordlist.zip"
-  stat: 
-    path: "/tmp/Footprinting-wordlist.zip"
+- name: "Check the presence of footprinting-wordlist.txt"
+  stat:
+    path: "/usr/share/wordlists/footprinting-wordlist.txt"
   register: footprinting_wordlist
   changed_when: false
+  when: ansible_facts['distribution']|lower == 'ubuntu'
 
-- name: "Extracting Footprinting-wordlist.zip"
-  unarchive:
-    src: "/tmp/Footprinting-wordlist.zip"
-    dest: "/opt"
+- name: "Check the presence of fasttrack.txt"
+  stat:
+    path: "/usr/share/wordlists/fasttrack.txt"
+  register: fasttrack_wordlist
+  changed_when: false
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Installing drtychai/wordlists from GitHub"
+  shell:
+    cmd: "git clone -j`nproc` https://github.com/drtychai/wordlists /tmp/wordlists-drtychai/"
   become: true
   become_method: sudo
-  when: footprinting_wordlist.stat.exists
+  when: not fasttrack_wordlist.stat.exists and ansible_facts['distribution']|lower == 'ubuntu'
 
-- name: "Downloading Footprinting-wordlist.zip from URL"
+- name: "Installing boboaung1337/wordlists from GitHub"
+  git:
+    repo: "{{ item }}"
+    dest: "/tmp/wordlists-boboaung1337/"
+  loop:
+    - https://github.com/boboaung1337/wordlists
+  become: true
+  become_method: sudo
+  when: not footprinting_wordlist.stat.exists and ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Copy drtychai wordlists into /usr/share/wordlists"
+  synchronize:
+    src: "/tmp/wordlists-drtychai/"
+    dest: "/usr/share/wordlists"
+    rsync_opts:
+      - "--exclude=.git"
+  become: true
+  when: not fasttrack_wordlist.stat.exists and ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Copy boboaung1337 wordlists into /usr/share/wordlists"
+  synchronize:
+    src: "/tmp/wordlists-boboaung1337/"
+    dest: "/usr/share/wordlists"
+    rsync_opts:
+      - "--exclude=.git"
+  become: true
+  when: not footprinting_wordlist.stat.exists and ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Change owner of boboaung1337/wordlists & drtychai/wordlists"
+  file:
+    path: "/usr/share/wordlists"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    recurse: yes
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Downloading smtp-user-enum"
   get_url:
     url: "https://pentestmonkey.net/tools/smtp-user-enum/smtp-user-enum-1.2.tar.gz"
     dest: "/tmp/smtp-user-enum-1.2.tar.gz"

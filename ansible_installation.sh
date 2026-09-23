@@ -12,6 +12,7 @@ sudo locale-gen en_US.UTF-8
 
 # Install Ansible Collection dependencies
 ansible-galaxy collection install community.general
+ansible-galaxy collection install ansible.posix
 
 # Update system-wide locale settings
 sudo update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
