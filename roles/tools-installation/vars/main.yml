@@ -68,6 +68,9 @@ GitHubTools:
     url: "https://github.com/unode/firefox_decrypt"
     destination: "/opt/firefox_decrypt"
 
+  - name: PetitPotam
+    url: "https://github.com/topotam/PetitPotam"
+    destination: "/opt/petitpotam"
 
 UVtools:
   - impacket
@@ -79,6 +82,7 @@ UVtools:
   - uploadserver
   - wsgidav
   - pypykatz
+  - coercer
 
 PIPToolsGit:
   - name: NetExec
@@ -153,3 +157,15 @@ GitHubReleases:
   - repo: "SnaffCon/Snaffler"
     regex: "Snaffler"
     destination: "/opt/snaffler"
+
+  - repo: "BeichenDream/GodPotato"
+    regex: "GodPotato"
+    destination: "/opt/godpotato"
+
+  - repo: "itm4n/PrintSpoofer"
+    regex: "PrintSpoofer"
+    destination: "/opt/printspoofer"
+
+  - repo: "trustedsec/DitExplorer"
+    regex: "DitExplorer"
+    destination: "/opt/ditexplorer"

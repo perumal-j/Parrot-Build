@@ -15,6 +15,26 @@
   shell: /tmp/uv-install.sh
   when: not uv_manager_exists.stat.exists
 
+- name: "Check if uv is linked system-wide"
+  stat:
+    path: "/usr/local/bin/uv"
+  register: "uv_linked"
+  changed_when: false
+
+- name: "Symlink uv and uvx to /usr/local/bin"
+  file:
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  loop:
+    - uv
+    - uvx
+  when: not uv_linked.stat.exists
+
 - name: "Removing Netexec"
   apt:
     name: netexec
@@ -163,11 +183,17 @@
   register: "pypykatz"
   changed_when: false
 
-- name: "Installing Impacket, sshuttle, Updog, Scrapy, XSStrike, defaultcreds-cheat-sheet, uploadserver, wsgidav, pypykatz via UV"
+- name: "Check if coercer exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/coercer"
+  register: "coercer"
+  changed_when: false
+
+- name: "Installing Impacket, sshuttle, Updog, Scrapy, XSStrike, defaultcreds-cheat-sheet, uploadserver, wsgidav, pypykatz, coercer via UV"
   shell:
     cmd: "uv tool install {{ item }}"
   loop: "{{ UVtools }}"
-  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists or not creds.stat.exists or not uploadserver.stat.exists or not wsgidav.stat.exists or not pypykatz.stat.exists
+  when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists or not creds.stat.exists or not uploadserver.stat.exists or not wsgidav.stat.exists or not pypykatz.stat.exists or not coercer.stat.exists
 
 - name: "Upgrading all UV tools"
   shell:
@@ -224,8 +250,8 @@
 - name: "Modifying PKINITtools Directory Owner"
   file:
     path: "/opt/PKINITtools"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     state: directory
     recurse: true
   become: true
@@ -289,8 +315,8 @@
 - name: "Modifying SMB_Killer Directory Owner"
   file:
     path: "/opt/SMB_Killer"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     state: directory
     recurse: true
   become: true
@@ -368,8 +394,8 @@
 - name: "Change the owner of /opt/theHarvester"
   file:
     path: "/opt/theHarvester"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     state: directory
     recurse: true
   become: true
@@ -404,8 +430,8 @@
 - name: "Change the owner of /opt/FinalRecon"
   file:
     path: "/opt/FinalRecon"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     state: directory
     recurse: true
   become: true
@@ -472,3 +498,58 @@
     dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linkedin2username"
     mode: 0755
   when: not linkedin2usernamebin.stat.exists
+
+- name: "Check if Responder is already cloned"
+  stat:
+    path: "/opt/responder/Responder.py"
+  register: "responder_cloned"
+  changed_when: false
+
+- name: "Downloading Responder from Github"
+  git:
+    repo: https://github.com/lgandx/Responder.git
+    dest: "/opt/responder"
+    version: master
+  become: true
+  become_method: sudo
+  when: not responder_cloned.stat.exists
+
+- name: "Modifying Responder Directory Owner"
+  file:
+    path: "/opt/responder"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    state: directory
+    mode: 0755
+    recurse: true
+  become: true
+  become_method: sudo
+
+- name: "Check the presence of Responder in one of the PATHs"
+  stat:
+    path: "/usr/local/bin/responder"
+  register: responder
+  changed_when: false
+
+- name: "Adding Dependencies to Responder"
+  shell: |
+    uv add --script /opt/responder/Responder.py -r /opt/responder/requirements.txt
+  when: not responder.stat.exists
+
+- name: "Tweaking Shebang of Responder.py"
+  replace:
+    path: "/opt/responder/Responder.py"
+    regexp: "#!/usr/bin/env python3"
+    replace: "#!/usr/bin/env -S uv run --script"
+  when: not responder.stat.exists
+
+- name: "Copying Responder.sh to .local/bin"
+  copy:
+    src: "responder.sh"
+    dest: "/usr/local/bin/responder"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  when: not responder.stat.exists

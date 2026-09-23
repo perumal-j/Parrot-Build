@@ -16,8 +16,8 @@
 - name: "Modifying Bloodhound Directory Owner"
   file:
     path: "/opt/BloodHound"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     state: directory
     recurse: true
   become: true

@@ -95,6 +95,12 @@
   register: firefox_decrypt
   changed_when: false 
 
+- name: "Check the presence of /opt/petitpotam"
+  stat:
+    path: "/opt/petitpotam"
+  register: petitpotam
+  changed_when: false 
+
 - name: "Installing Tools from GitHub Repositories"
   git:
     repo: "{{ item.url }}"
@@ -102,13 +108,13 @@
   loop: "{{ GitHubTools }}"
   become: true
   become_method: sudo
-  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists or not payloadsallthethings.stat.exists or not xss_payload_list.stat.exists or not subbrute.stat.exists or not statistically_likely_usernames.stat.exists or not aspnetCryptTools.stat.exists or not linkedin2username.stat.exists or not mimipenguin.stat.exists or not LaZagne_src.stat.exists or not firefox_decrypt.stat.exists
+  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists or not payloadsallthethings.stat.exists or not xss_payload_list.stat.exists or not subbrute.stat.exists or not statistically_likely_usernames.stat.exists or not aspnetCryptTools.stat.exists or not linkedin2username.stat.exists or not mimipenguin.stat.exists or not LaZagne_src.stat.exists or not firefox_decrypt.stat.exists or not petitpotam.stat.exists
 
 - name: "Change owner of downloaded GitHub Projects"
   file:
     path: "{{ item.destination }}"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     recurse: yes
   loop: "{{ GitHubTools }}"
   become: true
@@ -148,10 +154,15 @@
   become_method: sudo
   changed_when: false
 
+- name: "Debug Ansible Facts"
+  debug:
+    msg: "{{ ansible_facts['env'] }}"
+
 - name: "Downloading GitHub Tools"
   shell: "go run {{ build_dir.path }}/githubdownload.go {{ item.repo }} {{ item.regex }} {{ item.destination }}"
   environment:
     PATH: "/usr/local/go/bin"
+    GITHUB_TOKEN: "{{ github_api_key }}"
   loop: "{{ GitHubReleases }}"
   become: true
   become_method: sudo
@@ -159,8 +170,8 @@
 - name: "Change owner of downloaded GitHub Tools"
   file:
     path: "{{ item.destination }}"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
     state: directory
   loop: "{{ GitHubReleases }}"
   become: true
@@ -169,8 +180,9 @@
 - name: "Recursively change owner of files in GitHub Tools directories"
   file:
     path: "{{ item.destination }}"
-    owner: "{{ ansible_facts['user_id'] }}"
-    group: "{{ ansible_facts['user_id'] }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
     recurse: yes
   loop: "{{ GitHubReleases }}"
   become: true

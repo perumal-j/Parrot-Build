@@ -71,7 +71,7 @@
     - rust-lang.rust-analyzer
     - ms-vscode.cpptools-extension-pack
   become: true
-  become_user: "{{ ansible_facts['user_id'] }}"
+  become_user: "{{ ansible_facts['env']['USER'] }}"
   register: ext_install
   changed_when: "'is already installed' not in ext_install.stdout"
   ignore_errors: true

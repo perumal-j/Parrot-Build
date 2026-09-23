@@ -20,23 +20,38 @@ import (
 func GetGithubReleasesLatest(repo string) string {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", repo)
 
-	// Make a GET request to the URL
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return ""
+	}
 
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		req.Header.Set("Authorization", "token "+token)
+	}
+	req.Header.Set("Accept", "application/vnd.github+json")
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return ""
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("GitHub API returned status %d\n", resp.StatusCode)
+		body, _ := io.ReadAll(resp.Body)
+		fmt.Println(string(body))
+		return ""
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return ""
 	}
 
-	return string(body) // Return the raw JSON response as a string
+	return string(body)
 }
 
 // Get tag_name value from github releases json response

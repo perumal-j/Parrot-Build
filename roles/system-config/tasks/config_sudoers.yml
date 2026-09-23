@@ -2,11 +2,11 @@
 - name: "Add NOPASSWD rule using sudoers.d"
   become: true
   copy:
-    dest: "/etc/sudoers.d/{{ ansible_facts['user_id'] }}"
+    dest: "/etc/sudoers.d/{{ ansible_facts['env']['USER'] }}"
     content: |
-     {{ ansible_facts['user_id'] }} ALL=(ALL) NOPASSWD: ALL
+     {{ ansible_facts['env']['USER'] }} ALL=(ALL) NOPASSWD: ALL
     owner: root
     group: root
     mode: '0440'
     validate: 'visudo -cf %s'
-  when: ansible_facts['user_id'] != 'root'
+  when: ansible_facts['env']['USER'] != 'root'
