@@ -191,3 +191,23 @@
   command: "uv tool install wsgidav --with cheroot --with lxml"
   when: not wsgidav_env_check.rc == 0 and wsgidav_exists.stat.exists
 
+- name: "check the presence of $HOME/.local/bin/keytabextract"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/keytabextract"
+  register: keytabextract
+  changed_when: false
+
+- name: "Cloning https://github.com/sosdave/KeyTabExtract"
+  git:
+    repo: "https://github.com/sosdave/KeyTabExtract.git"
+    dest: "/tmp/KeyTabExtract"
+    version: "master"
+  when: not keytabextract.stat.exists
+
+- name: "Placing keytabextract.py in $HOME/.local/bin"
+  copy:
+    src: "/tmp/KeyTabExtract/keytabextract.py"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/keytabextract"
+    mode: 0755
+  when: not keytabextract.stat.exists
+  
