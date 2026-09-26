@@ -210,4 +210,3 @@
     dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/keytabextract"
     mode: 0755
   when: not keytabextract.stat.exists
-  
