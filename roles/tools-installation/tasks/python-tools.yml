@@ -35,6 +35,10 @@
     - uvx
   when: not uv_linked.stat.exists
 
+- name: "uv self-update"
+  shell: "uv self update"
+  changed_when: false
+
 - name: "Removing Netexec"
   apt:
     name: netexec
@@ -553,3 +557,78 @@
   become: true
   become_method: sudo
   when: not responder.stat.exists
+
+- name: "Check the presence of addspn"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/addspn"
+  register: addspn
+  changed_when: false
+
+- name: "Copying addspn.sh to .local/bin"
+  copy:
+    src: "addspn.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/addspn"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  when: not addspn.stat.exists
+
+- name: "Check the presence of dnstool"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/dnstool"
+  register: dnstool
+  changed_when: false
+
+- name: "Copying addspn.sh to .local/bin"
+  copy:
+    src: "dnstool.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/dnstool"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  when: not dnstool.stat.exists
+
+- name: "Check the presence of krbrelayx"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/krbrelayx"
+  register: krbrelayx
+  changed_when: false
+
+- name: "Copying krbrelayx.sh to .local/bin"
+  copy:
+    src: "krbrelayx.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/krbrelayx"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  when: not krbrelayx.stat.exists
+
+- name: "Check the presence of printerbug"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/printerbug"
+  register: printerbug
+  changed_when: false
+
+- name: "Copying printerbug.sh to .local/bin"
+  copy:
+    src: "printerbug.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/printerbug"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  when: not printerbug.stat.exists
+
+- name: "Check the presence of passthecert"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/passthecert"
+  register: passthecert
+  changed_when: false
+
+- name: "Copying passthecert.sh to .local/bin"
+  copy:
+    src: "passthecert.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/passthecert"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  when: not passthecert.stat.exists

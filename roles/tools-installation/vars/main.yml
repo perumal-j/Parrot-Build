@@ -80,6 +80,9 @@ GitHubTools:
     url: "https://github.com/dirkjanm/krbrelayx"
     destination: "/opt/krbrelayx"
 
+  - name: PassTheCert
+    url: "https://github.com/AlmondOffSec/PassTheCert"
+    destination: "/opt/PassTheCert"
 
 UVtools:
   - impacket
