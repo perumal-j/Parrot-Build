@@ -75,6 +75,11 @@ GitHubTools:
   - name: Invoke-TheHash
     url: "https://github.com/Kevin-Robertson/Invoke-TheHash"
     destination: "/opt/invoke-thehash"
+  
+  - name: krbrelayx
+    url: "https://github.com/dirkjanm/krbrelayx"
+    destination: "/opt/krbrelayx"
+
 
 UVtools:
   - impacket

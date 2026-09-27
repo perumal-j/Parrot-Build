@@ -224,4 +224,21 @@
     mode: 0755
   when: not linikatz.stat.exists
 
- 
+- name: "Check the presence of /opt/krbrelayx"
+  stat:
+    path: "/opt/krbrelayx"
+  register: krbrelayx_path
+  changed_when: false
+
+- name: "Make Files of a /opt/krbrelayx/*.py files executable"
+  file:
+    path: "/opt/krbrelayx/{{ item }}"
+    mode: 0755
+  loop:
+    - addspn.py
+    - dnstool.py
+    - krbrelayx.py
+    - printerbug.py
+  become: true
+  become_method: sudo
+  when: krbrelayx_path.stat.exists
