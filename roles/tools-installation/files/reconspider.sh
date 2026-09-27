@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-uv run /opt/ReconSpider.py
+uv run --with scrapy /opt/ReconSpider.py "$@"

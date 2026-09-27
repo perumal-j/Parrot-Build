@@ -1,3 +1,3 @@
 #!/bin/bash
 
-uv run --with impacket /opt/krbrelayx/dnstool.py
+uv run --with impacket /opt/krbrelayx/dnstool.py "$@"

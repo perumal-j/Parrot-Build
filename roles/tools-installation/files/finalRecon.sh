@@ -1,3 +1,3 @@
 #!/bin/bash
 
-/opt/FinalRecon/finalrecon.py
+/opt/FinalRecon/finalrecon.py "$@"
