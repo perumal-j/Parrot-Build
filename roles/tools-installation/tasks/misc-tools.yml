@@ -210,3 +210,18 @@
     dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/keytabextract"
     mode: 0755
   when: not keytabextract.stat.exists
+
+- name: "Check the presence of Linikatz"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linikatz.sh"
+  register: linikatz
+  changed_when: false
+
+- name: "Downloading Linikatz"
+  get_url:
+    url: "https://raw.githubusercontent.com/CiscoCXSecurity/linikatz/master/linikatz.sh"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linikatz.sh"
+    mode: 0755
+  when: not linikatz.stat.exists
+
+ 
