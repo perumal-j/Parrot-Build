@@ -558,6 +558,25 @@
   become_method: sudo
   when: not responder.stat.exists
 
+- name: "Check if ntlmrelayx.py is linked system-wide"
+  stat:
+    path: "/usr/local/bin/ntlmrelayx.py"
+  register: "ntlmrelayx_linked"
+  changed_when: false
+
+- name: "Symlink ntlmrelayx.py to /usr/local/bin"
+  file:
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  loop:
+    - ntlmrelayx.py
+  when: not ntlmrelayx_linked.stat.exists
+
 - name: "Check the presence of addspn"
   stat:
     path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/addspn"
@@ -632,3 +651,21 @@
     owner: "{{ ansible_facts['env']['USER'] }}"
     group: "{{ ansible_facts['env']['USER'] }}"
   when: not passthecert.stat.exists
+
+- name: "Check the presence of ntlmrelayx"
+  stat:
+    path: "/usr/local/bin/ntlmrelayx"
+  register: ntlmrelayx
+  changed_when: false
+
+- name: "Copying ntlmrelayx.sh to .local/bin"
+  copy:
+    src: "ntlmrelayx.sh"
+    dest: "/usr/local/bin/ntlmrelayx"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  when: not ntlmrelayx.stat.exists
+
