@@ -67,3 +67,22 @@
   args:
     chdir: "/opt/RustHound-CE"
   when: not rusthound_ce_bin.stat.exists
+
+- name: "Check the presence of rusthound-ce"
+  stat:
+    path: "/usr/local/bin/rusthound-ce"
+  register: rusthound_ce
+
+- name: "Symlink rusthound-ce to /usr/local/bin"
+  file:
+    src: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  loop:
+    - rusthound-ce
+  when: not rusthound_ce.stat.exists

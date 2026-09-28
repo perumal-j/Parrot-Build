@@ -114,7 +114,7 @@
 
 - name: "Check the existence of Sqlcmd"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/sqlcmd"
+    path: "/usr/local/bin/sqlcmd"
   register: sqlcmd_exists
   changed_when: false
 
@@ -164,16 +164,18 @@
 - name: "Extracting Sqlcmd"
   unarchive:
     src: "/tmp/sqlcmd-linux-amd64.tar.bz2"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+    dest: "/usr/local/bin"
   when: sqlcmd_update_required
+  become: true
+  become_method: sudo
 
 - name: "Check the existence of wsgidav"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/wsgidav"
+    path: "/usr/local/bin/wsgidav"
   register: wsgidav_exists
   changed_when: false
 
-- name: "Refreshing bashrc"
+- name: "Refreshing .bashrc"
   shell: ". {{ ansible_facts['env']['HOME'] }}/.bashrc"
   changed_when: false
 
@@ -189,11 +191,36 @@
 
 - name: "Install wsgidav with cheroot and lxml"
   command: "uv tool install wsgidav --with cheroot --with lxml"
-  when: not wsgidav_env_check.rc == 0 and wsgidav_exists.stat.exists
+  environment:
+    UV_TOOL_BIN_DIR: "{{ temp_wsgi_dir }}"
+  when: not wsgidav_env_check.rc == 0 and not wsgidav_exists.stat.exists
 
-- name: "check the presence of $HOME/.local/bin/keytabextract"
+- name: "Locate all generated wsgidav executables"
+  find:
+    paths: "{{ temp_wsgi_dir }}"
+    file_type: any
+  register: found_executables
+
+- name: "Move wsgidav binaries to /usr/local/bin with root privileges"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ temp_wsgi_dir }}/{{ item.path | basename }}"
+    remote_src: true
+    mode: '0755'
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  loop: "{{ found_executables.files }}"
+  become: true
+  become_method: sudo
+
+- name: Clean up temporary extraction folder
+  file:
+    path: "{{ temp_wsgi_dir }}"
+    state: absent
+
+- name: "check the presence of /usr/local/bin/keytabextract"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/keytabextract"
+    path: "/usr/local/bin/keytabextract"
   register: keytabextract
   changed_when: false
 
@@ -204,24 +231,32 @@
     version: "master"
   when: not keytabextract.stat.exists
 
-- name: "Placing keytabextract.py in $HOME/.local/bin"
+- name: "Placing keytabextract.py in /usr/local/bin"
   copy:
     src: "/tmp/KeyTabExtract/keytabextract.py"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/keytabextract"
+    dest: "/usr/local/bin/keytabextract"
     mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
   when: not keytabextract.stat.exists
 
 - name: "Check the presence of Linikatz"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linikatz.sh"
+    path: "/usr/local/bin/linikatz"
   register: linikatz
   changed_when: false
 
 - name: "Downloading Linikatz"
   get_url:
     url: "https://raw.githubusercontent.com/CiscoCXSecurity/linikatz/master/linikatz.sh"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linikatz.sh"
+    dest: "/usr/local/bin/linikatz"
     mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
   when: not linikatz.stat.exists
 
 - name: "Check the presence of /opt/krbrelayx"

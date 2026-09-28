@@ -22,3 +22,28 @@
 - name: "Installing Rustscan"
   shell: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/cargo install rustscan"
   changed_when: false
+
+- name: "Check the presence of feroxbuster"
+  stat:
+    path: "/usr/local/bin/feroxbuster"
+  register: feroxbuster
+
+- name: "Check the presence of rustscan"
+  stat:
+    path: "/usr/local/bin/rustscan"
+  register: rustscan
+
+- name: "Symlink rust tools to /usr/local/bin"
+  file:
+    src: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  loop:
+    - feroxbuster
+    - rustscan
+  when: not feroxbuster.stat.exists or not rustscan.stat.exists

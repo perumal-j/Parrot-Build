@@ -1,40 +1,55 @@
 ---
-  - name: "Installing RubyGems"
-    apt:
-      name: ruby-full
-      state: present
-    become: true
-    become_method: sudo
+- name: "Installing RubyGems"
+  apt:
+    name: ruby-full
+    state: present
+  become: true
+  become_method: sudo
 
-  - name: "Installing tools from Gems"
-    gem:
-      name: "{{ item }}"
-      state: present
-      user_install  : true
-    loop:
-      - logger
-      - stringio
-      - winrm
-      - builder
-      - erubi
-      - gssapi
-      - gyoku
-      - httpclient
-      - logging
-      - little-plugger
-      - nori
-      - rubyntlm
-      - winrm-fs
-      - evil-winrm
+- name: "Installing tools from Gems"
+  gem:
+    name: "{{ item }}"
+    state: present
+    user_install  : false
+  loop:
+    - logger
+    - stringio
+    - winrm
+    - builder
+    - erubi
+    - gssapi
+    - gyoku
+    - httpclient
+    - logging
+    - little-plugger
+    - nori
+    - rubyntlm
+    - winrm-fs
+    - evil-winrm
+  become: true
+  become_method: sudo
 
-  - name: "Get Ruby Version Directory"
-    shell: "ls {{ ansible_facts['env']['HOME'] }}/.local/share/gem/ruby | head -n 1"
-    register: ruby_version
-    changed_when: false
-
-  - name: "Adding ruby BIN PATH to .bashrc"
-    lineinfile:
-      path: "{{ ansible_facts['env']['HOME'] }}/.bashrc"
-      line: "export PATH=$PATH:{{ ansible_facts['env']['HOME'] }}/.local/share/gem/ruby/{{ ruby_version.stdout }}/bin"      
-      state: present
-    changed_when: false
+- name: "Set ownership of gem-installed binaries"
+  file:
+    path: "/usr/local/bin/{{ item }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    state: file
+  loop:
+    - logger
+    - stringio
+    - winrm
+    - builder
+    - erubi
+    - gssapi
+    - gyoku
+    - httpclient
+    - logging
+    - little-plugger
+    - nori
+    - rubyntlm
+    - winrm-fs
+    - evil-winrm
+  become: true
+  become_method: sudo
+  ignore_errors: true

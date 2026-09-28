@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 {% for repo in repositories %}
 git clone {{ repo.url }} {{ repo.destination }} 
@@ -35,8 +36,9 @@ fi
 
 
 if [[ {{ repo.destination }} == /tmp/* ]]; then
-    echo "Directory {{ repo.destination }} is in /tmp/. Copying to $USER/.local/bin"
-    cp {{ repo.destination }}/{{ repo.name }}.py $HOME/.local/bin
+    echo "Directory {{ repo.destination }} is in /tmp/. Copying to /usr/local/bin"
+    sudo cp {{ repo.destination }}/{{ repo.name }}.py /usr/local/bin/{{ repo.name }}
+    sudo chown $USER:$USER /usr/local/bin/{{ repo.name }}
 else
     echo "Directory {{ repo.destination }} is not in /tmp/. No changes needed."
 fi

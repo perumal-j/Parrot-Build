@@ -31,8 +31,19 @@
     PATH: "/usr/local/go/bin"
   changed_when: false
 
+- name: "Check the presence of kerbrute"
+  stat:
+    path: "/usr/local/bin/kerbrute"
+  register: kerbrute
+
 - name: "Moving Kerbrute to Bin Path"
   copy:
     src: "{{ ansible_facts['env']['HOME'] }}/go/bin/kerbrute"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/"
-    mode: 0750
+    dest: "/usr/local/bin/"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  when: not kerbrute.stat.exists
+

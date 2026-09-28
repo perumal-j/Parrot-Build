@@ -123,11 +123,42 @@
 
 - name: " Check if bloodhound-ce-python is installed"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/bloodhound-ce-python"
+    path: "{{ target_bin_dir }}/bloodhound-ce-python"
   register: bloodhound_ce_python
   changed_when: false
+
+- name: "Ensure temporary bin directory exists"
+  file:
+    path: "{{ temp_bin_dir }}"
+    state: directory
+    mode: '0755'
 
 - name: "Installing Bloodhound-ce Ingestor"
   shell: |
     uv tool install git+https://github.com/dirkjanm/BloodHound.py.git@bloodhound-ce
+  environment:
+    UV_TOOL_BIN_DIR: "{{ temp_bin_dir }}"
   when: not bloodhound_ce_python.stat.exists
+
+- name: "Locate all generated bloodhound executables"
+  find:
+    paths: "{{ temp_bin_dir }}"
+    file_type: any
+  register: found_executables
+
+- name: Move bloodhound binaries to /usr/local/bin with root privileges
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ target_bin_dir }}/{{ item.path | basename }}"
+    remote_src: true
+    mode: '0755'
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  loop: "{{ found_executables.files }}"
+  become: true
+  become_method: sudo
+
+- name: "Clean up temporary extraction folder"
+  file:
+    path: "{{ temp_bin_dir }}"
+    state: absent

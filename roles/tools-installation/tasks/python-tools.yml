@@ -40,6 +40,72 @@
   shell: "uv self update"
   changed_when: false
 
+- name: Debug HOME on the control machine
+  debug:
+    msg: "{{ lookup('env', 'HOME') }}"
+
+- name: "Check if Certipy exists"
+  stat:
+    path: "/usr/local/bin/certipy"
+  register: certipy_exists
+  changed_when: false
+
+- name: "Check if pywhisker exists"
+  stat:
+    path: "/usr/local/bin/pywhisker"
+  register: pywhisker_exists
+  changed_when: false
+
+- name: "Check if bloodyAD exists"
+  stat: 
+    path: "/usr/local/bin/bloodyAD"
+  register: bloodyAD_exists
+  changed_when: false
+
+- name: "Check if pwntools repository exists"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/share/uv/tools/pwntools/bin"
+  register: pwntools_exists
+  changed_when: false
+
+- name: "Check if ldeep exists"
+  stat: 
+    path: "/usr/local/bin/ldeep"
+  register: ldeep_exists
+  changed_when: false
+
+- name: "Ensure temporary bin directory exists"
+  file:
+    path: "{{ temp_bin_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: "Installing Certipy, pywhisker, bloodyAD, pwntools & ldeep"
+  shell:
+    cmd: uv tool install {{ item.url }}
+  environment:
+    UV_TOOL_BIN_DIR: "{{ temp_bin_dir }}"
+  loop: "{{ UVtoolsGit }}"
+  when: not certipy_exists.stat.exists or not pywhisker_exists.stat.exists or not bloodyAD_exists.stat.exists or not pwntools_exists.stat.exists or not ldeep_exists.stat.exists
+
+- name: "Find all generated executables in temporary directory"
+  find:
+    paths: "{{ temp_bin_dir }}"
+    file_type: any
+  register: found_files
+
+- name: "Move executables to /usr/local/bin with root privileges"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ target_bin_dir }}/{{ item.path | basename }}"
+    remote_src: true
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  loop: "{{ found_files.files }}"
+  become: true
+  become_method: sudo
+
 - name: "Removing Netexec"
   apt:
     name: netexec
@@ -58,73 +124,53 @@
   
 - name: "Check if NetExec exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/netexec"
+    path: "/usr/local/bin/netexec"
   register: netexec
   changed_when: false
 
 - name: "Check if wafw00f exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/wafw00f"
+    path: "/usr/local/bin/wafw00f"
   register: wafw00f
   changed_when: false
 
 - name: "Check if DonPAPI exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/donpapi"
+    path: "/usr/local/bin/donpapi"
   register: donpapi
   changed_when: false
 
-- name: Debug HOME on the control machine
-  debug:
-    msg: "{{ lookup('env', 'HOME') }}"
-
-- name: "Check if Certipy exists"
-  stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/certipy"
-  register: certipy_exists
-  changed_when: false
-
-- name: "Check if pywhisker exists"
-  stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/pywhisker"
-  register: pywhisker_exists
-  changed_when: false
-
-- name: "Check if bloodyAD exists"
-  stat: 
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/bloodyAD"
-  register: bloodyAD_exists
-  changed_when: false
-
-- name: "Check if pwntools repository exists"
-  stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/share/uv/tools/pwntools"
-  register: pwntools_exists
-  changed_when: false
-
-- name: "Check if gettgtpkinit exists"
-  stat: 
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/gettgtpkinit"
-  register: gettgtpkinit_exists
-  changed_when: false
-
-- name: "Check if ldeep exists"
-  stat: 
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/ldeep"
-  register: ldeep_exists
-  changed_when: false
-
-- name: "Installing Certipy, pywhisker, bloodyAD, pwntools, gettgtpkinit, ldeep_exists"
-  shell:
-    cmd: uv tool install {{ item.url }}
-  loop: "{{ UVtoolsGit }}"
-  when: not certipy_exists.stat.exists and not pywhisker_exists.stat.exists and not bloodyAD_exists.stat.exists and not pwntools_exists.stat.exists and not gettgtpkinit_exists.stat.exists and not ldeep_exists.stat.exists
+- name: "Ensure temporary bin directory exists"
+  file:
+    path: "{{ temp_bin_dir }}"
+    state: directory
+    mode: '0755'
 
 - name: "Installing NetExec, wafw00f, & DonPAPI via pipx"
   shell:
     cmd: pipx install {{ item.url }}
+  environment:
+    PIPX_BIN_DIR: "{{ temp_bin_dir }}"
   loop: "{{ PIPToolsGit }}"
   when: not netexec.stat.exists or not wafw00f.stat.exists or not donpapi.stat.exists
+
+- name: "Find all generated executables in temporary directory"
+  find:
+    paths: "{{ temp_bin_dir }}"
+    file_type: any
+  register: found_files
+
+- name: "Move executables to /usr/local/bin with root privileges"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ target_bin_dir }}/{{ item.path | basename }}"
+    remote_src: true
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  loop: "{{ found_files.files }}"
+  become: true
+  become_method: sudo
 
 - name: "Uninstall old Impacket"
   apt:
@@ -142,77 +188,141 @@
 
 - name: "Check if sshuttle Exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/sshuttle"
+    path: "/usr/local/bin/sshuttle"
   register: "sshuttle_exists"
   changed_when: false
 
 - name: "Check if updog exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/updog"
+    path: "/usr/local/bin/updog"
   register: "updog_exists"
   changed_when: false
 
 - name: "Check if scrapy exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/scrapy"
+    path: "/usr/local/bin/scrapy"
   register: "scrapy_exists"
   changed_when: false
 
 - name: "Check if XSStrike exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/xsstrike"
+    path: "/usr/local/bin/xsstrike"
   register: "XSStrike"
   changed_when: false
 
 - name: "Check if defaultcreds-cheat-sheet exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/creds"
+    path: "/usr/local/bin/creds"
   register: "creds"
   changed_when: false
 
 - name: "Check if uploadserver exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/uploadserver"
+    path: "/usr/local/bin/uploadserver"
   register: "uploadserver"
   changed_when: false
 
 - name: "Check if wsgidav exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/wsgidav"
+    path: "/usr/local/bin/wsgidav"
   register: "wsgidav"
   changed_when: false
 
 - name: "Check if pypykatz exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/pypykatz"
+    path: "/usr/local/bin/pypykatz"
   register: "pypykatz"
   changed_when: false
 
 - name: "Check if coercer exists"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/coercer"
+    path: "/usr/local/bin/coercer"
   register: "coercer"
   changed_when: false
+
+- name: "Ensure temporary bin directory exists"
+  file:
+    path: "{{ temp_bin_dir }}"
+    state: directory
+    mode: '0755'
 
 - name: "Installing Impacket, sshuttle, Updog, Scrapy, XSStrike, defaultcreds-cheat-sheet, uploadserver, wsgidav, pypykatz, coercer via UV"
   shell:
     cmd: "uv tool install {{ item }}"
+  environment:
+    UV_TOOL_BIN_DIR: "{{ temp_bin_dir }}"
   loop: "{{ UVtools }}"
   when: not sshuttle_exists.stat.exists or not impacket_exists.stat.exists or not updog_exists.stat.exists or not scrapy_exists.stat.exists or not XSStrike.stat.exists or not creds.stat.exists or not uploadserver.stat.exists or not wsgidav.stat.exists or not pypykatz.stat.exists or not coercer.stat.exists
+
+- name: "Find all generated executables in temporary directory"
+  find:
+    paths: "{{ temp_bin_dir }}"
+    file_type: any
+  register: found_files
+
+- name: "Move executables to /usr/local/bin with root privileges"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ target_bin_dir }}/{{ item.path | basename }}"
+    remote_src: true
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  loop: "{{ found_files.files }}"
+  become: true
+  become_method: sudo
+
+- name: "Check if volatility3 tool is already installed"
+  shell: "uv tool list"
+  register: volatility3
+  changed_when: false
+
+- name: "Ensure temporary bin directory exists"
+  file:
+    path: "{{ temp_bin_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: "Install volatility3 with yara-python and pycryptodome"
+  shell:
+    cmd: "uv tool install volatility3 --with yara-python --with pycryptodome"
+  environment:
+    UV_TOOL_BIN_DIR: "{{ temp_bin_dir }}"
+  when: "'vol' not in volatility3.stdout"
+
+- name: "Find all generated executables in temporary directory"
+  find:
+    paths: "{{ temp_bin_dir }}"
+    file_type: any
+  register: found_files
+
+- name: "Move executables to /usr/local/bin with root privileges"
+  copy:
+    src: "{{ item.path }}"
+    dest: "{{ target_bin_dir }}/{{ item.path | basename }}"
+    remote_src: true
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  loop: "{{ found_files.files }}"
+  become: true
+  become_method: sudo
+
+- name: "Clean up temporary bin directory"
+  file:
+    path: "{{ temp_bin_dir }}"
+    state: absent
 
 - name: "Upgrading all UV tools"
   shell:
     cmd: "uv tool upgrade --all"
   changed_when: false
 
-- name: "Check if volatility3 tool is already installed"
-  shell: "uv tool list"
-  register: uv_tool_list
-  changed_when: false
-
-- name: "Install volatility3 with yara-python and pycryptodome"
-  command: "uv tool install volatility3 --with yara-python --with pycryptodome"
-  when: "'volatility3' not in uv_tool_list.stdout"
+- name: "Check the presence of tools in repositories"
+  stat:
+    path: /usr/local/bin/{{ item.name }}
+  loop: "{{ repositories }}"
+  register: repositories_tool
 
 - name: "Copying Github Download Template"
   template:
@@ -222,20 +332,22 @@
 
 - name: "Executing Bash Script to Install Python UV"
   shell: "/tmp/uv-manager.sh"
-  changed_when: false
+  when: repositories_tool.results | selectattr('stat.exists') | list | length == 0
 
-- name: "Check if targetedKerberoast exists"
-  stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/targetedKerberoast"
-  register: targetedKerberoast
-  changed_when: false
+# - name: "Check if targetedKerberoast exists"
+#   stat:
+#     path: "/usr/local/bin/targetedKerberoast"
+#   register: targetedKerberoast
+#   changed_when: false
 
-- name: "Copying targetedKerberoast to .local/bin"
-  copy:
-    src: "/tmp/targetedKerberoast/targetedKerberoast.py"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/targetedKerberoast"
-    mode: 0755
-  when: not targetedKerberoast.stat.exists
+# - name: "Copying targetedKerberoast to .local/bin"
+#   copy:
+#     src: "/tmp/targetedKerberoast/targetedKerberoast.py"
+#     dest: "/usr/local/bin/targetedKerberoast"
+#     mode: 0755
+#     owner: "{{ ansible_facts['env']['USER'] }}"
+#     group: "{{ ansible_facts['env']['USER'] }}"
+#   when: not targetedKerberoast.stat.exists
 
 - name: "Check presence of PKINITtools"
   stat:
@@ -257,42 +369,70 @@
     path: "/opt/PKINITtools"
     owner: "{{ ansible_facts['env']['USER'] }}"
     group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
     state: directory
     recurse: true
   become: true
   become_method: sudo
   changed_when: false
 
-- name: "Check the presence of gettgtpkinit.py"
+- name: "Check the presence of gettgtpkinit"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/gettgtpkinit"
+    path: "/usr/local/bin/gettgtpkinit"
   register: gettgtpkinit
+  changed_when: false
+
+- name: "Check the presence of gets4uticket"
+  stat:
+    path: "/usr/local/bin/gets4uticket"
+  register: gets4uticket
+  changed_when: false
+
+- name: "Check the presence of getnthash"
+  stat:
+    path: "/usr/local/bin/getnthash"
+  register: getnthash
   changed_when: false
 
 - name: "Adding Dependencies to PKINITtools"
   shell: |
     cd /opt/PKINITtools
-    {{ ansible_facts['env']['HOME'] }}/.local/bin/uv add --script /opt/PKINITtools/gettgtpkinit.py -r /opt/PKINITtools/requirements.txt
+    {{ ansible_facts['env']['HOME'] }}/.local/bin/uv add --script /opt/PKINITtools/{{ item }}.py -r /opt/PKINITtools/requirements.txt
+  loop:
+    - gettgtpkinit
+    - gets4uticket
+    - getnthash
   become: true
   become_method: sudo
-  when: not gettgtpkinit.stat.exists
+  when: not gettgtpkinit.stat.exists or not gets4uticket.stat.exists or not getnthash.stat.exists
 
 - name: "Tweaking Shebang"
   replace:
-    path: "/opt/PKINITtools/gettgtpkinit.py"
+    path: "/opt/PKINITtools/{{ item }}.py"
     regexp: "#!/usr/bin/env python3"
     replace: "#!/usr/bin/env -S uv run --script"
+  loop:
+    - gettgtpkinit
+    - gets4uticket
+    - getnthash
   become: true
   become_method: sudo
+  when: not gettgtpkinit.stat.exists or not gets4uticket.stat.exists or not getnthash.stat.exists
 
-- name: "Adding gettgtpkinit.py to .local/bin"
+- name: "Adding PKINITtools .py files to /usr/local/bin"
   copy:
-    src: "/opt/PKINITtools/gettgtpkinit.py"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/gettgtpkinit"
+    src: "/opt/PKINITtools/{{ item }}.py"
+    dest: "/usr/local/bin/{{ item }}"
     mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  loop:
+    - gettgtpkinit
+    - gets4uticket
+    - getnthash
   become: true
   become_method: sudo
-  when: not gettgtpkinit.stat.exists
+  when: not gettgtpkinit.stat.exists or not gets4uticket.stat.exists or not getnthash.stat.exists
 
 - name: "Upgrading UV tools"
   shell: "{{ ansible_facts['env']['HOME'] }}/.local/bin/uv tool upgrade --all"
@@ -300,11 +440,10 @@
   become: true
   become_method: sudo
   changed_when: false
-  # ignore_errors: true
 
 - name: :"Check the presence of SMB_Killer"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/SMB_Killer.py"
+    path: "/usr/local/bin/SMB_Killer.py"
   register: smb_killer
   changed_when: false
 
@@ -331,8 +470,12 @@
 - name: "Adding SMB_Killer to .local/bin"
   copy:
     src: "/opt/SMB_Killer/SMB_Killer.py"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/SMB_Killer.py"
+    dest: "/usr/local/bin/SMB_Killer.py"
     mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
   when: not smb_killer.stat.exists
 
 - name: "Check the presence of /opt/ReconSpider.v1.2.zip"
@@ -366,18 +509,22 @@
 
 - name: "Check the presence of ReconSpider in PATH"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/reconspider"
+    path: "/usr/local/bin/reconspider"
   register: ReconSpiderBIN
   changed_when: false
 
-- name: "Moving reconspider.sh to .local/bin"
+- name: "Moving reconspider.sh to /usr/local/bin"
   copy:
     src: "reconspider.sh"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/reconspider"
+    dest: "/usr/local/bin/reconspider"
     mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
   when: not ReconSpiderBIN.stat.exists
 
-- name: "Check if theHarvester is already cloned"
+- name: "Check if /opt/theHarvester exists"
   stat:
     path: "/opt/theHarvester"
   register: theHarvester_precheck
@@ -412,6 +559,22 @@
   args:
     chdir: "/opt/theHarvester"
   when: theHarvester.stat.exists
+
+- name: "Check the presence of theHarvester"
+  stat:
+    path: "/usr/local/bin/theharvester"
+  register: theharvester
+
+- name: "Adding theHarvester.sh to /usr/local/bin"
+  copy:
+    src: "theHarvester.sh"
+    dest: "/usr/local/bin/theharvester"
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  when: not theharvester.stat.exists
 
 - name: "Check if FinalRecon is already cloned"
   stat:
@@ -469,114 +632,110 @@
 
 - name: "Check the presence of finalrecon"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/finalrecon"
+    path: "/usr/local/bin/finalrecon"
   register: finalrecon
 
-- name: "Adding FinalRecon to .local/bin"
+- name: "Adding FinalRecon to /usr/local/bin"
   copy:
     src: "finalRecon.sh"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/finalrecon"
+    dest: "/usr/local/bin/finalrecon"
     mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
   when: not finalrecon.stat.exists
-
-- name: "Check the presence of theHarvester"
-  stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/theharvester"
-  register: theharvester
-
-- name: "Adding theHarvester.sh to .local/bin"
-  copy:
-    src: "theHarvester.sh"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/theharvester"
-    mode: 0755
-  when: not theharvester.stat.exists
 
 - name: "Check the presence of linkedin2username in PATH"
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linkedin2username"
+    path: "/usr/local/bin/linkedin2username"
   register: linkedin2usernamebin
   changed_when: false
 
-- name: "Moving linkedin2username.sh to .local/bin"
+- name: "Moving linkedin2username.sh to /usr/local/bin"
   copy:
     src: "linkedin2username.sh"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/linkedin2username"
+    dest: "/usr/local/bin/linkedin2username"
     mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
   when: not linkedin2usernamebin.stat.exists
 
-- name: "Check if Responder is already cloned"
-  stat:
-    path: "/opt/responder/Responder.py"
-  register: "responder_cloned"
-  changed_when: false
+# - name: "Check if Responder is already cloned"
+#   stat:
+#     path: "/opt/responder/Responder.py"
+#   register: "responder_cloned"
+#   changed_when: false
 
-- name: "Downloading Responder from Github"
-  git:
-    repo: https://github.com/lgandx/Responder.git
-    dest: "/opt/responder"
-    version: master
-  become: true
-  become_method: sudo
-  when: not responder_cloned.stat.exists
+# - name: "Downloading Responder from Github"
+#   git:
+#     repo: https://github.com/lgandx/Responder.git
+#     dest: "/opt/responder"
+#     version: master
+#   become: true
+#   become_method: sudo
+#   when: not responder_cloned.stat.exists
 
-- name: "Modifying Responder Directory Owner"
-  file:
-    path: "/opt/responder"
-    owner: "{{ ansible_facts['env']['USER'] }}"
-    group: "{{ ansible_facts['env']['USER'] }}"
-    state: directory
-    mode: 0755
-    recurse: true
-  become: true
-  become_method: sudo
+# - name: "Modifying Responder Directory Owner"
+#   file:
+#     path: "/opt/responder"
+#     owner: "{{ ansible_facts['env']['USER'] }}"
+#     group: "{{ ansible_facts['env']['USER'] }}"
+#     state: directory
+#     mode: 0755
+#     recurse: true
+#   become: true
+#   become_method: sudo
 
-- name: "Check the presence of Responder in one of the PATHs"
-  stat:
-    path: "/usr/local/bin/responder"
-  register: responder
-  changed_when: false
+# - name: "Check the presence of Responder in one of the PATHs"
+#   stat:
+#     path: "/usr/local/bin/responder"
+#   register: responder
+#   changed_when: false
 
-- name: "Adding Dependencies to Responder"
-  shell: |
-    uv add --script /opt/responder/Responder.py -r /opt/responder/requirements.txt
-  when: not responder.stat.exists
+# - name: "Adding Dependencies to Responder"
+#   shell: |
+#     uv add --script /opt/responder/Responder.py -r /opt/responder/requirements.txt
+#   when: not responder.stat.exists
 
-- name: "Tweaking Shebang of Responder.py"
-  replace:
-    path: "/opt/responder/Responder.py"
-    regexp: "#!/usr/bin/env python3"
-    replace: "#!/usr/bin/env -S uv run --script"
-  when: not responder.stat.exists
+# - name: "Tweaking Shebang of Responder.py"
+#   replace:
+#     path: "/opt/responder/Responder.py"
+#     regexp: "#!/usr/bin/env python3"
+#     replace: "#!/usr/bin/env -S uv run --script"
+#   when: not responder.stat.exists
 
-- name: "Copying Responder.sh to .local/bin"
-  copy:
-    src: "responder.sh"
-    dest: "/usr/local/bin/responder"
-    mode: 0755
-    owner: "{{ ansible_facts['env']['USER'] }}"
-    group: "{{ ansible_facts['env']['USER'] }}"
-  become: true
-  become_method: sudo
-  when: not responder.stat.exists
+# - name: "Copying Responder.sh to .local/bin"
+#   copy:
+#     src: "responder.sh"
+#     dest: "/usr/local/bin/responder"
+#     mode: 0755
+#     owner: "{{ ansible_facts['env']['USER'] }}"
+#     group: "{{ ansible_facts['env']['USER'] }}"
+#   become: true
+#   become_method: sudo
+#   when: not responder.stat.exists
 
-- name: "Check if ntlmrelayx.py is linked system-wide"
-  stat:
-    path: "/usr/local/bin/ntlmrelayx.py"
-  register: "ntlmrelayx_linked"
-  changed_when: false
+# - name: "Check if ntlmrelayx.py is linked system-wide"
+#   stat:
+#     path: "/usr/local/bin/ntlmrelayx.py"
+#   register: "ntlmrelayx_linked"
+#   changed_when: false
 
-- name: "Symlink ntlmrelayx.py to /usr/local/bin"
-  file:
-    src: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
-    dest: "/usr/local/bin/{{ item }}"
-    state: link
-    mode: 0755
-    owner: "{{ ansible_facts['env']['USER'] }}"
-    group: "{{ ansible_facts['env']['USER'] }}"
-  become: true
-  loop:
-    - ntlmrelayx.py
-  when: not ntlmrelayx_linked.stat.exists
+# - name: "Symlink ntlmrelayx.py to /usr/local/bin"
+#   file:
+#     src: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item }}"
+#     dest: "/usr/local/bin/{{ item }}"
+#     state: link
+#     mode: 0755
+#     owner: "{{ ansible_facts['env']['USER'] }}"
+#     group: "{{ ansible_facts['env']['USER'] }}"
+#   become: true
+#   loop:
+#     - ntlmrelayx.py
+#   when: not ntlmrelayx_linked.stat.exists
 
 - name: "Check the presence of addspn"
   stat:
@@ -663,20 +822,19 @@
   become_method: sudo
   when: not passthecert.stat.exists
 
-- name: "Check the presence of ntlmrelayx"
-  stat:
-    path: "/usr/local/bin/ntlmrelayx"
-  register: ntlmrelayx
-  changed_when: false
+# - name: "Check the presence of ntlmrelayx"
+#   stat:
+#     path: "/usr/local/bin/ntlmrelayx"
+#   register: ntlmrelayx
+#   changed_when: false
 
-- name: "Copying ntlmrelayx.sh to .local/bin"
-  copy:
-    src: "ntlmrelayx.sh"
-    dest: "/usr/local/bin/ntlmrelayx"
-    mode: 0755
-    owner: "{{ ansible_facts['env']['USER'] }}"
-    group: "{{ ansible_facts['env']['USER'] }}"
-  become: true
-  become_method: sudo
-  when: not ntlmrelayx.stat.exists
-
+# - name: "Copying ntlmrelayx.sh to .local/bin"
+#   copy:
+#     src: "ntlmrelayx.sh"
+#     dest: "/usr/local/bin/ntlmrelayx"
+#     mode: 0755
+#     owner: "{{ ansible_facts['env']['USER'] }}"
+#     group: "{{ ansible_facts['env']['USER'] }}"
+#   become: true
+#   become_method: sudo
+#   when: not ntlmrelayx.stat.exists
