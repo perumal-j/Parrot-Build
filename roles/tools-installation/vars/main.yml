@@ -171,10 +171,6 @@ GitHubReleases:
     regex: "LaZagne"
     destination: "/opt/lazagne"
 
-  - repo: "SnaffCon/Snaffler"
-    regex: "Snaffler"
-    destination: "/opt/snaffler"
-
   - repo: "BeichenDream/GodPotato"
     regex: "GodPotato"
     destination: "/opt/godpotato"
