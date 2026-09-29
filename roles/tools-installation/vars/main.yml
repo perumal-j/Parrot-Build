@@ -182,3 +182,7 @@ GitHubReleases:
   - repo: "trustedsec/DitExplorer"
     regex: "DitExplorer"
     destination: "/opt/ditexplorer"
+
+  - name: "gentilkiwi/mimikatz"
+    url: "mimikatz_trunk.zip"
+    destination: "/opt/mimikatz"
