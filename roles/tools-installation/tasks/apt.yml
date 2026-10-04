@@ -133,3 +133,12 @@
   become: true
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
+
+- name: "Remove an APT installed package"
+  apt:
+    name: ffuf
+    state: absent
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'parrot'
+

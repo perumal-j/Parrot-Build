@@ -277,3 +277,23 @@
   become: true
   become_method: sudo
   when: krbrelayx_path.stat.exists
+
+- name: "Check the presence of ffuf"
+  stat:
+    path: "/usr/local/bin/ffuf"
+  register: ffuf_linked
+  changed_when: false
+
+- name: "Symlink ffuf binary into /usr/local/bin"
+  file:
+    src: "/opt/{{ item }}/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    mode: 0755
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  loop:
+    - ffuf
+  when: not ffuf_linked.stat.exists

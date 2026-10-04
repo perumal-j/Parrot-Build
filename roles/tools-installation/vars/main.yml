@@ -186,3 +186,7 @@ GitHubReleases:
   - repo: "gentilkiwi/mimikatz"
     regex: "mimikatz_trunk.zip"
     destination: "/opt/mimikatz"
+
+  - repo: "ffuf/ffuf"
+    regex: "linux_amd64.tar.gz"
+    destination: "/opt/ffuf"
