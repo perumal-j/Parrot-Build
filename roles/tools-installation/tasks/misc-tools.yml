@@ -297,3 +297,142 @@
   loop:
     - ffuf
   when: not ffuf_linked.stat.exists
+
+- name: "Check the presence of ligolo-ng"
+  stat:
+    path: "/opt/ligolo-ng"
+  register: ligolo_ng
+  changed_when: false
+
+- name: "Git Cloning ligolo-ng"
+  git:
+    repo: "https://github.com/nicocha30/ligolo-ng.git"
+    dest: "/opt/ligolo-ng"
+    version: "master"
+  register: ligolo_ng_git
+  become: true
+  become_method: "sudo"
+  when: not ligolo_ng.stat.exists
+
+- name: "Change owner of ligolo-ng"
+  file:
+    path: "/opt/ligolo-ng"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    recurse: yes
+  become: true
+  become_method: sudo
+
+# - name: "Check If Linux Agent Binary Exists AMD"
+#   stat:
+#     path: "/opt/ligolo-ng/dist/ligolo-ng-agent-linux_amd64"
+#   register: ligolo_ng_linux_agent
+#   changed_when: false
+#   when: ansible_facts['distribution']|lower == 'parrot'
+
+# - name: "Check If Linux Proxy Binary Exists AMD"
+#   stat:
+#     path: "/opt/ligolo-ng/dist/ligolo-ng-proxy-linux_amd64"
+#   register: ligolo_ng_linux_proxy
+#   changed_when: false
+#   when: ansible_facts['distribution']|lower == 'parrot'
+
+# - name: "Check If Linux Agent Binary Exists ARM"
+#   stat:
+#     path: "/opt/ligolo-ng/dist/ligolo-ng-agent-linux_amd64"
+#   register: ligolo_ng_linux_agent
+#   changed_when: false
+#   when: ansible_facts['distribution']|lower == 'ubuntu'
+
+# - name: "Check If Linux Proxy Binary Exists ARM"
+#   stat:
+#     path: "/opt/ligolo-ng/dist/ligolo-ng-proxy-linux_amd64"
+#   register: ligolo_ng_linux_proxy
+#   changed_when: false
+#   when: ansible_facts['distribution']|lower == 'ubuntu'
+
+# - name: "Check If Windows Agent Binary Exists AMD"
+#   stat:
+#     path: "/opt/ligolo-ng/dist/ligolo-ng-agent-windows_amd64.exe"
+#   register: ligolo_ng_windows_agent
+#   changed_when: false
+
+# - name: "Check If Windows Proxy Binary Exists AMD"
+#   stat:
+#     path: "/opt/ligolo-ng/dist/ligolo-ng-proxy-windows_amd64.exe"
+#   register: ligolo_ng_windows_proxy
+#   changed_when: false
+
+- name: "Check for any ligolo-ng build output"
+  find:
+    paths: "/opt/ligolo-ng/dist"
+    file_type: any
+    recurse: yes
+    patterns: "ligolo-ng-*"
+  register: ligolo_ng_dist_files
+  changed_when: false
+
+- name: "Build Go Ligolo Agents & Proxies"
+  command: "make {{ item }}"
+  args:
+    chdir: "/opt/ligolo-ng"
+  environment:
+    PATH: "/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  loop:
+    - linux
+    - windows
+  become: true
+  become_method: sudo
+  when: (ligolo_ng_git.changed or ligolo_ng_dist_files.matched == 0) and ansible_facts['distribution']|lower == 'parrot'
+
+
+- name: "Build Go Ligolo Agents & Proxies"
+  command: "make {{ item }}"
+  args:
+    chdir: "/opt/ligolo-ng"
+  environment:
+    PATH: "/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  loop:
+    - linux-arm64
+  become: true
+  become_method: sudo
+  when: (ligolo_ng_git.changed or ligolo_ng_dist_files.matched == 0) and ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Change the owner of ligolo-ng built binaries"
+  file:
+    path: "/opt/ligolo-ng/dist"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    recurse: yes
+  become: true
+  become_method: sudo
+
+- name: "Move certain binaries to /usr/local/bin"
+  copy:
+    src: "/opt/ligolo-ng/dist/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
+  loop:
+    - ligolo-ng-agent-linux_amd64
+    - ligolo-ng-proxy-linux_amd64
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'parrot'
+
+- name: "Move certain binaries to /usr/local/bin"
+  copy:
+    src: "/opt/ligolo-ng/dist/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
+  loop:
+    - ligolo-ng-agent-linux_arm64
+    - ligolo-ng-proxy-linux_arm64
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
+
+  
