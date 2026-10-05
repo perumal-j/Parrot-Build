@@ -323,46 +323,6 @@
   become: true
   become_method: sudo
 
-# - name: "Check If Linux Agent Binary Exists AMD"
-#   stat:
-#     path: "/opt/ligolo-ng/dist/ligolo-ng-agent-linux_amd64"
-#   register: ligolo_ng_linux_agent
-#   changed_when: false
-#   when: ansible_facts['distribution']|lower == 'parrot'
-
-# - name: "Check If Linux Proxy Binary Exists AMD"
-#   stat:
-#     path: "/opt/ligolo-ng/dist/ligolo-ng-proxy-linux_amd64"
-#   register: ligolo_ng_linux_proxy
-#   changed_when: false
-#   when: ansible_facts['distribution']|lower == 'parrot'
-
-# - name: "Check If Linux Agent Binary Exists ARM"
-#   stat:
-#     path: "/opt/ligolo-ng/dist/ligolo-ng-agent-linux_amd64"
-#   register: ligolo_ng_linux_agent
-#   changed_when: false
-#   when: ansible_facts['distribution']|lower == 'ubuntu'
-
-# - name: "Check If Linux Proxy Binary Exists ARM"
-#   stat:
-#     path: "/opt/ligolo-ng/dist/ligolo-ng-proxy-linux_amd64"
-#   register: ligolo_ng_linux_proxy
-#   changed_when: false
-#   when: ansible_facts['distribution']|lower == 'ubuntu'
-
-# - name: "Check If Windows Agent Binary Exists AMD"
-#   stat:
-#     path: "/opt/ligolo-ng/dist/ligolo-ng-agent-windows_amd64.exe"
-#   register: ligolo_ng_windows_agent
-#   changed_when: false
-
-# - name: "Check If Windows Proxy Binary Exists AMD"
-#   stat:
-#     path: "/opt/ligolo-ng/dist/ligolo-ng-proxy-windows_amd64.exe"
-#   register: ligolo_ng_windows_proxy
-#   changed_when: false
-
 - name: "Check for any ligolo-ng build output"
   find:
     paths: "/opt/ligolo-ng/dist"

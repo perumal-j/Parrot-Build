@@ -139,13 +139,13 @@ repositories:
 
 
 GitHubReleases:
-  - repo: "jpillora/chisel"
-    regex: "linux_amd64.gz"
-    destination: "/opt/chisel"
+  # - repo: "jpillora/chisel"
+  #   regex: "linux_amd64.gz"
+  #   destination: "/opt/chisel"
 
-  - repo: "jpillora/chisel"
-    regex: "windows_amd64.zip"
-    destination: "/opt/chisel"
+  # - repo: "jpillora/chisel"
+  #   regex: "windows_amd64.zip"
+  #   destination: "/opt/chisel"
 
   - repo: "peass-ng/PEASS-ng"
     regex: "linpeas"
@@ -190,3 +190,8 @@ GitHubReleases:
   - repo: "ffuf/ffuf"
     regex: "linux_amd64.tar.gz"
     destination: "/opt/ffuf"
+
+  - repo: "nccgroup/SocksOverRDP"
+    regex: "SocksOverRDP-x64.zip"
+    destination: "/opt/SocksOverRDP"
+
