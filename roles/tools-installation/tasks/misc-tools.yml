@@ -385,19 +385,6 @@
   become_method: sudo
   when: (ligolo_ng_git.changed or ligolo_ng_dist_files.matched == 0) and ansible_facts['distribution']|lower == 'ubuntu'
 
-# - name: "Build Go Chisel"
-#   command: "make {{ item }}"
-#   args:
-#     chdir: "/opt/chisel"
-#   environment:
-#     PATH: "/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-#   loop:
-#     - linux
-#     - windows
-#   become: true
-#   become_method: sudo
-#   when: (chisel_git.changed or chisel_build_files.matched == 0) and ansible_facts['distribution']|lower == 'parrot'
-
 - name: "Build chisel for multiple architectures for Linux"
   command: >
     go build -ldflags="-s -w" -o /opt/chisel/build/chisel-linux_{{ item }} .
@@ -452,20 +439,6 @@
   become: true
   become_method: sudo
 
-# - name: "Move certain chisel binary to /usr/local/bin"
-#   copy:
-#     src: "{{ chisel_build_files.files[0].path }}"
-#     dest: "/usr/local/bin/chisel-linux_amd64"
-#     remote_src: true
-#     owner: "{{ ansible_facts['env']['USER'] }}"
-#     group: "{{ ansible_facts['env']['USER'] }}"
-#     mode: "0755"
-#   become: true
-#   become_method: sudo
-#   when:
-#     - ansible_facts['distribution'] | lower == 'parrot'
-#     - chisel_build_files.files | length > 0
-
 - name: "Move certain binaries to /usr/local/bin"
   copy:
     src: "/opt/ligolo-ng/dist/{{ item }}"
@@ -480,4 +453,42 @@
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
- 
+- name: "Move certain binaries to /usr/local/bin"
+  copy:
+    src: "/opt/ligolo-ng/dist/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
+  loop:
+    - ligolo-ng-agent-linux_amd64
+    - ligolo-ng-proxy-linux_amd64
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'parrot'
+
+- name: "Move Chisel binary to /usr/local/bin"
+  copy:
+    src: "/opt/chisel/build/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
+  loop:
+    - chisel-linux_amd64
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'parrot'
+
+- name: "Move Chisel binary to /usr/local/bin"
+  copy:
+    src: "/opt/chisel/build/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
+  loop:
+    - chisel-linux_arm64
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'ubuntu'
