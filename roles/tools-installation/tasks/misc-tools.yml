@@ -304,6 +304,12 @@
   register: ligolo_ng
   changed_when: false
 
+- name: "Check the presence of chisel"
+  stat:
+    path: "/opt/chisel"
+  register: chisel
+  changed_when: false
+
 - name: "Git Cloning ligolo-ng"
   git:
     repo: "https://github.com/nicocha30/ligolo-ng.git"
@@ -311,15 +317,28 @@
     version: "master"
   register: ligolo_ng_git
   become: true
-  become_method: "sudo"
+  become_method: sudo
   when: not ligolo_ng.stat.exists
 
-- name: "Change owner of ligolo-ng"
+- name: "Git Cloning chisel"
+  git:
+    repo: "https://github.com/jpillora/chisel.git"
+    dest: "/opt/chisel"
+    version: "master"
+  register: chisel_git
+  become: true
+  become_method: sudo
+  when: not chisel.stat.exists
+
+- name: "Change owner of ligolo-ng & chisel"
   file:
-    path: "/opt/ligolo-ng"
+    path: "/opt/{{ item }}"
     owner: "{{ ansible_facts['env']['USER'] }}"
     group: "{{ ansible_facts['env']['USER'] }}"
     recurse: yes
+  loop:
+    - ligolo-ng
+    - chisel
   become: true
   become_method: sudo
 
@@ -330,6 +349,15 @@
     recurse: yes
     patterns: "ligolo-ng-*"
   register: ligolo_ng_dist_files
+  changed_when: false
+
+- name: "Check for chisel binary in build output path"
+  find:
+    paths: "/opt/chisel/build"
+    file_type: file
+    recurse: yes
+    patterns: "chisel-*"
+  register: chisel_build_files
   changed_when: false
 
 - name: "Build Go Ligolo Agents & Proxies"
@@ -345,7 +373,6 @@
   become_method: sudo
   when: (ligolo_ng_git.changed or ligolo_ng_dist_files.matched == 0) and ansible_facts['distribution']|lower == 'parrot'
 
-
 - name: "Build Go Ligolo Agents & Proxies"
   command: "make {{ item }}"
   args:
@@ -358,6 +385,55 @@
   become_method: sudo
   when: (ligolo_ng_git.changed or ligolo_ng_dist_files.matched == 0) and ansible_facts['distribution']|lower == 'ubuntu'
 
+# - name: "Build Go Chisel"
+#   command: "make {{ item }}"
+#   args:
+#     chdir: "/opt/chisel"
+#   environment:
+#     PATH: "/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#   loop:
+#     - linux
+#     - windows
+#   become: true
+#   become_method: sudo
+#   when: (chisel_git.changed or chisel_build_files.matched == 0) and ansible_facts['distribution']|lower == 'parrot'
+
+- name: "Build chisel for multiple architectures for Linux"
+  command: >
+    go build -ldflags="-s -w" -o /opt/chisel/build/chisel-linux_{{ item }} .
+  args:
+    chdir: /opt/chisel
+    creates: "/opt/chisel/build/chisel-linux_{{ item }}"
+  environment:
+    CGO_ENABLED: "0"
+    GOOS: linux
+    GOARCH: "{{ item }}"
+    PATH: "/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  loop:
+    - amd64
+    - arm64
+  become: true
+  become_method: sudo
+  when: (chisel_git.changed or chisel_build_files.matched == 0) and ansible_facts['distribution']|lower == 'parrot'
+
+- name: "Build chisel for multiple architectures for Windows"
+  command: >
+    go build -ldflags="-s -w" -o /opt/chisel/build/chisel-windows_{{ item }} .
+  args:
+    chdir: /opt/chisel
+    creates: "/opt/chisel/build/chisel-windows_{{ item }}"
+  environment:
+    CGO_ENABLED: "0"
+    GOOS: windows
+    GOARCH: "{{ item }}"
+    PATH: "/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  loop:
+    - amd64
+    - arm64
+  become: true
+  become_method: sudo
+  when: (chisel_git.changed or chisel_build_files.matched == 2 or chisel_build_files.matched == 0) and ansible_facts['distribution']|lower == 'parrot'
+
 - name: "Change the owner of ligolo-ng built binaries"
   file:
     path: "/opt/ligolo-ng/dist"
@@ -367,19 +443,28 @@
   become: true
   become_method: sudo
 
-- name: "Move certain binaries to /usr/local/bin"
-  copy:
-    src: "/opt/ligolo-ng/dist/{{ item }}"
-    dest: "/usr/local/bin/{{ item }}"
+- name: "Change the owner of chisel built binaries"
+  file:
+    path: "/opt/chisel/build"
     owner: "{{ ansible_facts['env']['USER'] }}"
     group: "{{ ansible_facts['env']['USER'] }}"
-    mode: 0755
-  loop:
-    - ligolo-ng-agent-linux_amd64
-    - ligolo-ng-proxy-linux_amd64
+    recurse: yes
   become: true
   become_method: sudo
-  when: ansible_facts['distribution']|lower == 'parrot'
+
+# - name: "Move certain chisel binary to /usr/local/bin"
+#   copy:
+#     src: "{{ chisel_build_files.files[0].path }}"
+#     dest: "/usr/local/bin/chisel-linux_amd64"
+#     remote_src: true
+#     owner: "{{ ansible_facts['env']['USER'] }}"
+#     group: "{{ ansible_facts['env']['USER'] }}"
+#     mode: "0755"
+#   become: true
+#   become_method: sudo
+#   when:
+#     - ansible_facts['distribution'] | lower == 'parrot'
+#     - chisel_build_files.files | length > 0
 
 - name: "Move certain binaries to /usr/local/bin"
   copy:
@@ -395,4 +480,4 @@
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
-  
+ 
