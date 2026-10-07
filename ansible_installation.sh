@@ -23,6 +23,10 @@ export LC_ALL=en_US.UTF-8
 
 sudo systemctl stop unattended-upgrades
 
+# echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$USER
+# sudo chmod 440 /etc/sudoers.d/$USER
+# sudo visudo -c
+
 # $HOME/.local/bin/ansible-galaxy install -r requirements.yml
 
 # Tweak Ansible configuration

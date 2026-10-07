@@ -1,43 +1,45 @@
----
-- name: "Remove podman and docker-compose"
-  package:
+- name: "Remove conflicting distro Docker packages"
+  apt:
     name:
-      - podman
+      - docker.io
+      - docker-cli
+      - docker-buildx
       - docker-compose
     state: absent
   become: true
-  become_method: sudo
 
-- name: "Check the presence of /etc/apt/sources.list.d/docker.list"
-  stat:
+- name: "Remove old docker.list from the previous apt_repository task"
+  file:
     path: /etc/apt/sources.list.d/docker.list
-  register: docker_list
-  changed_when: false
-
-- name: "Add Docker's official GPG key"
-  shell: |
-    sudo install -m 0755 -d /etc/apt/keyrings /
-    sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc /
-    sudo chmod a+r /etc/apt/keyrings/docker.asc
-  when: not docker_list.stat.exists
-
-- name: "Add the repository to Apt sources"
-  shell: |
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-      $(curl -s https://download.docker.com/linux/debian/dists/ | grep -oP '^<a href=\"[^\"/]+' | head -n 1 | sed 's/<a href=\"//; s/\"$//') stable" | \
-      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  when: not docker_list.stat.exists
-
-- name: "Updating Apt Cache"
-  command: apt-get update
+    state: absent
   become: true
-  become_method: sudo
-  changed_when: false
+
+- name: "Ensure python3-debian is present (needed by deb822_repository)"
+  apt:
+    name: python3-debian
+    state: present
+  become: true
+
+- name: "Add Docker apt repository"
+  deb822_repository:
+    name: docker
+    types: deb
+    uris: https://download.docker.com/linux/debian
+    suites: bookworm
+    components: stable
+    architectures: arm64
+    signed_by: https://download.docker.com/linux/debian/gpg
+    state: present
+  become: true
+
+- name: "Update apt cache"
+  apt:
+    update_cache: true
+  become: true
 
 - name: "Installing Docker"
-  package:
-    name: 
+  apt:
+    name:
       - docker-ce
       - docker-ce-cli
       - containerd.io
@@ -45,21 +47,10 @@
       - docker-buildx-plugin
     state: present
   become: true
-  become_method: sudo
 
-- name: "Check where current user is in docker group"
-  shell: "id -nG"
-  register: docker_group
-  changed_when: false
-  failed_when: false
-  become: true
-  become_method: sudo
-
-- name: "Adding Current User to Docker Group"
+- name: "Adding current user to docker group"
   user:
-    name: "{{ ansible_facts['env']['USER'] }}"
+    name: "{{ ansible_facts['user_id'] }}"
     groups: docker
     append: true
   become: true
-  become_method: sudo
-  when: "'docker' not in docker_group.stdout.split()"

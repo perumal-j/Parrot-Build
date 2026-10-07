@@ -141,7 +141,7 @@
   when: caido_update_required 
 
 - name: "Change owner and group of the file"
-  ansible.builtin.file:
+  file:
     path: "/usr/local/bin/caido"
     owner: "{{ ansible_facts['env']['USER'] }}"
     group: "{{ ansible_facts['env']['USER'] }}"
@@ -161,7 +161,7 @@
     dest: /opt/caido
     mode: '0755'
   become: true
-  when: caido_update_required and ansible_facts['distribution'] == "Ubuntu"
+  when: caido_update_required and (ansible_facts['architecture']|lower == "aarch64" or ansible_facts['architecture']|lower == "x86_64")
 
 - name: "Making Caido executable"
   shell: |
@@ -170,7 +170,7 @@
   args:
     executable: /bin/bash
   become: true
-  when: caido_update_required and ansible_facts['distribution'] == "Ubuntu"
+  when: caido_update_required and (ansible_facts['architecture']|lower == "aarch64" or ansible_facts['architecture']|lower == "x86_64")
 
 # --- Record the newly installed version ---
 

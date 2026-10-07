@@ -118,6 +118,14 @@
   register: sqlcmd_exists
   changed_when: false
 
+- name: "Ensure /opt/current_versions exists"
+  file:
+    path: /opt/current_versions
+    state: directory
+    mode: "0755"
+  become: true
+  become_method: sudo
+
 - name: "Create an empty sqlcmd_current_version.txt"
   file:
     path: "/opt/current_versions/sqlcmd_current_version.txt"
@@ -177,6 +185,8 @@
 
 - name: "Refreshing .bashrc"
   shell: ". {{ ansible_facts['env']['HOME'] }}/.bashrc"
+  args:
+    executable: /bin/bash
   changed_when: false
 
 - name: "Check that the wsgidav environment is healthy"

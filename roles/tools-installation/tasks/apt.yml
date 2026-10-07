@@ -17,7 +17,7 @@
   changed_when: false
 
   
-- name: "Installing Tools via Apt - Ubuntu"
+- name: "Installing Tools via Apt - Ubuntu Aarch64"
   package:
     name:
       - jq
@@ -75,9 +75,9 @@
     state: latest
   become: true
   become_method: sudo
-  when: ansible_facts['distribution']|lower == 'ubuntu'
+  when: ansible_facts['distribution']|lower == 'ubuntu' and ansible_facts['architecture']|lower == 'aarch64'
 
-- name: "Installing Tools via Apt - Parrot"
+- name: "Installing Tools via Apt - Parrot x86_64"
   package:
     name:
       - jq
@@ -132,7 +132,64 @@
     state: latest
   become: true
   become_method: sudo
-  when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['distribution']|lower == 'debian'
+  when: ansible_facts['distribution']|lower == 'parrot' and ansible_facts['architecture']|lower == 'x86_64'
+
+- name: "Installing Tools via Apt - Parrot Aarch64"
+  package:
+    name:
+      - jq
+      - rlwrap
+      - flameshot
+      - exiftool
+      - ca-certificates
+      - curl
+      - unrar
+      - ntpdate
+      - gh
+      - pipx
+      - sublime-text
+      - xclip
+      - remmina
+      - nautilus
+      - sqlite3
+      - python3-dev
+      - build-essential
+      - libssl-dev 
+      - libffi-dev
+      - ldap-utils
+      # - powershell
+      - acl
+      - gpg
+      - apt-transport-https
+      - python3-pyftpdlib
+      - fierce
+      - dnsrecon
+      - amass
+      - sublist3r
+      - wireshark
+      - libkrb5-dev
+      - pkg-config
+      - libreadline-dev
+      - libncurses-dev
+      - libfuse2
+      - evolution
+      - cifs-utils
+      - fonts-jetbrains-mono
+      - smbmap
+      - lftp
+      - ncftp
+      - claws-mail
+      - geary
+      - mailutils
+      - sendemail
+      - dbeaver
+      - crowbar
+      - rdesktop
+      - subfinder
+    state: latest
+  become: true
+  become_method: sudo
+  when: ansible_facts['distribution']|lower == 'parrot' and ansible_facts['architecture']|lower == 'aarch64'
 
 - name: "Remove an APT installed package"
   apt:

@@ -29,14 +29,6 @@
   become: true
   when: ansible_facts['distribution']|lower in ['parrot', 'debian', 'ubuntu']
 
-# - name: "Adding VS Code apt repository"
-#   apt_repository:
-#     repo: "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
-#     filename: vscode
-#     state: present
-#   become: true
-#   when: ansible_facts['distribution']|lower in ['parrot', 'debian', 'ubuntu']
-
 - name: "Adding VScode apt repository"
   deb822_repository:
     name: vscode
