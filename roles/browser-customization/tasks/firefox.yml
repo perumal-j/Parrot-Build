@@ -67,7 +67,7 @@
   become_method: sudo
   changed_when: false
 
-- name: Install Firefox native package
+- name: "Install Firefox native package"
   apt:
     name: firefox
     state: present
@@ -78,7 +78,7 @@
 
 - name: "Copying Firefox Policies"
   template:
-    src: "policies.json.j2"
+    src: "firefox-policy.json.j2"
     dest: "/usr/share/firefox-esr/distribution/policies.json" # Parrot
     # dest: "/etc/firefox/policies/policies.json"
   become: true
@@ -97,7 +97,7 @@
 
 - name: "Copying Firefox Policies"
   template:
-    src: "policies.json.j2"
+    src: "firefox-policy.json.j2"
     # dest: "/usr/share/firefox-esr/distribution/policies.json" # Parrot
     dest: "/etc/firefox/policies/policies.json"
   become: true

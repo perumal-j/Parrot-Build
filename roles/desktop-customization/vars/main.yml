@@ -8,6 +8,7 @@ DesktopLaunchers:
   - "obsidian"
   - "burp-suite"
   - "caido"
+  - "flameshot"
 
 AppPaths:
   - "/usr/bin/subl"
@@ -17,6 +18,7 @@ AppPaths:
   - "/usr/local/bin/obsidian"
   - "/usr/bin/burpsuite"
   - "/usr/local/bin/caido"
+  - "/usr/bin/flameshot"
 
 IconPaths:
   - "/opt/flatpak-icons/apps/scalable/sublimetext.svg"
@@ -26,6 +28,7 @@ IconPaths:
   - "/opt/flatpak-icons/apps/scalable/obsidian-icon.svg"
   - "/opt/flatpak-icons/apps/scalable/burp.svg"
   - "/opt/flatpak-icons/apps/scalable/caido.png"
+  - "/opt/flatpak-icons/apps/scalable/flameshot.png"
 
 parrot_apps:
   - name: "sublime-text"
@@ -49,8 +52,9 @@ parrot_apps:
   - name: "caido"
     desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/caido.desktop"
     id: 321
-
-
+  - name: "flameshot"
+    desktop: "{{ ansible_facts['env']['HOME'] }}/.config/mate/panel2.d/default/launchers/flameshot.desktop"
+    id: 331
 
 # ubuntu_apps:
 #   - name: "sublime-text"
@@ -82,5 +86,6 @@ parrot_apps:
 shortcut_name: "flameshot"
 shortcut_command: "flameshot gui"
 shortcut_binding: "<Alt>a"
+mac_shortcut_binding: "<Primary><Alt>a"
 new_slot: "custom6"
 new_path: "/org/mate/desktop/keybindings/{{ new_slot }}/"

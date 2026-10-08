@@ -8,4 +8,7 @@
   when: ansible_facts['distribution']|lower == 'ubuntu'
 
 - include_tasks: flameshot-gui.yml
-  when: ansible_facts['distribution']|lower == 'parrot'
+  when: ansible_facts['distribution']|lower == 'parrot' and ansible_facts['architecture']|lower == 'x86_64'
+
+- include_tasks: mac_flameshot-gui.yml
+  when: ansible_facts['distribution']|lower == 'parrot' or ansible_facts['architecture']|lower == 'aarch64'

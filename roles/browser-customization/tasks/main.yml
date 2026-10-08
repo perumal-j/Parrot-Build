@@ -1,4 +1,5 @@
 ---
 - include_tasks: "burpsuite.yml"
 - include_tasks: "firefox.yml"
+- include_tasks: "brave-browser.yml"
 - include_tasks: "caido.yml"

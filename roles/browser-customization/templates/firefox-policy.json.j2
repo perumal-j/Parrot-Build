@@ -14,7 +14,7 @@
       "StartPage": "homepage"
     },
     "SearchEngines": {
-      "Default": "DuckDuckGo",
+      "Default": "Google",
       "PreventInstalls": true
     },
     "SearchSuggestEnabled": false,
@@ -44,12 +44,14 @@
       "Cryptomining": true,
       "Fingerprinting": true
     },
-    "Extensions": {
-      "Install": [{% for extension in FirefoxExtensions %}
-"https://addons.mozilla.org/firefox/downloads/latest/{{ extension }}/latest.xpi"{{ "," if not loop.last }}
-{% endfor %}],
-      "Uninstall": ["bad_addon_id@mozilla.org"],
-      "Locked":  ["addon_id@mozilla.org"]
+    "ExtensionSettings": {
+{% for ext in FirefoxExtensions %}
+      "{{ ext.id }}": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/{{ ext.slug }}/latest.xpi"{% if ext.pin | default(false) %},
+        "default_area": "navbar"{% endif %}
+      }{{ "," if not loop.last }}
+{% endfor %}
     },
     "FirefoxHome": {
       "Search": true,
@@ -62,8 +64,7 @@
     "HardwareAcceleration": true,
     "NetworkPrediction": false,
     "PopupBlocking": {
-      "Allow": ["https://crypt.parrot.sh",
-                "https://pad.parrot.sh"],
+      "Allow": [],
       "Default": false,
       "Locked": false
     },

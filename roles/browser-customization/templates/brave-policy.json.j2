@@ -1,0 +1,47 @@
+{
+  "BookmarkBarEnabled": true,
+  "ShowHomeButton": true,
+  "HomepageLocation": "https://google.com",
+  "HomepageIsNewTabPage": false,
+  "RestoreOnStartup": 4,
+  "RestoreOnStartupURLs": ["https://google.com"],
+
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "Google",
+  "DefaultSearchProviderKeyword": "ddg",
+  "SearchSuggestEnabled": false,
+
+  "MetricsReportingEnabled": false,
+  "BraveP3AEnabled": false,
+  "BraveStatsPingEnabled": false,
+  "UserFeedbackAllowed": false,
+  "PromotionsEnabled": false,
+
+  "BlockThirdPartyCookies": true,
+  "DnsOverHttpsMode": "off",
+  "NetworkPredictionOptions": 2,
+
+  "DefaultBrowserSettingEnabled": false,
+  "HardwareAccelerationModeEnabled": true,
+  "PromptForDownloadLocation": true,
+
+  "PopupsAllowedForUrls": [
+  ],
+
+  "BraveRewardsDisabled": true,
+  "BraveWalletDisabled": true,
+  "BraveVPNDisabled": true,
+  "BraveAIChatEnabled": false,
+
+  "CACertificates": ["{{ burp_ca_b64 }}"],
+
+  "ExtensionSettings": {
+{% for ext in BraveExtensions %}
+    "{{ ext.id }}": {
+      "installation_mode": "force_installed",
+      "update_url": "https://clients2.google.com/service/update2/crx",
+      "toolbar_pin": "{{ ext.pin | default('default_unpinned') }}"
+    }{{ "," if not loop.last }}
+{% endfor %}
+  }
+}

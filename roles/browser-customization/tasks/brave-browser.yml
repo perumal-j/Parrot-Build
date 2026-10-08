@@ -22,3 +22,31 @@
     update_cache: yes  # This replaces 'sudo apt update'
   become: true
   become_method: sudo
+
+- name: "Create Brave policy dir"
+  file:
+    path: /etc/brave/policies/managed
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+  become_method: sudo
+
+- name: Read Burp CA as base64 (DER, single line)
+  slurp:
+    src: /usr/local/share/ca-certificates/BurpSuiteCA.der
+  register: burp_ca
+
+- name: Deploy Brave policy
+  template:
+    src: brave-policy.json.j2
+    dest: /etc/brave/policies/managed/policy.json
+    owner: root
+    group: root
+    mode: "0644"
+    validate: python3 -m json.tool %s
+  vars:
+    burp_ca_b64: "{{ burp_ca.content }}"
+  become: true
+  become_method: sudo

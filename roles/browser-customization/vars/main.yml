@@ -1,9 +1,25 @@
 ---
+# FirefoxExtensions:
+#   - "darkreader"
+#   - "foxyproxy-standard"
+#   - "bitwarden-password-manager"
+#   - "hacktools"
+#   - "wappalyzer"
+
 FirefoxExtensions:
-  - "darkreader"
-  - "foxyproxy-standard"
-  - "bitwarden-password-manager"
-  - "hacktools"
+  - { slug: darkreader, id: "addon@darkreader.org", pin: true }
+  - { slug: foxyproxy-standard, id: "foxyproxy@eric.h.jung", pin: true }
+  - { slug: bitwarden-password-manager, id: "{446900e4-71c2-419f-a6a7-df9c091e268b}", pin: true }
+  - { slug: hacktools, id: "{f1423c11-a4e2-4709-a0f8-6d6a68c83d08}", pin: true }
+  - { slug: wappalyzer, id: "wappalyzer@crunchlabz.com", pin: true }
+
+BraveExtensions:
+  - { id: gcknhkkoolaabfmlnjonogaaifnjlfnp, pin: force_pinned } # FoxyProxy
+  - { id: eimadpbcbfnmbkopoojfekhnkhdbieeh, pin: force_pinned } # Dark Reader
+  - { id: nngceckbapebfimnlniiiahkandclblb, pin: force_pinned } # Bitwarden
+  - { id: cmbndhnoonmghfofefkcccljbkdpamhi, pin: force_pinned } # Hack Tools
+  - { id: gppongmhjkpfnbhagpmjfkannfbllamg, pin: force_pinned } # Wappalyzer
+  - { id: nfbcfginnecenjncdjhaminfcienmehn, pin: force_pinned } # Save Webpages Offline As MHTML
 
 burpsuite_extras_dir: "/usr/local/lib/burpsuite-extras"
 burpsuite_extras_jars:
@@ -15,3 +31,4 @@ burpsuite_extras_jars:
     jar: jython-standalone.jar
     url: https://repo1.maven.org/maven2/org/python/jython-standalone/2.7.3/jython-standalone-2.7.3.jar
     checksum: sha256:da7f3d829b148bcfa86b059dc964e3a8556fedb021096c8db07e30c66faab9b4
+
