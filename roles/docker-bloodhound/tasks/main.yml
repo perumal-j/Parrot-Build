@@ -4,13 +4,16 @@
     os_id: "{{ ansible_facts['distribution']|lower }}"
   changed_when: false
 
-- include_tasks: docker-debian.yml
-  when: os_id == 'debian' or os_id == 'parrot'
+# - include_tasks: docker-debian.yml
+#   when: os_id == 'debian' or os_id == 'parrot'
 
-- include_tasks: docker-ubuntu.yml
-  when: os_id == 'ubuntu'
+# - include_tasks: docker-ubuntu.yml
+#   when: os_id == 'ubuntu'
+
+- include_tasks: bloodhound-cli.yml
+  when: ansible_facts['architecture']|lower == 'aarch64'
 
 # - include_tasks: bloodhound.yml
 
-- include_tasks: ingestor-rusthound-ce.yml
-  when: os_id == 'debian' or os_id == 'parrot' or os_id == 'ubuntu'
+# - include_tasks: ingestor-rusthound-ce.yml
+#   when: os_id == 'debian' or os_id == 'parrot' or os_id == 'ubuntu'
