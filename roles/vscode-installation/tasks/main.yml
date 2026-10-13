@@ -54,7 +54,7 @@
 - name: "Installing Visual Studio Code Extensions"
   command: "code --install-extension {{ item }} --force"
   loop:
-    - Codeium.codeium
+    # - Codeium.codeium
     - snyk-security.snyk-vulnerability-scanner
     - ms-python.python
     - DEVSENSE.phptools-vscode
@@ -67,3 +67,28 @@
   register: ext_install
   changed_when: "'is already installed' not in ext_install.stdout"
   ignore_errors: true
+
+- name: "Check for the presence of Codeium Extensions"
+  stat:
+    path: "/tmp/codeium-1.48.2.vsix"
+  register: codeium_ext
+  changed_when: false
+
+- name: "Copying Codeium Extensions to /tmp"
+  copy:
+    src: "codeium-1.48.2.vsix"
+    dest: "/tmp/codeium-1.48.2.vsix"
+    mode: 0755
+  when: not codeium_ext.stat.exists
+
+- name: "List installed VS Code extensions"
+  command: "code --list-extensions"
+  register: installed_vscode_extensions
+  changed_when: false
+
+- name: "Install Codeium Extension"
+  command: "code --install-extension /tmp/codeium-1.48.2.vsix"
+  when: "'codeium.codeium' not in (installed_vscode_extensions.stdout_lines | map('lower') | list)"
+  register: install_result
+  changed_when: "'successfully installed' in install_result.stdout"
+
