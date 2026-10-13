@@ -30,5 +30,5 @@
     - role: "roles/browser-customization"
     - role: "roles/logging-config"
     - role: "roles/obsidian-git"
-    # - role: "roles/docker-bloodhound"
+    - role: "roles/docker-bloodhound"
     - role: "roles/desktop-customization"

@@ -1,17 +1,135 @@
 ---
-- name: "Downloading BloodHound CLI"
+- name: "Check the existence of bloodhound_cli_latest.json file in /tmp"
+  stat:
+    path: /tmp/bloodhound_cli_latest.json
+  register: bloodhound_cli_latest_version
+  changed_when: false
+
+- name: "Downloading Latest Version of bloodhound-cli"
+  uri:
+    url: "https://api.github.com/repos/SpecterOps/bloodhound-cli/releases/latest"
+    method: GET
+    headers:
+      Authorization: "token {{ github_api_key }}"
+    dest: /tmp/bloodhound_cli_latest.json
+    mode: '0640'
+  when: not bloodhound_cli_latest_version.stat.exists
+
+- name: "Read caido-latest.json from disk"
+  slurp:
+    src: /tmp/bloodhound_cli_latest.json
+  register: bloodhound_cli_release_file
+  changed_when: false
+
+- name: "Parse Bloodhound CLI Release JSON"
+  set_fact:
+    bloodhound_cli_release_json: "{{ bloodhound_cli_release_file.content | b64decode | from_json }}"
+  changed_when: false
+
+- name: "Set Latest version of Bloodhound CLI"
+  set_fact:
+    bloodhound_cli_latest_version: "{{ bloodhound_cli_release_json.tag_name }}"
+  changed_when: false
+
+- name: "Show Latest version of Bloodhound CLI"
+  debug:
+    msg: "Latest version of Bloodhound CLI: {{ bloodhound_cli_latest_version }} Found."
+
+- name: "Check the existence of /opt/current_versions directory"
+  stat:
+    path: "/opt/current_versions"
+  register: current_versions
+  changed_when: false
+
+- name: "Creating /opt/current_versions directory"
+  file:
+    path: "/opt/current_versions"
+    state: directory
+    mode: 0755
+  become: true
+  become_method: sudo
+  when: not current_versions.stat.exists
+
+- name: "Check for bloodhound-cli existing version reference file"
+  stat:
+    path: /opt/current_versions/current_bloodhound_cli_version.txt
+  register: bloodhound_cli_version_file
+  changed_when: false
+
+- name: "Read currently installed bloodhound-cli version"
+  slurp:
+    src: /opt/current_versions/current_bloodhound_cli_version.txt
+  register: bloodhound_cli_installed_version_raw
+  when: bloodhound_cli_version_file.stat.exists
+  changed_when: false
+
+- name: "Set installed bloodhound_cli version fact (from file)"
+  set_fact:
+    bloodhound_cli_installed_version: "{{ bloodhound_cli_installed_version_raw.content | b64decode | trim }}"
+  when: bloodhound_cli_version_file.stat.exists
+  changed_when: false
+
+- name: "Set installed version fact (no file present yet)"
+  set_fact:
+    bloodhound_cli_installed_version: "none"
+  when: not bloodhound_cli_version_file.stat.exists
+  changed_when: false
+
+- name: "Show Bloodhound CLI installed vs latest version"
+  debug:
+    msg: "Installed: {{ bloodhound_cli_installed_version }} | Latest: {{ bloodhound_cli_latest_version }}"
+
+- name: "Determine if Bloodhound CLI update is required"
+  set_fact:
+    bloodhound_cli_update_required: "{{ bloodhound_cli_installed_version != bloodhound_cli_latest_version }}"
+
+- name: "Show whether Bloodhound CLI update will be performed"
+  debug:
+    msg: "Update required: {{ bloodhound_cli_update_required }}"
+
+- name: "Downloading BloodHound CLI for x86_64"
+  get_url:
+    url: "https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz"
+    dest: "/tmp/bloodhound-cli-linux-amd64.tar.gz"
+    mode: '0755'
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  when: ansible_facts['architecture']|lower == 'x86_64' and bloodhound_cli_update_required
+
+- name: "Downloading BloodHound CLI for Aarch64"
   get_url:
     url: "https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-arm64.tar.gz"
     dest: "/tmp/bloodhound-cli-linux-arm64.tar.gz"
     mode: '0755'
     owner: "{{ ansible_facts['env']['USER'] }}"
     group: "{{ ansible_facts['env']['USER'] }}"
+  when: ansible_facts['architecture']|lower == 'aarch64' and bloodhound_cli_update_required
+
+- name: "Update bloodhound_cli version reference file after successful install"
+  copy:
+    content: "{{ bloodhound_cli_latest_version }}"
+    dest: /opt/current_versions/current_bloodhound_cli_version.txt
+    mode: '0644'
+  become: true
+  become_method: sudo
+  when: bloodhound_cli_update_required
 
 - name: "Check the presence of /usr/local/bin/bloodhound-cli"
   stat:
     path: "/usr/local/bin/bloodhound-cli"
   register: bloodhound_cli
   changed_when: false
+
+- name: "Extracting /tmp/bloodhound-cli-linux-amd64.tar.gz"
+  unarchive:
+    src: "/tmp/bloodhound-cli-linux-amd64.tar.gz"
+    dest: "/usr/local/bin"
+    mode: '0755'
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  when: (not bloodhound_cli.stat.exists and ansible_facts['architecture']|lower == 'x86_64') or (bloodhound_cli_update_required and ansible_facts['architecture']|lower == 'x86_64')
 
 - name: "Extracting /tmp/bloodhound-cli-linux-arm64.tar.gz"
   unarchive:
@@ -22,116 +140,60 @@
     group: "{{ ansible_facts['env']['USER'] }}"
   become: true
   become_method: sudo
-  when: not bloodhound_cli.stat.exists
+  when: (not bloodhound_cli.stat.exists and ansible_facts['architecture']|lower == 'aarch64') or (bloodhound_cli_update_required and ansible_facts['architecture']|lower == 'aarch64')
+
+- name: "Check the presence of ~/.config/bloodhound/bloodhound.config.json"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/bloodhound/bloodhound.config.json"
+  register: bloodhound_config
+  changed_when: false
 
 # bloodhound-cli
+- name: "Execute bloodhound-cli"
+  shell: |
+    /usr/local/bin/bloodhound-cli
+  args:
+    executable: /bin/bash
+  when: not bloodhound_config.stat.exists
+
+- name: "Check the presence of ~/.config/bloodhound/docker-compose.yml"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/bloodhound/docker-compose.yml"
+  register: docker_compose_yml
+  changed_when: false
+
 # bloodhound-cli check
+- name: "Execute bloodhound-cli check"
+  shell: |
+    /usr/local/bin/bloodhound-cli check
+  args:
+    executable: /bin/bash
+  when: not docker_compose_yml.stat.exists
+
 # bloodhound-cli config set bind_addr 0.0.0.0:8888
+- name: "Execute bloodhound-cli config set bind_addr 0.0.0.0:8888"
+  shell: |
+    /usr/local/bin/bloodhound-cli config set bind_addr 0.0.0.0:8888
+  args:
+    executable: /bin/bash
+
 # bloodhound-cli config set root_url http://127.0.0.1:8888
+- name: "Execute bloodhound-cli config set root_url http://127.0.0.1:8888"
+  shell: |
+    /usr/local/bin/bloodhound-cli config set root_url http://127.0.0.1:8888
+  args:
+    executable: /bin/bash
 
-# Replace - ${BLOODHOUND_HOST:-127.0.0.1}:${BLOODHOUND_PORT:-8080}:8080 with below line in docker-compose.yml file
-# - ${BLOODHOUND_HOST:-127.0.0.1}:${BLOODHOUND_PORT:-8080}:8888
+- name: "Check the presence of ~/.config/bloodhound/docker-compose.yml"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/bloodhound/docker-compose.yml"
+  register: docker_compose_post_check
+  changed_when: false
 
+- name: "Change a line in file ~/.config/bloodhound/docker-compose.yml"
+  replace:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/bloodhound/docker-compose.yml"
+    regexp: '(\$\{BLOODHOUND_PORT:-8080\}):8080'
+    replace: '${BLOODHOUND_PORT:-8888}:8888'
+  when: docker_compose_post_check.stat.exists
 
-
-# ================================================================
-
-# # Copyright 2023 Specter Ops, Inc.
-# #
-# # Licensed under the Apache License, Version 2.0
-# # you may not use this file except in compliance with the License.
-# # You may obtain a copy of the License at
-# #
-# #     http://www.apache.org/licenses/LICENSE-2.0
-# #
-# # Unless required by applicable law or agreed to in writing, software
-# # distributed under the License is distributed on an "AS IS" BASIS,
-# # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# # See the License for the specific language governing permissions and
-# # limitations under the License.
-# #
-# # SPDX-License-Identifier: Apache-2.0
-
-# services:
-#   app-db:
-#     labels:
-#       name: "bhce_postgres"
-#     image: docker.io/library/postgres:18
-#     environment:
-#       - PGUSER=${POSTGRES_USER:-bloodhound}
-#       - POSTGRES_USER=${POSTGRES_USER:-bloodhound}
-#       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-bloodhoundcommunityedition}
-#       - POSTGRES_DB=${POSTGRES_DB:-bloodhound}
-#     # Database ports are disabled by default. Please change your database password to something secure before uncommenting
-#     # ports:
-#     #   - 127.0.0.1:${POSTGRES_PORT:-5432}:5432
-#     volumes:
-#       - postgres-data:/var/lib/postgresql
-#     healthcheck:
-#       test:
-#         [
-#           "CMD-SHELL",
-#           "pg_isready -U ${POSTGRES_USER:-bloodhound} -d ${POSTGRES_DB:-bloodhound} -h 127.0.0.1 -p 5432"
-#         ]
-#       interval: 10s
-#       timeout: 5s
-#       retries: 5
-#       start_period: 30s
-
-#   graph-db:
-#     labels:
-#       name: "bhce_neo4j"
-#     image: docker.io/library/neo4j:4.4
-#     environment:
-#       - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_SECRET:-bloodhoundcommunityedition}
-#       - NEO4J_dbms_allow__upgrade=${NEO4J_ALLOW_UPGRADE:-true}
-#     # Database ports are disabled by default. Please change your database password to something secure before uncommenting
-#     ports:
-#       - 127.0.0.1:${NEO4J_DB_PORT:-7687}:7687
-#       - 127.0.0.1:${NEO4J_WEB_PORT:-7474}:7474
-#     volumes:
-#       - ${NEO4J_DATA_MOUNT:-neo4j-data}:/data
-#     healthcheck:
-#       test:
-#         [
-#           "CMD-SHELL",
-#           "wget -O /dev/null -q http://localhost:7474 || exit 1"
-#         ]
-#       interval: 10s
-#       timeout: 5s
-#       retries: 5
-#       start_period: 30s
-
-#   bloodhound:
-#     labels:
-#       name: bhce_bloodhound
-#     image: docker.io/specterops/bloodhound:${BLOODHOUND_TAG:-latest}
-#     environment:
-#       - bhe_disable_cypher_complexity_limit=${bhe_disable_cypher_complexity_limit:-false}
-#       - bhe_enable_cypher_mutations=${bhe_enable_cypher_mutations:-false}
-#       - bhe_graph_query_memory_limit=${bhe_graph_query_memory_limit:-2}
-#       - bhe_database_connection=user=${POSTGRES_USER:-bloodhound} password=${POSTGRES_PASSWORD:-bloodhoundcommunityedition} dbname=${POSTGRES_DB:-bloodhound} host=app-db
-#       - bhe_neo4j_connection=neo4j://${NEO4J_USER:-neo4j}:${NEO4J_SECRET:-bloodhoundcommunityedition}@graph-db:7687/
-#       - bhe_recreate_default_admin=${bhe_recreate_default_admin:-false}
-#       - bhe_enable_text_logger=${bhe_enable_text_logger:-true}
-#       ### Add additional environment variables you wish to use here.
-#       ### For common configuration options that you might want to use environment variables for, see `.env.example`
-#       ### example: bhe_database_connection=${bhe_database_connection}
-#       ### The left side is the environment variable you're setting for bloodhound, the variable on the right in `${}`
-#       ### is the variable available outside of Docker
-#     ports:
-#       ### Default to localhost to prevent accidental publishing of the service to your outer networks
-#       ### These can be modified by your .env file or by setting the environment variables in your Docker host OS
-#       - ${BLOODHOUND_HOST:-127.0.0.1}:${BLOODHOUND_PORT:-8080}:8080
-#     ### Uncomment to use your own bloodhound.config.json to configure the application
-#     volumes:
-#       - ./bloodhound.config.json:/bloodhound.config.json:ro
-#     depends_on:
-#       app-db:
-#         condition: service_healthy
-#       graph-db:
-#         condition: service_healthy
-
-# volumes:
-#   neo4j-data:
-#   postgres-data:

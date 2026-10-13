@@ -50,7 +50,7 @@
 
 - name: "Adding current user to docker group"
   user:
-    name: "{{ ansible_facts['user_id'] }}"
+    name: "{{ ansible_facts['env']['USER'] }}"
     groups: docker
     append: true
   become: true
