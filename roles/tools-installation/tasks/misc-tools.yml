@@ -502,3 +502,23 @@
   become: true
   become_method: sudo
   when: ansible_facts['distribution']|lower == 'ubuntu'
+
+- name: "Check for the presence of Devin CLI"
+  stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin/devin"
+  register: devin
+  changed_when: false
+
+- name: "Install Devin CLI _ curl -fsSL https://cli.devin.ai/install.sh | bash"
+  shell: "curl -fsSL https://cli.devin.ai/install.sh | bash"
+  when: not devin.stat.exists
+
+- name: "Move Devin CLI binary to /usr/local/bin"
+  copy:
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/bin/devin"
+    dest: "/usr/local/bin/devin"
+    owner: "{{ ansible_facts['env']['USER'] }}"
+    group: "{{ ansible_facts['env']['USER'] }}"
+    mode: 0755
+  become: true
+  become_method: sudo
