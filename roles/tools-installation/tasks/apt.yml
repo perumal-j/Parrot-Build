@@ -72,6 +72,9 @@
       - mailutils
       - sendemail
       - rdesktop
+      - libldap2-dev
+      - libsasl2-dev
+      - python3-dev
     state: latest
   become: true
   become_method: sudo
@@ -129,6 +132,8 @@
       - crowbar
       - rdesktop
       - subfinder
+      - libldap2-dev
+      - libsasl2-dev
     state: latest
   become: true
   become_method: sudo
@@ -186,6 +191,8 @@
       - crowbar
       - rdesktop
       - subfinder
+      - libldap2-dev
+      - libsasl2-dev
     state: latest
   become: true
   become_method: sudo

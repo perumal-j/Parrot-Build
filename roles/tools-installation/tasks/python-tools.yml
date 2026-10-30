@@ -140,19 +140,25 @@
   register: donpapi
   changed_when: false
 
+- name: "Check if adidnsdump exists"
+  stat:
+    path: "/usr/local/bin/adidnsdump"
+  register: adidnsdump
+  changed_when: false
+
 - name: "Ensure temporary bin directory exists"
   file:
     path: "{{ temp_bin_dir }}"
     state: directory
     mode: '0755'
 
-- name: "Installing NetExec, wafw00f, & DonPAPI via pipx"
+- name: "Installing NetExec, wafw00f, DonPAPI & adidnsdump via pipx"
   shell:
     cmd: pipx install {{ item.url }}
   environment:
     PIPX_BIN_DIR: "{{ temp_bin_dir }}"
   loop: "{{ PIPToolsGit }}"
-  when: not netexec.stat.exists or not wafw00f.stat.exists or not donpapi.stat.exists
+  when: not netexec.stat.exists or not wafw00f.stat.exists or not donpapi.stat.exists or not adidnsdump.stat.exists
 
 - name: "Find all generated executables in temporary directory"
   find:
@@ -318,11 +324,25 @@
     cmd: "uv tool upgrade --all"
   changed_when: false
 
-- name: "Check the presence of tools in repositories"
+- name: "Check the presence of targetedKerberoast tool"
   stat:
-    path: /usr/local/bin/{{ item.name }}
-  loop: "{{ repositories }}"
-  register: repositories_tool
+    path: /usr/local/bin/targetedKerberoast
+  register: targetedkerberoast_tool
+
+- name: "Check the presence of enum4linux-ng tool"
+  stat:
+    path: /usr/local/bin/enum4linux-ng
+  register: enum4linux_tool
+
+- name: "Check the presence of windapsearch tool"
+  stat:
+    path: /usr/local/bin/windapsearch
+  register: windapsearch_tool
+
+- name: "Check the presence of noPac tool"
+  stat:
+    path: /usr/local/bin/noPac
+  register: nopac_tool
 
 - name: "Copying Github Download Template"
   template:
@@ -332,22 +352,7 @@
 
 - name: "Executing Bash Script to Install Python UV"
   shell: "/tmp/uv-manager.sh"
-  when: repositories_tool.results | selectattr('stat.exists') | list | length == 0
-
-# - name: "Check if targetedKerberoast exists"
-#   stat:
-#     path: "/usr/local/bin/targetedKerberoast"
-#   register: targetedKerberoast
-#   changed_when: false
-
-# - name: "Copying targetedKerberoast to .local/bin"
-#   copy:
-#     src: "/tmp/targetedKerberoast/targetedKerberoast.py"
-#     dest: "/usr/local/bin/targetedKerberoast"
-#     mode: 0755
-#     owner: "{{ ansible_facts['env']['USER'] }}"
-#     group: "{{ ansible_facts['env']['USER'] }}"
-#   when: not targetedKerberoast.stat.exists
+  when: not targetedkerberoast_tool.stat.exists or not enum4linux_tool.stat.exists or not windapsearch_tool.stat.exists or not nopac_tool.stat.exists
 
 - name: "Check presence of PKINITtools"
   stat:

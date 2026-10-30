@@ -119,14 +119,39 @@
   register: passthecert
   changed_when: false
 
+- name: "Check the presence of /opt/DomainPasswordSpray"
+  stat:
+    path: "/opt/DomainPasswordSpray"
+  register: domainpasswordspray
+  changed_when: false
+
+- name: "Check the presence of /opt/LAPSToolkit"
+  stat:
+    path: "/opt/LAPSToolkit"
+  register: lapstoolkit
+  changed_when: false
+
+- name: "Check the presence of /opt/CVE-2021-1675"
+  stat:
+    path: "/opt/CVE-2021-1675"
+  register: cve_2021_1675
+  changed_when: false
+
+- name: "Check the presence of /opt/ADRecon"
+  stat:
+    path: "/opt/ADRecon"
+  register: adrecon_tool
+  changed_when: false
+
 - name: "Installing Tools from GitHub Repositories"
   git:
     repo: "{{ item.url }}"
     dest: "{{ item.destination }}"
+    force: yes
   loop: "{{ GitHubTools }}"
   become: true
   become_method: sudo
-  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists or not payloadsallthethings.stat.exists or not xss_payload_list.stat.exists or not subbrute.stat.exists or not statistically_likely_usernames.stat.exists or not aspnetCryptTools.stat.exists or not linkedin2username.stat.exists or not mimipenguin.stat.exists or not LaZagne_src.stat.exists or not firefox_decrypt.stat.exists or not petitpotam.stat.exists or not invokethehash.stat.exists or not krbrelayx.stat.exists or not passthecert.stat.exists
+  when: not sec_lists.stat.exists or not sharp_collection.stat.exists or not username_anarchy.stat.exists or not security_wordlist.stat.exists or not static_binaries.stat.exists or not mhtml_converter.stat.exists or not phpbash.stat.exists or not payloadsallthethings.stat.exists or not xss_payload_list.stat.exists or not subbrute.stat.exists or not statistically_likely_usernames.stat.exists or not aspnetCryptTools.stat.exists or not linkedin2username.stat.exists or not mimipenguin.stat.exists or not LaZagne_src.stat.exists or not firefox_decrypt.stat.exists or not petitpotam.stat.exists or not invokethehash.stat.exists or not krbrelayx.stat.exists or not passthecert.stat.exists or not domainpasswordspray.stat.exists or not lapstoolkit.stat.exists or not cve_2021_1675.stat.exists or not adrecon_tool.stat.exists
 
 - name: "Change owner of downloaded GitHub Projects"
   file:

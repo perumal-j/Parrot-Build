@@ -84,6 +84,23 @@ GitHubTools:
     url: "https://github.com/AlmondOffSec/PassTheCert"
     destination: "/opt/PassTheCert"
 
+  - name: DomainPasswordSpray
+    url: "https://github.com/dafthack/DomainPasswordSpray"
+    destination: "/opt/DomainPasswordSpray"
+
+  - name: LAPSToolkit
+    url: "https://github.com/leoloobeek/LAPSToolkit"
+    destination: "/opt/LAPSToolkit"
+
+  - name: CVE-2021-1675
+    url: "https://github.com/cube0x0/CVE-2021-1675"
+    destination: "/opt/CVE-2021-1675"
+
+  - name: ADRecon
+    url: "https://github.com/adrecon/ADRecon"
+    destination: "/opt/ADRecon"
+
+
 UVtools:
   - impacket
   - sshuttle
@@ -95,6 +112,8 @@ UVtools:
   - wsgidav
   - pypykatz
   - coercer
+  - smbmap
+  - gpp-decrypt
 
 temp_bin_dir: "/tmp/uv-bin"
 target_bin_dir: "/usr/local/bin"
@@ -111,6 +130,8 @@ PIPToolsGit:
   - name: DonPAPI
     url: "git+https://github.com/login-securite/DonPAPI"
 
+  - name: adidnsdump
+    url: "git+https://github.com/dirkjanm/adidnsdump#egg=adidnsdump"
 
 UVtoolsGit: 
   - name: Certipy
@@ -137,23 +158,27 @@ repositories:
     url: "https://github.com/ShutdownRepo/targetedKerberoast"
     destination: "/tmp/targetedKerberoast"
 
+  - name: enum4linux-ng
+    url: "https://github.com/cddmp/enum4linux-ng"
+    destination: "/tmp/enum4linux-ng"
+
+  - name: windapsearch
+    url: "https://github.com/ropnop/windapsearch"
+    destination: "/tmp/windapsearch"
+
+  - name: noPac
+    url: "https://github.com/Ridter/noPac"
+    destination: "/tmp/noPac"
+
 
 GitHubReleases:
-  # - repo: "jpillora/chisel"
-  #   regex: "linux_amd64.gz"
-  #   destination: "/opt/chisel"
-
-  # - repo: "jpillora/chisel"
-  #   regex: "windows_amd64.zip"
-  #   destination: "/opt/chisel"
-
   - repo: "peass-ng/PEASS-ng"
     regex: "linpeas"
-    destination: "/opt/peass"
+    destination: "/opt/linpeass"
 
   - repo: "peass-ng/PEASS-ng"
     regex: "winPEAS"
-    destination: "/opt/peass"
+    destination: "/opt/winpeass"
 
   - repo: "SpecterOps/SharpHound"
     regex: "windows_x86.zip"
@@ -195,3 +220,26 @@ GitHubReleases:
     regex: "SocksOverRDP-x64.zip"
     destination: "/opt/SocksOverRDP"
 
+  - repo: "Kevin-Robertson/Inveigh"
+    regex: "Inveigh-net10.0-linux-x64-trimmed-single"
+    destination: "/opt/Inveigh_Linux"
+
+  - repo: "Kevin-Robertson/Inveigh"
+    regex: "Inveigh-net10.0-win-x64-trimmed-single"
+    destination: "/opt/Inveigh_Windows"
+
+  - repo: "Kevin-Robertson/Inveigh"
+    regex: "Inveigh-net10.0"
+    destination: "/opt/Inveigh_net10"
+
+  - repo: "Kevin-Robertson/Inveigh"
+    regex: "Inveigh-net4.6.2"
+    destination: "/opt/Inveigh_net4"
+
+  - repo: "SnaffCon/Snaffler"
+    regex: "Snaffler.exe"
+    destination: "/opt/Snaffler"
+
+  - repo: "Group3r/Group3r"
+    regex: "Group3r.exe"
+    destination: "/opt/Group3r"
