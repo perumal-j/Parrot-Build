@@ -395,6 +395,20 @@
   become_method: sudo
   when: (ligolo_ng_git.changed or ligolo_ng_dist_files.matched == 0) and ansible_facts['distribution']|lower == 'ubuntu'
 
+- name: "Check the presence of chisel source"
+  stat:
+    path: "/opt/chisel/main.go"
+  register: chiseldir
+  changed_when: false
+
+- name: "Remove incomplete chisel directory"
+  file:
+    path: /opt/chisel
+    state: absent
+  become: true
+  become_method: sudo
+  when: not chiseldir.stat.exists
+
 - name: "Build chisel for multiple architectures for Linux"
   command: >
     go build -ldflags="-s -w" -o /opt/chisel/build/chisel-linux_{{ item }} .
@@ -522,3 +536,4 @@
     mode: 0755
   become: true
   become_method: sudo
+
