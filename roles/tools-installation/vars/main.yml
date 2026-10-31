@@ -100,6 +100,10 @@ GitHubTools:
     url: "https://github.com/adrecon/ADRecon"
     destination: "/opt/ADRecon"
 
+  - name: Dehashed
+    url: "https://github.com/sm00v/Dehashed"
+    destination: "/opt/Dehashed"
+
 
 UVtools:
   - impacket
@@ -243,3 +247,7 @@ GitHubReleases:
   - repo: "Group3r/Group3r"
     regex: "Group3r.exe"
     destination: "/opt/Group3r"
+
+  - repo: "trufflesecurity/trufflehog"
+    regex: "tar.gz"
+    destination: "/opt/trufflehog"
