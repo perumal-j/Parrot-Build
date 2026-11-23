@@ -15,6 +15,10 @@
   shell: "/tmp/rust-install.sh"
   when: not rust_exists.stat.exists
 
+- name: "Updating Rust toolchain"
+  command: "/home/perumalj/.cargo/bin/rustup update stable"
+  changed_when: true
+
 - name: "Installing Feroxbuster"
   shell: "{{ ansible_facts['env']['HOME'] }}/.cargo/bin/cargo install feroxbuster"
   changed_when: false

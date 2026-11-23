@@ -104,6 +104,10 @@ GitHubTools:
     url: "https://github.com/sm00v/Dehashed"
     destination: "/opt/Dehashed"
 
+  - name: PowerSploit
+    url: "https://github.com/PowerShellMafia/PowerSploit"
+    destination: "/opt/PowerSploit"
+
 
 UVtools:
   - impacket

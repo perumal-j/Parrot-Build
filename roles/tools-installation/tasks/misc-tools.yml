@@ -537,3 +537,19 @@
   become: true
   become_method: sudo
 
+- name: "Check for the presence of PowerView.ps1 in /opt"
+  stat:
+    path: "/opt/PowerView.ps1"
+  register: powerview
+  changed_when: false
+
+- name: "Download PowerView.ps1 to /opt"
+  get_url:  
+    url: https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/refs/heads/master/Recon/PowerView.ps1  
+    dest: /opt/PowerView.ps1  
+    mode: 0755  
+    owner: "{{ ansible_facts['env']['USER'] }}"  
+    group: "{{ ansible_facts['env']['USER'] }}"
+  become: true
+  become_method: sudo
+  when: not powerview.stat.exists
