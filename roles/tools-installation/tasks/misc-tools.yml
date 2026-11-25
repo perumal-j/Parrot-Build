@@ -153,21 +153,21 @@
 
 - name: "Downloading Sqlcmd"
   get_url:
-    url: "https://github.com/microsoft/go-sqlcmd/releases/download/{{ sqlcmd_latest_version }}/sqlcmd-linux-amd64.tar.bz2"
+    url: "https://github.com/microsoft/go-sqlcmd/releases/download/{{ sqlcmd_current_version }}/sqlcmd-linux-amd64.tar.bz2"
     dest: "/tmp/sqlcmd-linux-amd64.tar.bz2"
     mode: '0640'
     headers:
       Authorization: "token {{ github_api_key }}"
   when: sqlcmd_update_required
 
-- name: "Store latest version in the current version file"
-  copy:
-    dest: "/opt/current_versions/sqlcmd_current_version.txt"
-    content: "{{ sqlcmd_latest_version }}"
-    mode: "0644"
-  become: true
-  become_method: sudo
-  when: sqlcmd_update_required
+# - name: "Store latest version in the current version file"
+#   copy:
+#     dest: "/opt/current_versions/sqlcmd_current_version.txt"
+#     content: "{{ sqlcmd_latest_version }}"
+#     mode: "0644"
+#   become: true
+#   become_method: sudo
+#   when: sqlcmd_update_required
 
 - name: "Extracting Sqlcmd"
   unarchive:
