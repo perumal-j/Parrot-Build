@@ -108,6 +108,9 @@ GitHubTools:
     url: "https://github.com/PowerShellMafia/PowerSploit"
     destination: "/opt/PowerSploit"
 
+  - name: UACME
+    url: "https://github.com/hfiref0x/UACME"
+    destination: "/opt/UACME"
 
 UVtools:
   - impacket
