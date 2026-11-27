@@ -125,6 +125,7 @@ UVtools:
   - coercer
   - smbmap
   - gpp-decrypt
+  - evil-winrm-py
 
 temp_bin_dir: "/tmp/uv-bin"
 target_bin_dir: "/usr/local/bin"
